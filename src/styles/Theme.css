@@ -1,0 +1,109 @@
+/* ✅ Global colorful theme */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #f9f9ff, #e6f7ff);
+  color: #222;
+}
+
+/* ✅ Common Container */
+.container {
+  max-width: 850px;
+  margin: auto;
+  padding: 20px;
+}
+
+/* ✅ Card UI */
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.08);
+  margin-bottom: 18px;
+  border: 1px solid #eee;
+}
+
+/* ✅ Headings */
+h2 {
+  color: #1a2b4c;
+}
+h3 {
+  color: #2b3a67;
+}
+
+/* ✅ Input fields */
+input, select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  outline: none;
+  margin-bottom: 12px;
+  transition: 0.2s;
+}
+
+input:focus, select:focus {
+  border-color: #4a90e2;
+  box-shadow: 0px 0px 8px rgba(74, 144, 226, 0.4);
+}
+
+/* ✅ Buttons */
+button {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  background: linear-gradient(135deg, #4a90e2, #0077ff);
+  color: white;
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: scale(1.03);
+  opacity: 0.95;
+}
+
+button:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+/* ✅ Navbar colorful */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, #ff6a00, #ee0979);
+  color: white;
+  border-radius: 14px;
+  margin-bottom: 20px;
+  box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+.navbar h3 {
+  margin: 0;
+  cursor: pointer;
+  color: white;
+}
+
+.navbar span {
+  background: rgba(255, 255, 255, 0.25);
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.navbar-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.navbar-buttons button {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.navbar-buttons button:hover {
+  background: rgba(255, 255, 255, 0.32);
+}
