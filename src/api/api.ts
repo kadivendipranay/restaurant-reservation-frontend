@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://127.0.0.1:5000/api",
+  baseURL: "https://restaurant-reservation-backend-6va5.onrender.com/api",
 });
 
 API.interceptors.request.use((req) => {
