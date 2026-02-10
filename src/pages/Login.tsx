@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import API from "../api/api";
 import Navbar from "../components/Navbar";
@@ -12,20 +12,6 @@ export default function Login() {
 
   const [loading, setLoading] = useState(false);
 
-  // ✅ Auto redirect if already logged in (runs ONCE)
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const role = (localStorage.getItem("role") || "").toUpperCase();
-
-    if (!token) return;
-
-    if (role === "ADMIN") {
-      window.location.replace("/#/admin");
-    } else {
-      window.location.replace("/#/user");
-    }
-  }, []);
-
   const saveTokenAndRedirect = (token: string) => {
     localStorage.setItem("token", token);
 
@@ -36,7 +22,7 @@ export default function Login() {
 
     alert(`✅ Login successful | Role: ${role}`);
 
-    // 🔥 FULL reload so App reads fresh role (ADMIN + USER both)
+    // 🔥 Single redirect point (no loops)
     if (role === "ADMIN") {
       window.location.replace("/#/admin");
     } else {
@@ -115,7 +101,10 @@ export default function Login() {
     <div className="container">
       <Navbar />
 
-      <div className="card" style={{ maxWidth: "420px", margin: "0 auto", padding: "25px" }}>
+      <div
+        className="card"
+        style={{ maxWidth: "420px", margin: "0 auto", padding: "25px" }}
+      >
         <h2 style={{ textAlign: "center", marginBottom: "15px" }}>
           Restaurant Reservation ✅
         </h2>
@@ -127,8 +116,19 @@ export default function Login() {
 
         {activeTab === "LOGIN" && (
           <>
-            <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-            <input placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <input
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+
+            <input
+              placeholder="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
             <button onClick={handleLogin} disabled={loading}>
               {loading ? "Logging in..." : "Login"}
             </button>
@@ -137,9 +137,25 @@ export default function Login() {
 
         {activeTab === "REGISTER" && (
           <>
-            <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
-            <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-            <input placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <input
+              placeholder="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+
+            <input
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+
+            <input
+              placeholder="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
             <button onClick={handleRegister} disabled={loading}>
               {loading ? "Registering..." : "Register"}
             </button>
