@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 import type { ReactNode } from "react";
-import { getSession } from "../utils/auth";
+import { useAuth } from "../context/AuthContext";
 
 type Role = "ADMIN" | "USER";
 
@@ -10,13 +10,13 @@ type Props = {
 };
 
 export default function ProtectedRoute({ children, allowedRole }: Props) {
-  const session = getSession();
+  const { token, role, loading } = useAuth();
 
-  if (!session) {
-    return <Navigate to="/login" replace />;
-  }
+  if (loading) return null;
 
-  if (allowedRole && session.role !== allowedRole) {
+  if (!token) return <Navigate to="/login" replace />;
+
+  if (allowedRole && role !== allowedRole) {
     return <Navigate to="/" replace />;
   }
 
