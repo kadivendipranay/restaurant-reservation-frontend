@@ -1,5 +1,6 @@
 import { Navigate } from "react-router-dom";
 import type { ReactNode } from "react";
+import { getToken, getRole } from "../utils/auth";
 
 type Role = "ADMIN" | "USER";
 
@@ -9,23 +10,13 @@ type Props = {
 };
 
 export default function ProtectedRoute({ children, allowedRole }: Props) {
-  const token = localStorage.getItem("token");
-  const rawRole = localStorage.getItem("role");
+  const token = getToken();
+  const role = getRole();
 
-  const role = rawRole?.toUpperCase() as Role | undefined;
-
-  // No token → login
-  if (!token) {
+  if (!token || !role) {
     return <Navigate to="/login" replace />;
   }
 
-  // Invalid or missing role → clear session
-  if (!role || (role !== "ADMIN" && role !== "USER")) {
-    localStorage.clear();
-    return <Navigate to="/login" replace />;
-  }
-
-  // Role mismatch
   if (allowedRole && role !== allowedRole) {
     return <Navigate to="/" replace />;
   }
