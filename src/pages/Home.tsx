@@ -1,16 +1,16 @@
 import { Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Home() {
-  const token = localStorage.getItem("token");
-  const role = (localStorage.getItem("role") || "").toUpperCase();
+  const { token, role } = useAuth();
 
   if (!token) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
   if (role === "ADMIN") {
-    return <Navigate to="/admin" />;
+    return <Navigate to="/admin" replace />;
   }
 
-  return <Navigate to="/user" />;
+  return <Navigate to="/user" replace />;
 }

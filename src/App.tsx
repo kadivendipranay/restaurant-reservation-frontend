@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import AdminPage from "./pages/AdminPage";
@@ -8,10 +9,13 @@ import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
   return (
     <Routes>
+      {/* Root → auto redirect based on auth */}
       <Route path="/" element={<Home />} />
+
+      {/* Login */}
       <Route path="/login" element={<Login />} />
 
-      {/* ADMIN */}
+      {/* Admin Dashboard */}
       <Route
         path="/admin"
         element={
@@ -21,7 +25,7 @@ function App() {
         }
       />
 
-      {/* USER */}
+      {/* User Dashboard */}
       <Route
         path="/user"
         element={
@@ -31,7 +35,8 @@ function App() {
         }
       />
 
-      <Route path="*" element={<Navigate to="/" />} />
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
