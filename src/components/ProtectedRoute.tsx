@@ -10,15 +10,17 @@ type Props = {
 
 export default function ProtectedRoute({ children, allowedRole }: Props) {
   const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role")?.toUpperCase() as Role | null;
+  const rawRole = localStorage.getItem("role");
+
+  const role = rawRole?.toUpperCase() as Role | undefined;
 
   // No token → login
   if (!token) {
     return <Navigate to="/login" replace />;
   }
 
-  // No role found → logout
-  if (!role) {
+  // Invalid or missing role → clear session
+  if (!role || (role !== "ADMIN" && role !== "USER")) {
     localStorage.clear();
     return <Navigate to="/login" replace />;
   }
