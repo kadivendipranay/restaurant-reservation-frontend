@@ -3,36 +3,34 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import AdminPage from "./pages/AdminPage";
 import UserPage from "./pages/UserPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
-  const token = localStorage.getItem("token");
-  const role = (localStorage.getItem("role") || "").toUpperCase();
-
   return (
     <Routes>
-      {/* Home */}
       <Route path="/" element={<Home />} />
-
-      {/* Login */}
       <Route path="/login" element={<Login />} />
 
-      {/* Admin */}
+      {/* ADMIN */}
       <Route
         path="/admin"
         element={
-          token && role === "ADMIN" ? <AdminPage /> : <Navigate to="/login" />
+          <ProtectedRoute allowedRole="ADMIN">
+            <AdminPage />
+          </ProtectedRoute>
         }
       />
 
-      {/* User */}
+      {/* USER */}
       <Route
         path="/user"
         element={
-          token && role === "USER" ? <UserPage /> : <Navigate to="/login" />
+          <ProtectedRoute allowedRole="USER">
+            <UserPage />
+          </ProtectedRoute>
         }
       />
 
-      {/* fallback */}
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
