@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import Navbar from "../components/Navbar";
 
@@ -13,8 +12,6 @@ export default function Login() {
 
   const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate();
-
   // ✅ Auto redirect if already logged in (runs ONCE)
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -23,11 +20,10 @@ export default function Login() {
     if (!token) return;
 
     if (role === "ADMIN") {
-      navigate("/admin", { replace: true });
+      window.location.replace("/#/admin");
     } else {
-      navigate("/user", { replace: true });
+      window.location.replace("/#/user");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const saveTokenAndRedirect = (token: string) => {
@@ -40,8 +36,12 @@ export default function Login() {
 
     alert(`✅ Login successful | Role: ${role}`);
 
-    if (role === "ADMIN") navigate("/admin", { replace: true });
-    else navigate("/user", { replace: true });
+    // 🔥 FULL reload so App reads fresh role (ADMIN + USER both)
+    if (role === "ADMIN") {
+      window.location.replace("/#/admin");
+    } else {
+      window.location.replace("/#/user");
+    }
   };
 
   const handleLogin = async () => {
@@ -115,104 +115,31 @@ export default function Login() {
     <div className="container">
       <Navbar />
 
-      <div
-        className="card"
-        style={{
-          maxWidth: "420px",
-          margin: "0 auto",
-          padding: "25px",
-        }}
-      >
+      <div className="card" style={{ maxWidth: "420px", margin: "0 auto", padding: "25px" }}>
         <h2 style={{ textAlign: "center", marginBottom: "15px" }}>
           Restaurant Reservation ✅
         </h2>
 
-        {/* Tabs */}
         <div style={{ display: "flex", gap: "10px", marginBottom: "18px" }}>
-          <button
-            onClick={() => setActiveTab("LOGIN")}
-            style={{
-              flex: 1,
-              padding: "10px",
-              borderRadius: "10px",
-              background:
-                activeTab === "LOGIN"
-                  ? "linear-gradient(135deg,#0077ff,#00c6ff)"
-                  : "#f1f1f1",
-              color: activeTab === "LOGIN" ? "white" : "black",
-              border: "none",
-            }}
-          >
-            Login
-          </button>
-
-          <button
-            onClick={() => setActiveTab("REGISTER")}
-            style={{
-              flex: 1,
-              padding: "10px",
-              borderRadius: "10px",
-              background:
-                activeTab === "REGISTER"
-                  ? "linear-gradient(135deg,#00c853,#00bfa5)"
-                  : "#f1f1f1",
-              color: activeTab === "REGISTER" ? "white" : "black",
-              border: "none",
-            }}
-          >
-            Register
-          </button>
+          <button onClick={() => setActiveTab("LOGIN")}>Login</button>
+          <button onClick={() => setActiveTab("REGISTER")}>Register</button>
         </div>
 
-        {/* LOGIN */}
         {activeTab === "LOGIN" && (
           <>
-            <input
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={loading}
-            />
-
-            <input
-              placeholder="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={loading}
-            />
-
+            <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
             <button onClick={handleLogin} disabled={loading}>
               {loading ? "Logging in..." : "Login"}
             </button>
           </>
         )}
 
-        {/* REGISTER */}
         {activeTab === "REGISTER" && (
           <>
-            <input
-              placeholder="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              disabled={loading}
-            />
-
-            <input
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={loading}
-            />
-
-            <input
-              placeholder="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={loading}
-            />
-
+            <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
+            <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
             <button onClick={handleRegister} disabled={loading}>
               {loading ? "Registering..." : "Register"}
             </button>
