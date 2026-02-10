@@ -10,9 +10,7 @@ type Props = {
 };
 
 export default function ProtectedRoute({ children, allowedRole }: Props) {
-  const { token, role, loading } = useAuth();
-
-  if (loading) return null;
+  const { token, role } = useAuth();
 
   if (!token) return <Navigate to="/login" replace />;
 

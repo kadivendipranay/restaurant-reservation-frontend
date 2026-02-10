@@ -1,34 +1,19 @@
 import { useState } from "react";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import Navbar from "../components/Navbar";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const [activeTab, setActiveTab] = useState<"LOGIN" | "REGISTER">("LOGIN");
-
   const [name, setName] = useState("Test User");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
 
-  const saveTokenAndRedirect = (token: string) => {
-    localStorage.setItem("token", token);
-
-    const decoded: any = jwtDecode(token);
-    const role = (decoded.role || "USER").toUpperCase();
-
-    localStorage.setItem("role", role);
-
-    alert(`✅ Login successful | Role: ${role}`);
-
-    // 🔥 Single redirect point (no loops)
-    if (role === "ADMIN") {
-      window.location.replace("/#/admin");
-    } else {
-      window.location.replace("/#/user");
-    }
-  };
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -44,16 +29,17 @@ export default function Login() {
         password: password.trim(),
       });
 
-      saveTokenAndRedirect(res.data.token);
+      login(res.data.token);
+
+      const decoded: any = jwtDecode(res.data.token);
+
+      if (decoded.role === "ADMIN") navigate("/admin");
+      else navigate("/user");
 
       setEmail("");
       setPassword("");
     } catch (err: any) {
-      const status = err?.response?.status;
-      const message =
-        err?.response?.data?.message || err?.message || "Login failed";
-
-      alert(`STATUS: ${status || "NO STATUS"}\nMESSAGE: ${message}`);
+      alert(err?.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -75,23 +61,11 @@ export default function Login() {
         role: "USER",
       });
 
-      alert("✅ Registered successfully. Please login now.");
-
+      alert("Registered successfully. Please login.");
       setActiveTab("LOGIN");
       setPassword("");
     } catch (err: any) {
-      const status = err?.response?.status;
-
-      if (status === 409) {
-        alert("✅ Email already registered. Please login.");
-        setActiveTab("LOGIN");
-        return;
-      }
-
-      const message =
-        err?.response?.data?.message || err?.message || "Register failed";
-
-      alert(`STATUS: ${status || "NO STATUS"}\nMESSAGE: ${message}`);
+      alert(err?.response?.data?.message || "Register failed");
     } finally {
       setLoading(false);
     }
@@ -101,34 +75,18 @@ export default function Login() {
     <div className="container">
       <Navbar />
 
-      <div
-        className="card"
-        style={{ maxWidth: "420px", margin: "0 auto", padding: "25px" }}
-      >
-        <h2 style={{ textAlign: "center", marginBottom: "15px" }}>
-          Restaurant Reservation ✅
-        </h2>
+      <div className="card" style={{ maxWidth: 420, margin: "0 auto", padding: 25 }}>
+        <h2 style={{ textAlign: "center" }}>Restaurant Reservation</h2>
 
-        <div style={{ display: "flex", gap: "10px", marginBottom: "18px" }}>
+        <div style={{ display: "flex", gap: 10, marginBottom: 15 }}>
           <button onClick={() => setActiveTab("LOGIN")}>Login</button>
           <button onClick={() => setActiveTab("REGISTER")}>Register</button>
         </div>
 
         {activeTab === "LOGIN" && (
           <>
-            <input
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-
-            <input
-              placeholder="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-
+            <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
             <button onClick={handleLogin} disabled={loading}>
               {loading ? "Logging in..." : "Login"}
             </button>
@@ -137,25 +95,9 @@ export default function Login() {
 
         {activeTab === "REGISTER" && (
           <>
-            <input
-              placeholder="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-
-            <input
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-
-            <input
-              placeholder="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-
+            <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
+            <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
             <button onClick={handleRegister} disabled={loading}>
               {loading ? "Registering..." : "Register"}
             </button>
