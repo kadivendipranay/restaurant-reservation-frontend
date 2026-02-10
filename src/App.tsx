@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import AdminPage from "./pages/AdminPage";
@@ -9,34 +9,32 @@ function App() {
   const role = (localStorage.getItem("role") || "").toUpperCase();
 
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* ✅ Home Redirect */}
-        <Route path="/" element={<Home />} />
+    <Routes>
+      {/* Home */}
+      <Route path="/" element={<Home />} />
 
-        {/* ✅ Login */}
-        <Route path="/login" element={<Login />} />
+      {/* Login */}
+      <Route path="/login" element={<Login />} />
 
-        {/* ✅ Admin Route */}
-        <Route
-          path="/admin"
-          element={
-            token && role === "ADMIN" ? <AdminPage /> : <Navigate to="/login" />
-          }
-        />
+      {/* Admin */}
+      <Route
+        path="/admin"
+        element={
+          token && role === "ADMIN" ? <AdminPage /> : <Navigate to="/login" />
+        }
+      />
 
-        {/* ✅ User Route */}
-        <Route
-          path="/user"
-          element={
-            token && role === "USER" ? <UserPage /> : <Navigate to="/login" />
-          }
-        />
+      {/* User */}
+      <Route
+        path="/user"
+        element={
+          token && role === "USER" ? <UserPage /> : <Navigate to="/login" />
+        }
+      />
 
-        {/* ✅ fallback */}
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    </BrowserRouter>
+      {/* fallback */}
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
   );
 }
 

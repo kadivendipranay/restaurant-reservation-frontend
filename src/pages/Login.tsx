@@ -15,16 +15,20 @@ export default function Login() {
 
   const navigate = useNavigate();
 
-  // ✅ Auto redirect if already logged in
+  // ✅ Auto redirect if already logged in (runs ONCE)
   useEffect(() => {
     const token = localStorage.getItem("token");
     const role = (localStorage.getItem("role") || "").toUpperCase();
 
-    if (token) {
-      if (role === "ADMIN") navigate("/admin");
-      else navigate("/user");
+    if (!token) return;
+
+    if (role === "ADMIN") {
+      navigate("/admin", { replace: true });
+    } else {
+      navigate("/user", { replace: true });
     }
-  }, [navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const saveTokenAndRedirect = (token: string) => {
     localStorage.setItem("token", token);
@@ -36,8 +40,8 @@ export default function Login() {
 
     alert(`✅ Login successful | Role: ${role}`);
 
-    if (role === "ADMIN") navigate("/admin");
-    else navigate("/user");
+    if (role === "ADMIN") navigate("/admin", { replace: true });
+    else navigate("/user", { replace: true });
   };
 
   const handleLogin = async () => {
@@ -123,14 +127,8 @@ export default function Login() {
           Restaurant Reservation ✅
         </h2>
 
-        {/* ✅ Tabs */}
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-            marginBottom: "18px",
-          }}
-        >
+        {/* Tabs */}
+        <div style={{ display: "flex", gap: "10px", marginBottom: "18px" }}>
           <button
             onClick={() => setActiveTab("LOGIN")}
             style={{
@@ -143,7 +141,6 @@ export default function Login() {
                   : "#f1f1f1",
               color: activeTab === "LOGIN" ? "white" : "black",
               border: "none",
-              cursor: "pointer",
             }}
           >
             Login
@@ -161,18 +158,16 @@ export default function Login() {
                   : "#f1f1f1",
               color: activeTab === "REGISTER" ? "white" : "black",
               border: "none",
-              cursor: "pointer",
             }}
           >
             Register
           </button>
         </div>
 
-        {/* ✅ LOGIN FORM */}
+        {/* LOGIN */}
         {activeTab === "LOGIN" && (
-          <div>
+          <>
             <input
-              style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -180,7 +175,6 @@ export default function Login() {
             />
 
             <input
-              style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
               placeholder="Password"
               type="password"
               value={password}
@@ -188,29 +182,16 @@ export default function Login() {
               disabled={loading}
             />
 
-            <button
-              style={{
-                width: "100%",
-                padding: "10px",
-                borderRadius: "10px",
-                background: "linear-gradient(135deg,#0077ff,#00c6ff)",
-                border: "none",
-                color: "white",
-                fontWeight: "bold",
-              }}
-              onClick={handleLogin}
-              disabled={loading}
-            >
+            <button onClick={handleLogin} disabled={loading}>
               {loading ? "Logging in..." : "Login"}
             </button>
-          </div>
+          </>
         )}
 
-        {/* ✅ REGISTER FORM */}
+        {/* REGISTER */}
         {activeTab === "REGISTER" && (
-          <div>
+          <>
             <input
-              style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
               placeholder="Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -218,7 +199,6 @@ export default function Login() {
             />
 
             <input
-              style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -226,7 +206,6 @@ export default function Login() {
             />
 
             <input
-              style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
               placeholder="Password"
               type="password"
               value={password}
@@ -234,22 +213,10 @@ export default function Login() {
               disabled={loading}
             />
 
-            <button
-              style={{
-                width: "100%",
-                padding: "10px",
-                borderRadius: "10px",
-                background: "linear-gradient(135deg,#00c853,#00bfa5)",
-                border: "none",
-                color: "white",
-                fontWeight: "bold",
-              }}
-              onClick={handleRegister}
-              disabled={loading}
-            >
+            <button onClick={handleRegister} disabled={loading}>
               {loading ? "Registering..." : "Register"}
             </button>
-          </div>
+          </>
         )}
       </div>
     </div>
