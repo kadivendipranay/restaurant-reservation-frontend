@@ -1,34 +1,28 @@
 import { jwtDecode } from "jwt-decode";
 
-export type Role = "ADMIN" | "USER";
+type Role = "ADMIN" | "USER";
 
 type JwtPayload = {
   role: Role;
   exp: number;
 };
 
-export const getToken = (): string | null => {
-  return localStorage.getItem("token");
-};
-
-export const getRole = (): Role | null => {
-  const token = getToken();
+export const getSession = () => {
+  const token = localStorage.getItem("token");
   if (!token) return null;
 
   try {
     const decoded = jwtDecode<JwtPayload>(token);
 
-    // Check token expiry
     if (decoded.exp * 1000 < Date.now()) {
-      logout();
+      localStorage.clear();
       return null;
     }
 
-    if (decoded.role !== "ADMIN" && decoded.role !== "USER") {
-      return null;
-    }
-
-    return decoded.role;
+    return {
+      token,
+      role: decoded.role,
+    };
   } catch {
     return null;
   }
