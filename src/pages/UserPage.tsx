@@ -62,7 +62,7 @@ export default function UserPage() {
 
   const handleCreateReservation = async () => {
     if (!date || !timeSlot || guests < 1) {
-      setMsg({ type: "error", text: "Fill all fields correctly" });
+      setMsg({ type: "error", text: "Please fill all fields correctly" });
       return;
     }
 
@@ -70,7 +70,8 @@ export default function UserPage() {
 
     try {
       await API.post("/reservations", { date, timeSlot, guests });
-      setMsg({ type: "success", text: "Reservation created successfully" });
+
+      setMsg({ type: "success", text: "Reservation created successfully ✅" });
 
       setDate("");
       setGuests(1);
@@ -105,25 +106,62 @@ export default function UserPage() {
     <div className="container">
       <Navbar />
 
-      <div className="card">
-        <h2>User Dashboard</h2>
-        <button onClick={handleLogout}>Logout</button>
+      {/* Header */}
+      <div
+        className="card"
+        style={{
+          padding: 18,
+          marginBottom: 15,
+          background: "linear-gradient(135deg,#0077ff,#00c6ff)",
+          color: "white",
+        }}
+      >
+        <h2 style={{ margin: 0 }}>User Dashboard</h2>
+        <p>Create and manage your reservations</p>
+
+        <button
+          onClick={handleLogout}
+          style={{
+            background: "white",
+            color: "#0077ff",
+            border: "none",
+            padding: "8px 12px",
+            borderRadius: 10,
+            cursor: "pointer",
+            fontWeight: "bold",
+          }}
+        >
+          Logout
+        </button>
       </div>
 
-      {msg && <div className="card">{msg.text}</div>}
+      {/* Message */}
+      {msg && (
+        <div
+          className="card"
+          style={{
+            padding: 12,
+            marginBottom: 15,
+            background: msg.type === "success" ? "#d4edda" : "#f8d7da",
+          }}
+        >
+          {msg.text}
+        </div>
+      )}
 
       {/* Create Reservation */}
-      <div className="card">
+      <div className="card" style={{ padding: 18, marginBottom: 20 }}>
+        <h3>Create Reservation</h3>
+
+        <label>Date</label>
         <input
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
         />
 
-        <select
-          value={timeSlot}
-          onChange={(e) => setTimeSlot(e.target.value)}
-        >
+        <label>Time Slot</label>
+        <select value={timeSlot} onChange={(e) => setTimeSlot(e.target.value)}>
           {TIME_SLOTS.map((slot) => (
             <option key={slot} value={slot}>
               {slot}
@@ -131,6 +169,7 @@ export default function UserPage() {
           ))}
         </select>
 
+        <label>Guests</label>
         <input
           type="number"
           min={1}
@@ -138,16 +177,32 @@ export default function UserPage() {
           onChange={(e) => setGuests(Number(e.target.value))}
         />
 
-        <button onClick={handleCreateReservation} disabled={loading}>
-          {loading ? "Creating..." : "Create"}
+        <button
+          onClick={handleCreateReservation}
+          disabled={loading}
+          style={{
+            marginTop: 10,
+            width: "100%",
+            padding: 10,
+            borderRadius: 12,
+            background: "linear-gradient(135deg,#00c853,#00bfa5)",
+            border: "none",
+            color: "white",
+            fontWeight: "bold",
+          }}
+        >
+          {loading ? "Creating..." : "Create Reservation"}
         </button>
       </div>
 
       {/* Reservation List */}
-      <div className="card">
+      <div className="card" style={{ padding: 18 }}>
+        <h3>My Reservations</h3>
+
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
+          style={{ marginBottom: 12 }}
         >
           <option value="ACTIVE">ACTIVE</option>
           <option value="CANCELLED">CANCELLED</option>
@@ -161,13 +216,38 @@ export default function UserPage() {
           <Spinner text="No reservations found" />
         ) : (
           reservations.map((r: any) => (
-            <div key={r._id}>
+            <div
+              key={r._id}
+              style={{
+                padding: 12,
+                border: "1px solid #ddd",
+                borderRadius: 12,
+                marginBottom: 10,
+              }}
+            >
               <p>
-                {r.date} | {r.timeSlot} | Guests: {r.guests}
+                📅 {r.date} | ⏰ {r.timeSlot} | 👥 {r.guests}
+              </p>
+
+              <p>
+                Status:{" "}
+                <b style={{ color: r.status === "ACTIVE" ? "#00c853" : "#e53935" }}>
+                  {r.status}
+                </b>
               </p>
 
               {r.status === "ACTIVE" && (
-                <button onClick={() => handleCancelReservation(r._id)}>
+                <button
+                  onClick={() => handleCancelReservation(r._id)}
+                  style={{
+                    padding: "6px 10px",
+                    borderRadius: 10,
+                    border: "none",
+                    background: "#ff5252",
+                    color: "white",
+                    cursor: "pointer",
+                  }}
+                >
                   Cancel
                 </button>
               )}
