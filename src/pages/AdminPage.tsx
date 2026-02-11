@@ -3,228 +3,194 @@ import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
-import Spinner from "../components/Spinner";
 
-export default function AdminPage() {
+export default function UserPage() {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
-  const [data, setData] = useState<any[]>([]);
-  const [page, setPage] = useState(1);
-  const [pages, setPages] = useState(1);
+  const [date, setDate] = useState("");
+  const [timeSlot, setTimeSlot] = useState("17:00-18:00");
+  const [guests, setGuests] = useState(1);
+  const [reservations, setReservations] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [statusFilter, setStatusFilter] = useState("ACTIVE");
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
+  const TIME = ["17:00-18:00","18:00-19:00","19:00-20:00","20:00-21:00"];
+
+  const fetchReservations = async () => {
+    const res = await API.get("/reservations/my");
+    setReservations(res.data || []);
   };
 
-  const fetchAllReservations = async (pageNumber: number) => {
+  useEffect(() => { fetchReservations(); }, []);
+
+  const createReservation = async () => {
+    if (!date) return alert("Select date");
     setLoading(true);
-    try {
-      const res = await API.get(
-        `/reservations/all?page=${pageNumber}&limit=5&status=${statusFilter}`
-      );
-
-      setData(res?.data?.data || []);
-      setPages(res?.data?.pages || 1);
-    } catch (error) {
-      console.error("Failed to fetch reservations", error);
-      setData([]);
-    } finally {
-      setLoading(false);
-    }
+    await API.post("/reservations", { date, timeSlot, guests });
+    setLoading(false);
+    fetchReservations();
   };
 
-  useEffect(() => {
-    fetchAllReservations(page);
-  }, [page, statusFilter]);
-
-  const cancel = async (id: string) => {
-    try {
-      await API.patch(`/reservations/admin-cancel/${id}`);
-      fetchAllReservations(page);
-    } catch {
-      alert("Cancel failed");
-    }
-  };
-
-  const restore = async (id: string) => {
-    try {
-      await API.patch(`/reservations/admin-restore/${id}`);
-      fetchAllReservations(page);
-    } catch {
-      alert("Restore failed");
-    }
+  const cancelReservation = async (id: string) => {
+    await API.patch(`/reservations/${id}/cancel`);
+    fetchReservations();
   };
 
   return (
-    <div style={bg}>
+    <div style={page}>
       <Navbar />
 
       <div style={container}>
-        {/* Header */}
-        <div style={cardRow}>
+        {/* HEADER */}
+        <div style={header}>
           <div>
-            <h2>🍽 Restaurant Admin</h2>
-            <p style={{ color: "#666" }}>Reservation Dashboard</p>
+            <h2 style={{ margin: 0 }}>User Dashboard</h2>
+            <p style={{ margin: 0, color: "#aaa" }}>
+              Book & Manage Reservations
+            </p>
           </div>
 
-          <button style={primaryBtn} onClick={handleLogout}>
+          <button
+            style={primaryBtn}
+            onClick={() => {
+              logout();
+              navigate("/login");
+            }}
+          >
             Logout
           </button>
         </div>
 
-        {/* Filter */}
+        {/* BOOK TABLE */}
         <div style={card}>
+          <h3>Book Your Table</h3>
+
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            style={input}
+          />
+
           <select
-            value={statusFilter}
-            onChange={(e) => {
-              setPage(1);
-              setStatusFilter(e.target.value);
-            }}
+            value={timeSlot}
+            onChange={(e) => setTimeSlot(e.target.value)}
             style={input}
           >
-            <option value="ACTIVE">Active</option>
-            <option value="CANCELLED">Cancelled</option>
-            <option value="COMPLETED">Completed</option>
-            <option value="ALL">All</option>
+            {TIME.map((t) => (
+              <option key={t}>{t}</option>
+            ))}
           </select>
+
+          <input
+            type="number"
+            min={1}
+            value={guests}
+            onChange={(e) => setGuests(+e.target.value)}
+            style={input}
+          />
+
+          <button style={primaryBtn} onClick={createReservation}>
+            {loading ? "Saving..." : "Reserve Table"}
+          </button>
         </div>
 
-        {loading ? (
-          <Spinner text="Loading..." />
-        ) : data.length === 0 ? (
-          <p style={{ color: "white", textAlign: "center" }}>
-            No reservations found
-          </p>
-        ) : (
-          <div style={{ display: "grid", gap: 16 }}>
-            {data.map((r: any) => (
-              <div key={r._id} style={card}>
-                <b>{r.user?.email || "Unknown User"}</b>
-                <p>
-                  {r.date} • {r.timeSlot}
-                </p>
-                <p>Guests: {r.guests}</p>
+        {/* RESERVATIONS */}
+        <div style={{ display: "grid", gap: 16 }}>
+          {reservations.map((r: any) => (
+            <div key={r._id} style={card}>
+              <p>📅 {r.date}</p>
+              <p>⏰ {r.timeSlot}</p>
+              <p>👥 Guests: {r.guests}</p>
 
-                <span
-                  style={{
-                    ...badge,
-                    background:
-                      r.status === "ACTIVE" ? "#c8e6c9" : "#ffcdd2",
-                  }}
+              <span
+                style={{
+                  ...badge,
+                  background:
+                    r.status === "ACTIVE" ? "#2e7d32" : "#c62828",
+                }}
+              >
+                {r.status}
+              </span>
+
+              {r.status === "ACTIVE" && (
+                <button
+                  style={dangerBtn}
+                  onClick={() => cancelReservation(r._id)}
                 >
-                  {r.status}
-                </span>
-
-                {r.status === "ACTIVE" && (
-                  <button style={dangerBtn} onClick={() => cancel(r._id)}>
-                    Cancel
-                  </button>
-                )}
-
-                {r.status === "CANCELLED" && (
-                  <button style={successBtn} onClick={() => restore(r._id)}>
-                    Restore
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Pagination */}
-        <div style={{ marginTop: 20, textAlign: "center" }}>
-          <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
-            Prev
-          </button>
-
-          <span style={{ color: "white", margin: "0 15px" }}>
-            {page} / {pages}
-          </span>
-
-          <button disabled={page >= pages} onClick={() => setPage((p) => p + 1)}>
-            Next
-          </button>
+                  Cancel
+                </button>
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </div>
   );
 }
 
-/* -------- Styles -------- */
+/* STYLES */
 
-const bg = {
+const page = {
   minHeight: "100vh",
-  display: "flex",
-  justifyContent: "center",
-  background:
-    "linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)), url('https://images.unsplash.com/photo-1559339352-11d035aa65de') center/cover",
+  background: "#1c1c1c",
+  color: "white",
 };
 
 const container = {
-  width: "100%",
   maxWidth: 900,
-  padding: "30px 15px",
+  margin: "auto",
+  padding: 30,
 };
 
-const card = {
-  background: "rgba(255,255,255,.95)",
-  borderRadius: 18,
+const header = {
+  background: "#2a2a2a",
   padding: 20,
-  boxShadow: "0 10px 25px rgba(0,0,0,.25)",
-  display: "grid",
-  gap: 8,
-};
-
-const cardRow = {
-  ...card,
+  borderRadius: 12,
+  marginBottom: 20,
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  marginBottom: 20,
+};
+
+const card = {
+  background: "#2a2a2a",
+  padding: 20,
+  borderRadius: 12,
+  display: "grid",
+  gap: 10,
+  boxShadow: "0 4px 10px rgba(0,0,0,.4)",
 };
 
 const input = {
-  width: "100%",
   padding: 12,
-  borderRadius: 10,
+  borderRadius: 8,
+  border: "1px solid #444",
+  background: "#1c1c1c",
+  color: "white",
 };
 
 const badge = {
-  padding: "5px 12px",
-  borderRadius: 20,
+  padding: "4px 10px",
+  borderRadius: 15,
   width: "fit-content",
-  fontWeight: "bold",
+  fontSize: 12,
 };
 
 const primaryBtn = {
-  background: "linear-gradient(135deg,#ff6a00,#ff005c)",
+  background: "#d4af37",
   border: "none",
-  color: "white",
-  padding: "8px 20px",
-  borderRadius: 25,
+  padding: "8px 18px",
+  borderRadius: 20,
+  fontWeight: "bold",
   cursor: "pointer",
 };
 
 const dangerBtn = {
-  marginTop: 10,
-  background: "#ff5252",
+  background: "#c62828",
   border: "none",
-  color: "white",
   padding: "6px 14px",
   borderRadius: 20,
-  cursor: "pointer",
-};
-
-const successBtn = {
-  marginTop: 10,
-  background: "#00c853",
-  border: "none",
   color: "white",
-  padding: "6px 14px",
-  borderRadius: 20,
   cursor: "pointer",
 };

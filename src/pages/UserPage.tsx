@@ -21,13 +21,10 @@ export default function UserPage() {
     setReservations(res.data || []);
   };
 
-  useEffect(() => {
-    fetchReservations();
-  }, []);
+  useEffect(() => { fetchReservations(); }, []);
 
   const createReservation = async () => {
     if (!date) return alert("Select date");
-
     setLoading(true);
     await API.post("/reservations", { date, timeSlot, guests });
     setLoading(false);
@@ -40,15 +37,17 @@ export default function UserPage() {
   };
 
   return (
-    <div style={bg}>
+    <div style={page}>
       <Navbar />
 
       <div style={container}>
         {/* HEADER */}
-        <div style={cardRow}>
+        <div style={header}>
           <div>
-            <h2>🍽 User Dashboard</h2>
-            <p style={{ color: "#666" }}>Book & Manage Reservations</p>
+            <h2 style={{ margin: 0 }}>User Dashboard</h2>
+            <p style={{ margin: 0, color: "#aaa" }}>
+              Book & Manage Reservations
+            </p>
           </div>
 
           <button
@@ -64,7 +63,7 @@ export default function UserPage() {
 
         {/* BOOK TABLE */}
         <div style={card}>
-          <h3>🍽 Book Your Table</h3>
+          <h3>Book Your Table</h3>
 
           <input
             type="date"
@@ -89,7 +88,6 @@ export default function UserPage() {
             value={guests}
             onChange={(e) => setGuests(+e.target.value)}
             style={input}
-            placeholder="Guests"
           />
 
           <button style={primaryBtn} onClick={createReservation}>
@@ -98,23 +96,18 @@ export default function UserPage() {
         </div>
 
         {/* RESERVATIONS */}
-        <div style={{ marginTop: 25, display: "grid", gap: 16 }}>
-          {reservations.length === 0 && (
-            <p style={{ color: "white", textAlign: "center" }}>
-              No reservations found
-            </p>
-          )}
-
+        <div style={{ display: "grid", gap: 16 }}>
           {reservations.map((r: any) => (
             <div key={r._id} style={card}>
-              <p>{r.date} • {r.timeSlot}</p>
-              <p>Guests: {r.guests}</p>
+              <p>📅 {r.date}</p>
+              <p>⏰ {r.timeSlot}</p>
+              <p>👥 Guests: {r.guests}</p>
 
               <span
                 style={{
                   ...badge,
                   background:
-                    r.status === "ACTIVE" ? "#c8e6c9" : "#ffcdd2",
+                    r.status === "ACTIVE" ? "#2e7d32" : "#c62828",
                 }}
               >
                 {r.status}
@@ -136,68 +129,68 @@ export default function UserPage() {
   );
 }
 
-/* ---------------- STYLES ---------------- */
+/* STYLES */
 
-const bg = {
+const page = {
   minHeight: "100vh",
-  display: "flex",
-  justifyContent: "center",
-  background:
-    "linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)), url('https://images.unsplash.com/photo-1559339352-11d035aa65de') center/cover",
+  background: "#1c1c1c",
+  color: "white",
 };
 
 const container = {
-  width: "100%",
   maxWidth: 900,
-  padding: "30px 15px",
+  margin: "auto",
+  padding: 30,
 };
 
-const card = {
-  background: "rgba(255,255,255,.95)",
-  borderRadius: 18,
+const header = {
+  background: "#2a2a2a",
   padding: 20,
-  boxShadow: "0 10px 25px rgba(0,0,0,.25)",
-  display: "grid",
-  gap: 10,
-};
-
-const cardRow = {
-  ...card,
+  borderRadius: 12,
+  marginBottom: 20,
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
 };
 
+const card = {
+  background: "#2a2a2a",
+  padding: 20,
+  borderRadius: 12,
+  display: "grid",
+  gap: 10,
+  boxShadow: "0 4px 10px rgba(0,0,0,.4)",
+};
+
 const input = {
-  width: "100%",
   padding: 12,
-  borderRadius: 10,
-  border: "1px solid #ddd",
+  borderRadius: 8,
+  border: "1px solid #444",
+  background: "#1c1c1c",
+  color: "white",
 };
 
 const badge = {
-  padding: "5px 12px",
-  borderRadius: 20,
+  padding: "4px 10px",
+  borderRadius: 15,
   width: "fit-content",
-  fontWeight: "bold",
+  fontSize: 12,
 };
 
 const primaryBtn = {
-  background: "linear-gradient(135deg,#ff6a00,#ff005c)",
+  background: "#d4af37",
   border: "none",
-  color: "white",
-  padding: "10px 22px",
-  borderRadius: 25,
+  padding: "8px 18px",
+  borderRadius: 20,
   fontWeight: "bold",
   cursor: "pointer",
 };
 
 const dangerBtn = {
-  marginTop: 10,
-  background: "#ff5252",
+  background: "#c62828",
   border: "none",
-  color: "white",
   padding: "6px 14px",
   borderRadius: 20,
+  color: "white",
   cursor: "pointer",
 };
