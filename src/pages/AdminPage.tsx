@@ -3,55 +3,57 @@ import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
+import Spinner from "../components/Spinner";
 
-export default function UserPage() {
+type Reservation = {
+  _id: string;
+  date: string;
+  timeSlot: string;
+  guests: number;
+  status: string;
+  user?: { email?: string };
+};
+
+export default function AdminPage() {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, role } = useAuth();
 
-  const [date, setDate] = useState("");
-  const [timeSlot, setTimeSlot] = useState("17:00-18:00");
-  const [guests, setGuests] = useState(1);
-  const [reservations, setReservations] = useState<any[]>([]);
+  const [data, setData] = useState<Reservation[]>([]);
+  const [statusFilter, setStatusFilter] = useState("ACTIVE");
   const [loading, setLoading] = useState(false);
 
-  const TIME = ["17:00-18:00","18:00-19:00","19:00-20:00","20:00-21:00"];
+  useEffect(() => {
+    if (role !== "ADMIN") navigate("/login");
+  }, [role, navigate]);
 
   const fetchReservations = async () => {
-    const res = await API.get("/reservations/my");
-    setReservations(res.data || []);
-  };
-
-  useEffect(() => { fetchReservations(); }, []);
-
-  const createReservation = async () => {
-    if (!date) return alert("Select date");
     setLoading(true);
-    await API.post("/reservations", { date, timeSlot, guests });
+    try {
+      const res = await API.get(`/reservations/all?status=${statusFilter}`);
+      setData(res?.data?.data || []);
+    } catch {
+      setData([]);
+    }
     setLoading(false);
-    fetchReservations();
   };
 
-  const cancelReservation = async (id: string) => {
-    await API.patch(`/reservations/${id}/cancel`);
+  useEffect(() => {
     fetchReservations();
-  };
+  }, [statusFilter]);
 
   return (
     <div style={page}>
       <Navbar />
 
       <div style={container}>
-        {/* HEADER */}
         <div style={header}>
           <div>
-            <h2 style={{ margin: 0 }}>User Dashboard</h2>
-            <p style={{ margin: 0, color: "#aaa" }}>
-              Book & Manage Reservations
-            </p>
+            <h2>👑 Admin Dashboard</h2>
+            <p style={{ color: "#666" }}>Manage restaurant reservations</p>
           </div>
 
           <button
-            style={primaryBtn}
+            style={dangerBtn}
             onClick={() => {
               logout();
               navigate("/login");
@@ -61,69 +63,40 @@ export default function UserPage() {
           </button>
         </div>
 
-        {/* BOOK TABLE */}
         <div style={card}>
-          <h3>Book Your Table</h3>
-
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            style={input}
-          />
-
-          <select
-            value={timeSlot}
-            onChange={(e) => setTimeSlot(e.target.value)}
-            style={input}
-          >
-            {TIME.map((t) => (
-              <option key={t}>{t}</option>
-            ))}
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} style={input}>
+            <option value="ACTIVE">ACTIVE</option>
+            <option value="CANCELLED">CANCELLED</option>
+            <option value="COMPLETED">COMPLETED</option>
+            <option value="ALL">ALL</option>
           </select>
-
-          <input
-            type="number"
-            min={1}
-            value={guests}
-            onChange={(e) => setGuests(+e.target.value)}
-            style={input}
-          />
-
-          <button style={primaryBtn} onClick={createReservation}>
-            {loading ? "Saving..." : "Reserve Table"}
-          </button>
         </div>
 
-        {/* RESERVATIONS */}
-        <div style={{ display: "grid", gap: 16 }}>
-          {reservations.map((r: any) => (
-            <div key={r._id} style={card}>
-              <p>📅 {r.date}</p>
-              <p>⏰ {r.timeSlot}</p>
-              <p>👥 Guests: {r.guests}</p>
+        {loading ? (
+          <Spinner text="Loading..." />
+        ) : (
+          <div style={{ display: "grid", gap: 18 }}>
+            {data.length === 0 && <p style={{ textAlign: "center" }}>No reservations</p>}
 
-              <span
-                style={{
-                  ...badge,
-                  background:
-                    r.status === "ACTIVE" ? "#2e7d32" : "#c62828",
-                }}
-              >
-                {r.status}
-              </span>
+            {data.map((r) => (
+              <div key={r._id} style={card}>
+                <b>{r.user?.email || "Unknown user"}</b>
+                <p>📅 {r.date}</p>
+                <p>⏰ {r.timeSlot}</p>
+                <p>👥 Guests: {r.guests}</p>
 
-              {r.status === "ACTIVE" && (
-                <button
-                  style={dangerBtn}
-                  onClick={() => cancelReservation(r._id)}
+                <span
+                  style={{
+                    ...badge,
+                    background: r.status === "ACTIVE" ? "#2e7d32" : "#c62828",
+                  }}
                 >
-                  Cancel
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
+                  {r.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -131,65 +104,42 @@ export default function UserPage() {
 
 /* STYLES */
 
-const page = {
-  minHeight: "100vh",
-  background: "#1c1c1c",
-  color: "white",
-};
+const page = { minHeight: "100vh", background: "#f8f5f0" };
 
-const container = {
-  maxWidth: 900,
-  margin: "auto",
-  padding: 30,
-};
+const container = { maxWidth: 900, margin: "auto", padding: 30 };
 
 const header = {
-  background: "#2a2a2a",
+  background: "white",
   padding: 20,
-  borderRadius: 12,
-  marginBottom: 20,
+  borderRadius: 15,
+  marginBottom: 25,
   display: "flex",
   justifyContent: "space-between",
-  alignItems: "center",
+  boxShadow: "0 4px 12px rgba(0,0,0,.08)",
 };
 
 const card = {
-  background: "#2a2a2a",
+  background: "white",
   padding: 20,
-  borderRadius: 12,
+  borderRadius: 15,
   display: "grid",
   gap: 10,
-  boxShadow: "0 4px 10px rgba(0,0,0,.4)",
+  boxShadow: "0 6px 15px rgba(0,0,0,.08)",
 };
 
-const input = {
-  padding: 12,
-  borderRadius: 8,
-  border: "1px solid #444",
-  background: "#1c1c1c",
-  color: "white",
-};
+const input = { padding: 12, borderRadius: 8 };
 
 const badge = {
   padding: "4px 10px",
   borderRadius: 15,
+  color: "white",
   width: "fit-content",
-  fontSize: 12,
-};
-
-const primaryBtn = {
-  background: "#d4af37",
-  border: "none",
-  padding: "8px 18px",
-  borderRadius: 20,
-  fontWeight: "bold",
-  cursor: "pointer",
 };
 
 const dangerBtn = {
   background: "#c62828",
   border: "none",
-  padding: "6px 14px",
+  padding: "8px 18px",
   borderRadius: 20,
   color: "white",
   cursor: "pointer",
