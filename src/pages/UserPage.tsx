@@ -5,10 +5,7 @@ import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../components/Spinner";
 
-type Message = {
-  type: "success" | "error";
-  text: string;
-};
+
 
 export default function UserPage() {
   const navigate = useNavigate();
@@ -21,7 +18,7 @@ export default function UserPage() {
   const [loading, setLoading] = useState(false);
   const [loadingList, setLoadingList] = useState(false);
   const [statusFilter, setStatusFilter] = useState("ACTIVE");
-  const [msg, setMsg] = useState<Message | null>(null);
+  
 
   const TIME_SLOTS = ["17:00-18:00", "18:00-19:00", "19:00-20:00", "20:00-21:00"];
 
