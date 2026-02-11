@@ -17,7 +17,12 @@ export default function UserPage() {
   const [loadingList, setLoadingList] = useState(false);
   const [statusFilter, setStatusFilter] = useState("ACTIVE");
 
-  const TIME_SLOTS = ["17:00-18:00", "18:00-19:00", "19:00-20:00", "20:00-21:00"];
+  const TIME_SLOTS = [
+    "17:00-18:00",
+    "18:00-19:00",
+    "19:00-20:00",
+    "20:00-21:00",
+  ];
 
   const handleLogout = () => {
     logout();
@@ -68,141 +73,206 @@ export default function UserPage() {
   };
 
   return (
-    <div className="container">
+    <div
+      style={{
+        minHeight: "100vh",
+        background:
+          "linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)), url('https://images.unsplash.com/photo-1559339352-11d035aa65de') center/cover",
+      }}
+    >
       <Navbar />
 
-      {/* HEADER */}
-      <div
-        className="card"
-        style={{
-          padding: 22,
-          background: "linear-gradient(135deg,#ff6a00,#ff005c)",
-          color: "white",
-          borderRadius: 20
-        }}
-      >
-        <h2>🍽 User Dashboard</h2>
-        <p>Book & manage your reservations</p>
+      <div style={{ maxWidth: 1100, margin: "auto", padding: "40px 20px" }}>
+        {/* HEADER */}
+        <div style={headerCard}>
+          <div>
+            <h2>🍽 User Dashboard</h2>
+            <p style={{ color: "#777" }}>
+              Book & Manage Your Reservations
+            </p>
+          </div>
 
-        <button
-          onClick={handleLogout}
-          style={{
-            background: "white",
-            borderRadius: 20,
-            padding: "6px 14px",
-            border: "none",
-            fontWeight: "bold"
-          }}
-        >
-          Logout
-        </button>
-      </div>
-
-      {/* BOOK TABLE */}
-      <div
-        className="card"
-        style={{
-          padding: 25,
-          marginTop: 20,
-          background: "white",
-          borderRadius: 20,
-          boxShadow: "0 6px 20px rgba(0,0,0,.1)"
-        }}
-      >
-        <h3>🍽 Book Your Table</h3>
-
-        <div style={{ display: "grid", gap: 14 }}>
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-
-          <select value={timeSlot} onChange={(e) => setTimeSlot(e.target.value)}>
-            {TIME_SLOTS.map((t) => (
-              <option key={t}>{t}</option>
-            ))}
-          </select>
-
-          <input
-            type="number"
-            min={1}
-            value={guests}
-            onChange={(e) => setGuests(+e.target.value)}
-            placeholder="Guests"
-          />
-
-          <button
-            onClick={handleCreateReservation}
-            disabled={loading}
-            style={{
-              padding: 14,
-              borderRadius: 30,
-              background: "linear-gradient(135deg,#ff6a00,#ff005c)",
-              color: "white",
-              border: "none",
-              fontSize: 16,
-              fontWeight: "bold"
-            }}
-          >
-            {loading ? "Creating..." : "Reserve Table"}
+          <button onClick={handleLogout} style={logoutBtn}>
+            Logout
           </button>
         </div>
-      </div>
 
-      {/* FILTER */}
-      <div className="card" style={{ padding: 15 }}>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-          <option value="ACTIVE">ACTIVE</option>
-          <option value="CANCELLED">CANCELLED</option>
-          <option value="COMPLETED">COMPLETED</option>
-          <option value="ALL">ALL</option>
-        </select>
-      </div>
+        {/* BOOK TABLE */}
+        <div style={bookingCard}>
+          <h3>🍽 Book Your Table</h3>
 
-      {/* RESERVATIONS */}
-      <div className="card">
-        <h3>📌 My Reservations</h3>
+          <div style={{ display: "grid", gap: 15 }}>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              style={inputStyle}
+            />
 
-        {loadingList ? (
-          <Spinner text="Loading..." />
-        ) : reservations.length === 0 ? (
-          <Spinner text="No reservations" />
-        ) : (
-          reservations.map((r: any) => (
-            <div
-              key={r._id}
-              style={{
-                padding: 20,
-                marginBottom: 15,
-                borderRadius: 18,
-                background: "white",
-                boxShadow: "0 4px 12px rgba(0,0,0,.08)"
-              }}
+            <select
+              value={timeSlot}
+              onChange={(e) => setTimeSlot(e.target.value)}
+              style={inputStyle}
             >
-              <p>📅 {r.date}</p>
-              <p>⏰ {r.timeSlot}</p>
-              <p>👥 Guests: {r.guests}</p>
+              {TIME_SLOTS.map((t) => (
+                <option key={t}>{t}</option>
+              ))}
+            </select>
 
-              <b style={{ color: r.status === "ACTIVE" ? "green" : "red" }}>
-                {r.status}
-              </b>
+            <input
+              type="number"
+              min={1}
+              value={guests}
+              onChange={(e) => setGuests(+e.target.value)}
+              placeholder="Guests"
+              style={inputStyle}
+            />
 
-              {r.status === "ACTIVE" && (
-                <button
-                  onClick={() => handleCancel(r._id)}
-                  style={{
-                    marginTop: 10,
-                    background: "#ff5252",
-                    color: "white",
-                    border: "none",
-                    borderRadius: 20,
-                    padding: "6px 12px"
-                  }}
-                >
-                  Cancel
-                </button>
-              )}
+            <button
+              onClick={handleCreateReservation}
+              disabled={loading}
+              style={primaryBtn}
+            >
+              {loading ? "Creating..." : "Reserve Table"}
+            </button>
+          </div>
+        </div>
+
+        {/* FILTER */}
+        <div style={filterBar}>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            style={inputStyle}
+          >
+            <option value="ACTIVE">Active</option>
+            <option value="CANCELLED">Cancelled</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="ALL">All</option>
+          </select>
+        </div>
+
+        {/* RESERVATIONS */}
+        <div style={{ marginTop: 20 }}>
+          <h3 style={{ color: "white" }}>📌 My Reservations</h3>
+
+          {loadingList ? (
+            <Spinner text="Loading..." />
+          ) : reservations.length === 0 ? (
+            <Spinner text="No reservations found" />
+          ) : (
+            <div style={{ display: "grid", gap: 18 }}>
+              {reservations.map((r: any) => (
+                <div key={r._id} style={reservationCard}>
+                  <div>
+                    <p>📅 {r.date}</p>
+                    <p>⏰ {r.timeSlot}</p>
+                    <p>👥 Guests: {r.guests}</p>
+                  </div>
+
+                  <span
+                    style={{
+                      ...statusBadge,
+                      background:
+                        r.status === "ACTIVE"
+                          ? "#c8e6c9"
+                          : r.status === "CANCELLED"
+                          ? "#ffcdd2"
+                          : "#ffe0b2",
+                    }}
+                  >
+                    {r.status}
+                  </span>
+
+                  {r.status === "ACTIVE" && (
+                    <button
+                      onClick={() => handleCancel(r._id)}
+                      style={cancelBtn}
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </div>
+              ))}
             </div>
-          ))
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
 }
+
+/* ---------------- STYLES ---------------- */
+
+const headerCard = {
+  background: "rgba(255,255,255,.95)",
+  borderRadius: 20,
+  padding: 25,
+  marginBottom: 25,
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+};
+
+const bookingCard = {
+  background: "rgba(255,255,255,.95)",
+  borderRadius: 20,
+  padding: 25,
+  boxShadow: "0 6px 18px rgba(0,0,0,.2)",
+};
+
+const filterBar = {
+  marginTop: 20,
+  background: "rgba(255,255,255,.9)",
+  padding: 15,
+  borderRadius: 15,
+};
+
+const inputStyle = {
+  padding: 12,
+  borderRadius: 10,
+  border: "1px solid #ddd",
+  fontSize: 15,
+};
+
+const primaryBtn = {
+  padding: 14,
+  borderRadius: 30,
+  background: "linear-gradient(135deg,#ff6a00,#ff005c)",
+  color: "white",
+  border: "none",
+  fontSize: 16,
+  fontWeight: "bold",
+};
+
+const reservationCard = {
+  background: "rgba(255,255,255,.95)",
+  borderRadius: 18,
+  padding: 20,
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  boxShadow: "0 6px 18px rgba(0,0,0,.2)",
+};
+
+const statusBadge = {
+  padding: "6px 14px",
+  borderRadius: 20,
+  fontWeight: "bold",
+};
+
+const cancelBtn = {
+  padding: "6px 14px",
+  borderRadius: 20,
+  background: "#ff5252",
+  color: "white",
+  border: "none",
+};
+
+const logoutBtn = {
+  padding: "8px 20px",
+  borderRadius: 25,
+  border: "none",
+  background: "linear-gradient(135deg,#ff6a00,#ff005c)",
+  color: "white",
+};
