@@ -16,15 +16,11 @@ type Reservation = {
 
 export default function AdminPage() {
   const navigate = useNavigate();
-  const { logout, role } = useAuth();
+  const { logout } = useAuth();
 
   const [data, setData] = useState<Reservation[]>([]);
   const [statusFilter, setStatusFilter] = useState("ACTIVE");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (role !== "ADMIN") navigate("/login");
-  }, [role, navigate]);
 
   const fetchReservations = async () => {
     setLoading(true);
@@ -41,15 +37,28 @@ export default function AdminPage() {
     fetchReservations();
   }, [statusFilter]);
 
+  const handleCancel = async (id: string) => {
+    await API.patch(`/reservations/admin-cancel/${id}`);
+    fetchReservations();
+  };
+
+  const handleRestore = async (id: string) => {
+    await API.patch(`/reservations/admin-restore/${id}`);
+    fetchReservations();
+  };
+
   return (
     <div style={page}>
       <Navbar />
 
       <div style={container}>
+        {/* HEADER */}
         <div style={header}>
           <div>
-            <h2>👑 Admin Dashboard</h2>
-            <p style={{ color: "#666" }}>Manage restaurant reservations</p>
+            <h2 style={{ margin: 0 }}>👑 Admin Dashboard</h2>
+            <p style={{ margin: 0, color: "#777" }}>
+              Restaurant Reservation Control Panel
+            </p>
           </div>
 
           <button
@@ -63,24 +72,39 @@ export default function AdminPage() {
           </button>
         </div>
 
-        <div style={card}>
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} style={input}>
+        {/* FILTER */}
+        <div style={filterCard}>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            style={input}
+          >
             <option value="ACTIVE">ACTIVE</option>
             <option value="CANCELLED">CANCELLED</option>
             <option value="COMPLETED">COMPLETED</option>
             <option value="ALL">ALL</option>
           </select>
+
+          <button style={primaryBtn} onClick={fetchReservations}>
+            Refresh
+          </button>
         </div>
 
+        {/* LIST */}
         {loading ? (
-          <Spinner text="Loading..." />
+          <Spinner text="Loading reservations..." />
         ) : (
-          <div style={{ display: "grid", gap: 18 }}>
-            {data.length === 0 && <p style={{ textAlign: "center" }}>No reservations</p>}
+          <div style={{ display: "grid", gap: 20 }}>
+            {data.length === 0 && (
+              <p style={{ textAlign: "center", color: "#777" }}>
+                No reservations found
+              </p>
+            )}
 
             {data.map((r) => (
               <div key={r._id} style={card}>
-                <b>{r.user?.email || "Unknown user"}</b>
+                <b>👤 {r.user?.email || "Unknown user"}</b>
+
                 <p>📅 {r.date}</p>
                 <p>⏰ {r.timeSlot}</p>
                 <p>👥 Guests: {r.guests}</p>
@@ -88,11 +112,36 @@ export default function AdminPage() {
                 <span
                   style={{
                     ...badge,
-                    background: r.status === "ACTIVE" ? "#2e7d32" : "#c62828",
+                    background:
+                      r.status === "ACTIVE"
+                        ? "#2e7d32"
+                        : r.status === "CANCELLED"
+                        ? "#c62828"
+                        : "#ff9800",
                   }}
                 >
                   {r.status}
                 </span>
+
+                <div style={{ display: "flex", gap: 10 }}>
+                  {r.status === "ACTIVE" && (
+                    <button
+                      style={dangerSmall}
+                      onClick={() => handleCancel(r._id)}
+                    >
+                      Cancel
+                    </button>
+                  )}
+
+                  {r.status === "CANCELLED" && (
+                    <button
+                      style={successSmall}
+                      onClick={() => handleRestore(r._id)}
+                    >
+                      Restore
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -102,45 +151,94 @@ export default function AdminPage() {
   );
 }
 
-/* STYLES */
+/* ---------- STYLES ---------- */
 
-const page = { minHeight: "100vh", background: "#f8f5f0" };
+const page = {
+  minHeight: "100vh",
+  background: "#f8f5f0",
+};
 
-const container = { maxWidth: 900, margin: "auto", padding: 30 };
+const container = {
+  maxWidth: 950,
+  margin: "auto",
+  padding: 30,
+};
 
 const header = {
   background: "white",
-  padding: 20,
-  borderRadius: 15,
+  padding: 22,
+  borderRadius: 16,
   marginBottom: 25,
   display: "flex",
   justifyContent: "space-between",
+  alignItems: "center",
+  boxShadow: "0 6px 18px rgba(0,0,0,.1)",
+};
+
+const filterCard = {
+  background: "white",
+  padding: 18,
+  borderRadius: 14,
+  marginBottom: 25,
+  display: "flex",
+  gap: 12,
   boxShadow: "0 4px 12px rgba(0,0,0,.08)",
 };
 
 const card = {
   background: "white",
-  padding: 20,
-  borderRadius: 15,
+  padding: 22,
+  borderRadius: 16,
   display: "grid",
-  gap: 10,
+  gap: 8,
   boxShadow: "0 6px 15px rgba(0,0,0,.08)",
 };
 
-const input = { padding: 12, borderRadius: 8 };
+const input = {
+  padding: 12,
+  borderRadius: 10,
+  border: "1px solid #ddd",
+  flex: 1,
+};
 
 const badge = {
-  padding: "4px 10px",
-  borderRadius: 15,
-  color: "white",
+  padding: "4px 12px",
+  borderRadius: 14,
   width: "fit-content",
+  color: "white",
+  fontSize: 13,
+};
+
+const primaryBtn = {
+  background: "#2e7d32",
+  border: "none",
+  padding: "10px 20px",
+  borderRadius: 20,
+  color: "white",
+  cursor: "pointer",
 };
 
 const dangerBtn = {
   background: "#c62828",
   border: "none",
-  padding: "8px 18px",
+  padding: "10px 22px",
   borderRadius: 20,
   color: "white",
   cursor: "pointer",
+};
+
+const dangerSmall = {
+  background: "#c62828",
+  border: "none",
+  padding: "6px 14px",
+  borderRadius: 18,
+  color: "white",
+};
+
+const successSmall = {
+  background: "#2e7d32",
+  border: "none",
+  padding: "6px 14px",
+  borderRadius: 18,
+  color: "white",
 };
