@@ -89,167 +89,161 @@ export default function AdminPage() {
   }, [page, statusFilter]);
 
   return (
-    <div className="container">
+    <div
+      style={{
+        minHeight: "100vh",
+        background:
+          "linear-gradient(rgba(0,0,0,.4),rgba(0,0,0,.4)), url('https://images.unsplash.com/photo-1559339352-11d035aa65de') center/cover",
+      }}
+    >
       <Navbar />
 
-      {/* Header */}
-      <div
-        className="card"
-        style={{
-          padding: 18,
-          marginBottom: 15,
-          background: "linear-gradient(135deg,#6a11cb,#2575fc)",
-          color: "white",
-        }}
-      >
-        <h2 style={{ margin: 0 }}>Admin Dashboard</h2>
-        <p>Manage all reservations</p>
-
-        <button
-          onClick={handleLogout}
-          style={{
-            background: "white",
-            color: "#2575fc",
-            border: "none",
-            padding: "8px 12px",
-            borderRadius: 10,
-            cursor: "pointer",
-            fontWeight: "bold",
-          }}
-        >
-          Logout
-        </button>
-      </div>
-
-      {/* Message */}
-      {msg && (
+      <div style={{ maxWidth: 1100, margin: "auto", padding: "40px 20px" }}>
+        {/* HEADER */}
         <div
-          className="card"
           style={{
-            padding: 12,
-            marginBottom: 15,
-            background: msg.type === "success" ? "#d4edda" : "#f8d7da",
+            background: "rgba(255,255,255,.95)",
+            borderRadius: 20,
+            padding: 25,
+            marginBottom: 20,
+            boxShadow: "0 10px 25px rgba(0,0,0,.3)",
           }}
         >
-          {msg.text}
+          <h2>👑 Admin Dashboard</h2>
+          <p style={{ color: "#666" }}>Manage all restaurant reservations</p>
+
+          <button
+            onClick={handleLogout}
+            style={{
+              marginTop: 10,
+              padding: "8px 16px",
+              borderRadius: 30,
+              border: "none",
+              background: "linear-gradient(135deg,#ff6a00,#ff005c)",
+              color: "white",
+              cursor: "pointer",
+              fontWeight: "bold",
+            }}
+          >
+            Logout
+          </button>
         </div>
-      )}
 
-      {/* Filter */}
-      <div
-        className="card"
-        style={{
-          padding: 15,
-          marginBottom: 15,
-          display: "flex",
-          gap: 10,
-          alignItems: "center",
-        }}
-      >
-        <b>Status:</b>
+        {/* MESSAGE */}
+        {msg && (
+          <div
+            style={{
+              padding: 15,
+              borderRadius: 15,
+              marginBottom: 15,
+              background: msg.type === "success" ? "#d4edda" : "#f8d7da",
+            }}
+          >
+            {msg.text}
+          </div>
+        )}
 
-        <select
-          value={statusFilter}
-          onChange={(e) => {
-            setPage(1);
-            setStatusFilter(e.target.value);
+        {/* FILTER */}
+        <div
+          style={{
+            background: "rgba(255,255,255,.9)",
+            padding: 15,
+            borderRadius: 15,
+            marginBottom: 20,
+            display: "flex",
+            gap: 10,
           }}
-          style={{ padding: 8, flex: 1 }}
         >
-          <option value="ACTIVE">ACTIVE</option>
-          <option value="CANCELLED">CANCELLED</option>
-          <option value="COMPLETED">COMPLETED</option>
-          <option value="ALL">ALL</option>
-        </select>
+          <select
+            value={statusFilter}
+            onChange={(e) => {
+              setPage(1);
+              setStatusFilter(e.target.value);
+            }}
+            style={{ flex: 1, padding: 10, borderRadius: 10 }}
+          >
+            <option value="ACTIVE">ACTIVE</option>
+            <option value="CANCELLED">CANCELLED</option>
+            <option value="COMPLETED">COMPLETED</option>
+            <option value="ALL">ALL</option>
+          </select>
 
-        <button onClick={() => fetchAllReservations(page)}>Refresh</button>
-      </div>
+          <button onClick={() => fetchAllReservations(page)}>Refresh</button>
+        </div>
 
-      {/* Reservations */}
-      <div className="card" style={{ padding: 18 }}>
+        {/* LIST */}
         {loading ? (
-          <Spinner text="Loading..." />
+          <Spinner text="Loading reservations..." />
         ) : data.length === 0 ? (
           <Spinner text="No reservations found" />
         ) : (
-          data.map((r: any) => (
-            <div
-              key={r._id}
-              style={{
-                padding: 14,
-                border: "1px solid #ddd",
-                borderRadius: 12,
-                marginBottom: 12,
-                background: "#fafafa",
-              }}
-            >
-              <p>👤 {r.user?.email}</p>
-              <p>📅 {r.date}</p>
-              <p>⏰ {r.timeSlot}</p>
-              <p>👥 Guests: {r.guests}</p>
+          <div style={{ display: "grid", gap: 15 }}>
+            {data.map((r: any) => (
+              <div
+                key={r._id}
+                style={{
+                  background: "rgba(255,255,255,.95)",
+                  borderRadius: 18,
+                  padding: 20,
+                  boxShadow: "0 6px 15px rgba(0,0,0,.2)",
+                }}
+              >
+                <b>{r.user?.email}</b>
+                <p>{r.date} | {r.timeSlot}</p>
+                <p>Guests: {r.guests}</p>
 
-              <p>
-                Status:{" "}
-                <b
-                  style={{
-                    color:
-                      r.status === "ACTIVE"
-                        ? "#00c853"
-                        : r.status === "CANCELLED"
-                        ? "#e53935"
-                        : "#ff9800",
-                  }}
-                >
-                  {r.status}
-                </b>
-              </p>
-
-              <div style={{ display: "flex", gap: 10 }}>
-                {r.status === "ACTIVE" && (
-                  <button
-                    onClick={() => handleAdminCancel(r._id)}
+                <p>
+                  Status:{" "}
+                  <span
                     style={{
-                      padding: "6px 12px",
-                      borderRadius: 10,
-                      border: "none",
-                      background: "#ff5252",
-                      color: "white",
+                      fontWeight: "bold",
+                      color:
+                        r.status === "ACTIVE"
+                          ? "#00c853"
+                          : r.status === "CANCELLED"
+                          ? "#e53935"
+                          : "#ff9800",
                     }}
                   >
-                    Cancel
-                  </button>
-                )}
+                    {r.status}
+                  </span>
+                </p>
 
-                {r.status === "CANCELLED" && (
-                  <button
-                    onClick={() => handleAdminRestore(r._id)}
-                    style={{
-                      padding: "6px 12px",
-                      borderRadius: 10,
-                      border: "none",
-                      background: "#00c853",
-                      color: "white",
-                    }}
-                  >
-                    Restore
-                  </button>
-                )}
+                <div style={{ display: "flex", gap: 10 }}>
+                  {r.status === "ACTIVE" && (
+                    <button
+                      onClick={() => handleAdminCancel(r._id)}
+                      style={actionRed}
+                    >
+                      Cancel
+                    </button>
+                  )}
+
+                  {r.status === "CANCELLED" && (
+                    <button
+                      onClick={() => handleAdminRestore(r._id)}
+                      style={actionGreen}
+                    >
+                      Restore
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
 
-        {/* Pagination */}
-        <div style={{ display: "flex", gap: 10, marginTop: 15 }}>
-          <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+        {/* PAGINATION */}
+        <div style={{ marginTop: 20, display: "flex", gap: 15 }}>
+          <button disabled={page <= 1} onClick={() => setPage(p => p - 1)}>
             Prev
           </button>
 
-          <b>
+          <b style={{ color: "white" }}>
             Page {page} / {pages}
           </b>
 
-          <button disabled={page >= pages} onClick={() => setPage((p) => p + 1)}>
+          <button disabled={page >= pages} onClick={() => setPage(p => p + 1)}>
             Next
           </button>
         </div>
@@ -257,3 +251,21 @@ export default function AdminPage() {
     </div>
   );
 }
+
+const actionRed = {
+  padding: "8px 14px",
+  borderRadius: 20,
+  border: "none",
+  background: "linear-gradient(135deg,#ff5252,#ff1744)",
+  color: "white",
+  cursor: "pointer",
+};
+
+const actionGreen = {
+  padding: "8px 14px",
+  borderRadius: 20,
+  border: "none",
+  background: "linear-gradient(135deg,#00c853,#00bfa5)",
+  color: "white",
+  cursor: "pointer",
+};
