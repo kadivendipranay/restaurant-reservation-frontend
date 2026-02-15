@@ -1,73 +1,124 @@
-# React + TypeScript + Vite
+# 🍽️ Restaurant Reservation System – Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React + TypeScript frontend application for a Restaurant Reservation Management System.  
+Users can book tables and manage their reservations, while Admins can view and manage all bookings.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Live Demo
 
-## React Compiler
+Frontend:  
+https://restaurant-reservation-frontend-pli.vercel.app/
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🛠 Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- React.js
+- TypeScript
+- HTML / CSS
+- React Router
+- Axios
+- JWT Authentication
+- Vercel (Deployment)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## ✨ Features
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### User
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- Register & Login
+- Book table (date, time slot, guests)
+- View personal reservations
+- Cancel active reservations
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Admin
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- Login as Admin
+- View all reservations
+- Filter by status (Active / Cancelled / Completed / All)
+
+---
+
+## 🔐 Authentication
+
+- JWT based authentication
+- Role-based routing (Admin / User dashboards)
+- Protected routes
+
+---
+
+## ⚙️ Setup Instructions
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/kadivendipranay/restaurant-reservation-frontend.git
+cd restaurant-reservation-frontend
+
+# 🍽️ Restaurant Reservation System – Frontend
+
+A React + TypeScript frontend application for a Restaurant Reservation Management System.  
+Users can book tables and manage their reservations, while Admins can view and manage all bookings.
+
+---
+
+## 🚀 Live Demo
+
+Frontend:  
+https://restaurant-reservation-frontend-pli.vercel.app/
+
+---
+
+## 🛠 Tech Stack
+
+- React.js
+- TypeScript
+- HTML / CSS
+- React Router
+- Axios
+- JWT Authentication
+- Vercel (Deployment)
+
+---
+
+## ✨ Features
+
+### User
+
+- Register & Login
+- Book table (date, time slot, guests)
+- View personal reservations
+- Cancel active reservations
+
+### Admin
+
+- Login as Admin
+- View all reservations
+- Filter by status (Active / Cancelled / Completed / All)
+
+---
+
+## 🔐 Authentication
+
+- JWT based authentication
+- Role-based routing (Admin / User dashboards)
+- Protected routes
+
+---
+
+## ⚙️ Setup Instructions
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/kadivendipranay/restaurant-reservation-frontend.git
+cd restaurant-reservation-frontend
+
+
+2.Install Dependencies
+  npm install
+
+3. Start Application
+npm run dev
