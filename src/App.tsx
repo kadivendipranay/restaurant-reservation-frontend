@@ -1,4 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -8,36 +10,42 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
-    <Routes>
-      {/* Root → auto redirect based on auth */}
-      <Route path="/" element={<Home />} />
+    <>
+      {/* ROUTES */}
+      <Routes>
+        {/* Home */}
+        <Route path="/" element={<Home />} />
 
-      {/* Login */}
-      <Route path="/login" element={<Login />} />
+        {/* Login */}
+        <Route path="/login" element={<Login />} />
 
-      {/* Admin Dashboard */}
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute allowedRole="ADMIN">
-            <AdminPage />
-          </ProtectedRoute>
-        }
-      />
+        {/* Admin */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRole="ADMIN">
+              <AdminPage />
+            </ProtectedRoute>
+          }
+        />
 
-      {/* User Dashboard */}
-      <Route
-        path="/user"
-        element={
-          <ProtectedRoute allowedRole="USER">
-            <UserPage />
-          </ProtectedRoute>
-        }
-      />
+        {/* User */}
+        <Route
+          path="/user"
+          element={
+            <ProtectedRoute allowedRole="USER">
+              <UserPage />
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Fallback */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        {/* 404 Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+
+      {/* 🔥 TOAST CONTAINER */}
+      <ToastContainer position="top-right" autoClose={3000} />
+    </>
   );
 }
 

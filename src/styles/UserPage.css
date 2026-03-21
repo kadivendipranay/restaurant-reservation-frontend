@@ -1,0 +1,98 @@
+/* CONTAINER */
+.user-container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 20px;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* HEADER */
+.user-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg,#0077ff,#00c6ff);
+  color: white;
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+
+.logout-btn {
+  background: white;
+  color: #0077ff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* CARD */
+.card {
+  padding: 20px;
+  border-radius: 16px;
+  background: white;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* INPUTS */
+.card input,
+.card select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+/* BUTTON */
+.create-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  background: linear-gradient(135deg,#00c853,#00bfa5);
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* FILTER */
+.filter-select {
+  margin-bottom: 10px;
+  padding: 8px;
+}
+
+/* ITEM */
+.reservation-item {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+/* STATUS */
+.status.ACTIVE {
+  color: #00c853;
+}
+
+.status.CANCELLED {
+  color: #e53935;
+}
+
+.status.COMPLETED {
+  color: #ff9800;
+}
+
+/* CANCEL BUTTON */
+.cancel-btn {
+  margin-top: 8px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: none;
+  background: #ff5252;
+  color: white;
+  cursor: pointer;
+}

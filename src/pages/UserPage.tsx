@@ -4,11 +4,8 @@ import API from "../api/api";
 import Navbar from "../components/Navbar";
 import Spinner from "../components/Spinner";
 import { useAuth } from "../context/AuthContext";
-
-type Message = {
-  type: "success" | "error";
-  text: string;
-};
+import { toast } from "react-toastify";
+import "../styles/UserPage.css";
 
 export default function UserPage() {
   const navigate = useNavigate();
@@ -17,11 +14,10 @@ export default function UserPage() {
   const [date, setDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("17:00-18:00");
   const [guests, setGuests] = useState(1);
-  const [reservations, setReservations] = useState<any[]>([]);
+  const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingList, setLoadingList] = useState(false);
   const [statusFilter, setStatusFilter] = useState("ACTIVE");
-  const [msg, setMsg] = useState<Message | null>(null);
 
   const TIME_SLOTS = [
     "17:00-18:00",
@@ -38,19 +34,12 @@ export default function UserPage() {
 
   const fetchMyReservations = async () => {
     setLoadingList(true);
-    setMsg(null);
 
     try {
       const res = await API.get(`/reservations/my?status=${statusFilter}`);
       setReservations(res.data || []);
-    } catch (err: any) {
-      setMsg({
-        type: "error",
-        text:
-          err?.response?.data?.message ||
-          err?.message ||
-          "Failed to load reservations",
-      });
+    } catch (err) {
+      toast.error("Failed to load reservations");
     } finally {
       setLoadingList(false);
     }
@@ -62,7 +51,7 @@ export default function UserPage() {
 
   const handleCreateReservation = async () => {
     if (!date || !timeSlot || guests < 1) {
-      setMsg({ type: "error", text: "Please fill all fields correctly" });
+      toast.warning("Please fill all fields correctly");
       return;
     }
 
@@ -71,86 +60,50 @@ export default function UserPage() {
     try {
       await API.post("/reservations", { date, timeSlot, guests });
 
-      setMsg({ type: "success", text: "Reservation created successfully ✅" });
+      toast.success("Reservation created successfully ✅");
 
       setDate("");
       setGuests(1);
       setTimeSlot("17:00-18:00");
 
       fetchMyReservations();
-    } catch (err: any) {
-      setMsg({
-        type: "error",
-        text:
-          err?.response?.data?.message ||
-          err?.message ||
-          "Reservation failed",
-      });
+    } catch (err) {
+      toast.error("Reservation failed");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCancelReservation = async (id: string) => {
+  const handleCancelReservation = async (id) => {
     if (!window.confirm("Cancel reservation?")) return;
 
     try {
       await API.patch(`/reservations/${id}/cancel`);
+      toast.success("Cancelled successfully");
       fetchMyReservations();
     } catch {
-      alert("Cancel failed");
+      toast.error("Cancel failed");
     }
   };
 
   return (
-    <div className="container">
+    <div className="user-container">
       <Navbar />
 
-      {/* Header */}
-      <div
-        className="card"
-        style={{
-          padding: 18,
-          marginBottom: 15,
-          background: "linear-gradient(135deg,#0077ff,#00c6ff)",
-          color: "white",
-        }}
-      >
-        <h2 style={{ margin: 0 }}>User Dashboard</h2>
-        <p>Create and manage your reservations</p>
+      {/* HEADER */}
+      <div className="user-header">
+        <div>
+          <h2>User Dashboard</h2>
+          <p>Create and manage your reservations</p>
+        </div>
 
-        <button
-          onClick={handleLogout}
-          style={{
-            background: "white",
-            color: "#0077ff",
-            border: "none",
-            padding: "8px 12px",
-            borderRadius: 10,
-            cursor: "pointer",
-            fontWeight: "bold",
-          }}
-        >
+        <button className="logout-btn" onClick={handleLogout}>
           Logout
         </button>
       </div>
 
-      {/* Message */}
-      {msg && (
-        <div
-          className="card"
-          style={{
-            padding: 12,
-            marginBottom: 15,
-            background: msg.type === "success" ? "#d4edda" : "#f8d7da",
-          }}
-        >
-          {msg.text}
-        </div>
-      )}
-
-      {/* Create Reservation */}
-      <div className="card" style={{ padding: 18, marginBottom: 20 }}>
+      {/* CREATE FORM */}
+      <div className="card">
         <h3>Create Reservation</h3>
 
         <label>Date</label>
@@ -180,29 +133,20 @@ export default function UserPage() {
         <button
           onClick={handleCreateReservation}
           disabled={loading}
-          style={{
-            marginTop: 10,
-            width: "100%",
-            padding: 10,
-            borderRadius: 12,
-            background: "linear-gradient(135deg,#00c853,#00bfa5)",
-            border: "none",
-            color: "white",
-            fontWeight: "bold",
-          }}
+          className="create-btn"
         >
           {loading ? "Creating..." : "Create Reservation"}
         </button>
       </div>
 
-      {/* Reservation List */}
-      <div className="card" style={{ padding: 18 }}>
+      {/* LIST */}
+      <div className="card">
         <h3>My Reservations</h3>
 
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          style={{ marginBottom: 12 }}
+          className="filter-select"
         >
           <option value="ACTIVE">ACTIVE</option>
           <option value="CANCELLED">CANCELLED</option>
@@ -213,40 +157,22 @@ export default function UserPage() {
         {loadingList ? (
           <Spinner text="Loading..." />
         ) : reservations.length === 0 ? (
-          <Spinner text="No reservations found" />
+          <p>No reservations found</p>
         ) : (
-          reservations.map((r: any) => (
-            <div
-              key={r._id}
-              style={{
-                padding: 12,
-                border: "1px solid #ddd",
-                borderRadius: 12,
-                marginBottom: 10,
-              }}
-            >
+          reservations.map((r) => (
+            <div key={r._id} className="reservation-item">
               <p>
                 📅 {r.date} | ⏰ {r.timeSlot} | 👥 {r.guests}
               </p>
 
               <p>
-                Status:{" "}
-                <b style={{ color: r.status === "ACTIVE" ? "#00c853" : "#e53935" }}>
-                  {r.status}
-                </b>
+                Status: <span className={`status ${r.status}`}>{r.status}</span>
               </p>
 
               {r.status === "ACTIVE" && (
                 <button
+                  className="cancel-btn"
                   onClick={() => handleCancelReservation(r._id)}
-                  style={{
-                    padding: "6px 10px",
-                    borderRadius: 10,
-                    border: "none",
-                    background: "#ff5252",
-                    color: "white",
-                    cursor: "pointer",
-                  }}
                 >
                   Cancel
                 </button>

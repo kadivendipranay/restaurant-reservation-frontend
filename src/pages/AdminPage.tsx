@@ -4,22 +4,22 @@ import API from "../api/api";
 import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
 import Spinner from "../components/Spinner";
-
-type Message = {
-  type: "success" | "error";
-  text: string;
-};
+import { toast } from "react-toastify";
+import "../styles/AdminPage.css";
 
 export default function AdminPage() {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState("ACTIVE");
-  const [msg, setMsg] = useState<Message | null>(null);
+
+  // 🔥 NEW STATES
+  const [searchEmail, setSearchEmail] = useState("");
+  const [searchDate, setSearchDate] = useState("");
 
   const handleLogout = () => {
     if (!window.confirm("Logout?")) return;
@@ -27,60 +27,47 @@ export default function AdminPage() {
     navigate("/login");
   };
 
-  const fetchAllReservations = async (pageNumber: number) => {
+  const fetchAllReservations = async (pageNumber) => {
     setLoading(true);
-    setMsg(null);
 
     try {
       const res = await API.get(
-        `/reservations/all?page=${pageNumber}&limit=5&status=${statusFilter}`
+        `/reservations/all?page=${pageNumber}&limit=5&status=${statusFilter}&email=${searchEmail}&date=${searchDate}`
       );
 
       setData(res.data.data || []);
       setPage(res.data.page || 1);
       setPages(res.data.pages || 1);
-    } catch (err: any) {
-      setMsg({
-        type: "error",
-        text:
-          err?.response?.data?.message ||
-          err?.message ||
-          "Failed to load reservations",
-      });
+    } catch (err) {
+      toast.error(
+        err?.response?.data?.message || "Failed to load reservations"
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAdminCancel = async (id: string) => {
+  const handleAdminCancel = async (id) => {
     if (!window.confirm("Cancel reservation?")) return;
 
     try {
       const res = await API.patch(`/reservations/admin-cancel/${id}`);
-      setMsg({ type: "success", text: res.data.message || "Cancelled" });
+      toast.success(res.data.message || "Cancelled");
       fetchAllReservations(page);
-    } catch (err: any) {
-      setMsg({
-        type: "error",
-        text:
-          err?.response?.data?.message || err?.message || "Cancel failed",
-      });
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Cancel failed");
     }
   };
 
-  const handleAdminRestore = async (id: string) => {
+  const handleAdminRestore = async (id) => {
     if (!window.confirm("Restore reservation?")) return;
 
     try {
       const res = await API.patch(`/reservations/admin-restore/${id}`);
-      setMsg({ type: "success", text: res.data.message || "Restored" });
+      toast.success(res.data.message || "Restored");
       fetchAllReservations(page);
-    } catch (err: any) {
-      setMsg({
-        type: "error",
-        text:
-          err?.response?.data?.message || err?.message || "Restore failed",
-      });
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Restore failed");
     }
   };
 
@@ -89,63 +76,23 @@ export default function AdminPage() {
   }, [page, statusFilter]);
 
   return (
-    <div className="container">
+    <div className="admin-container">
       <Navbar />
 
-      {/* Header */}
-      <div
-        className="card"
-        style={{
-          padding: 18,
-          marginBottom: 15,
-          background: "linear-gradient(135deg,#6a11cb,#2575fc)",
-          color: "white",
-        }}
-      >
-        <h2 style={{ margin: 0 }}>Admin Dashboard</h2>
-        <p>Manage all reservations</p>
+      {/* HEADER */}
+      <div className="admin-header">
+        <div>
+          <h2>Admin Dashboard</h2>
+          <p>Manage all reservations</p>
+        </div>
 
-        <button
-          onClick={handleLogout}
-          style={{
-            background: "white",
-            color: "#2575fc",
-            border: "none",
-            padding: "8px 12px",
-            borderRadius: 10,
-            cursor: "pointer",
-            fontWeight: "bold",
-          }}
-        >
+        <button className="logout-btn" onClick={handleLogout}>
           Logout
         </button>
       </div>
 
-      {/* Message */}
-      {msg && (
-        <div
-          className="card"
-          style={{
-            padding: 12,
-            marginBottom: 15,
-            background: msg.type === "success" ? "#d4edda" : "#f8d7da",
-          }}
-        >
-          {msg.text}
-        </div>
-      )}
-
-      {/* Filter */}
-      <div
-        className="card"
-        style={{
-          padding: 15,
-          marginBottom: 15,
-          display: "flex",
-          gap: 10,
-          alignItems: "center",
-        }}
-      >
+      {/* 🔥 FILTER + SEARCH */}
+      <div className="filter-card">
         <b>Status:</b>
 
         <select
@@ -154,7 +101,6 @@ export default function AdminPage() {
             setPage(1);
             setStatusFilter(e.target.value);
           }}
-          style={{ padding: 8, flex: 1 }}
         >
           <option value="ACTIVE">ACTIVE</option>
           <option value="CANCELLED">CANCELLED</option>
@@ -162,27 +108,40 @@ export default function AdminPage() {
           <option value="ALL">ALL</option>
         </select>
 
-        <button onClick={() => fetchAllReservations(page)}>Refresh</button>
+        <input
+          placeholder="Search email"
+          value={searchEmail}
+          onChange={(e) => setSearchEmail(e.target.value)}
+        />
+
+        <input
+          type="date"
+          value={searchDate}
+          onChange={(e) => setSearchDate(e.target.value)}
+        />
+
+        <button onClick={() => fetchAllReservations(1)}>Search</button>
+
+        <button
+          onClick={() => {
+            setSearchEmail("");
+            setSearchDate("");
+            fetchAllReservations(1);
+          }}
+        >
+          Reset
+        </button>
       </div>
 
-      {/* Reservations */}
-      <div className="card" style={{ padding: 18 }}>
+      {/* LIST */}
+      <div className="reservation-card">
         {loading ? (
           <Spinner text="Loading..." />
         ) : data.length === 0 ? (
-          <Spinner text="No reservations found" />
+          <p>No reservations found</p>
         ) : (
-          data.map((r: any) => (
-            <div
-              key={r._id}
-              style={{
-                padding: 14,
-                border: "1px solid #ddd",
-                borderRadius: 12,
-                marginBottom: 12,
-                background: "#fafafa",
-              }}
-            >
+          data.map((r) => (
+            <div key={r._id} className="reservation-item">
               <p>👤 {r.user?.email}</p>
               <p>📅 {r.date}</p>
               <p>⏰ {r.timeSlot}</p>
@@ -190,31 +149,16 @@ export default function AdminPage() {
 
               <p>
                 Status:{" "}
-                <b
-                  style={{
-                    color:
-                      r.status === "ACTIVE"
-                        ? "#00c853"
-                        : r.status === "CANCELLED"
-                        ? "#e53935"
-                        : "#ff9800",
-                  }}
-                >
+                <span className={`status ${r.status}`}>
                   {r.status}
-                </b>
+                </span>
               </p>
 
-              <div style={{ display: "flex", gap: 10 }}>
+              <div className="actions">
                 {r.status === "ACTIVE" && (
                   <button
+                    className="cancel-btn"
                     onClick={() => handleAdminCancel(r._id)}
-                    style={{
-                      padding: "6px 12px",
-                      borderRadius: 10,
-                      border: "none",
-                      background: "#ff5252",
-                      color: "white",
-                    }}
                   >
                     Cancel
                   </button>
@@ -222,14 +166,8 @@ export default function AdminPage() {
 
                 {r.status === "CANCELLED" && (
                   <button
+                    className="restore-btn"
                     onClick={() => handleAdminRestore(r._id)}
-                    style={{
-                      padding: "6px 12px",
-                      borderRadius: 10,
-                      border: "none",
-                      background: "#00c853",
-                      color: "white",
-                    }}
                   >
                     Restore
                   </button>
@@ -239,17 +177,15 @@ export default function AdminPage() {
           ))
         )}
 
-        {/* Pagination */}
-        <div style={{ display: "flex", gap: 10, marginTop: 15 }}>
-          <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
+        {/* PAGINATION */}
+        <div className="pagination">
+          <button disabled={page <= 1} onClick={() => setPage(p => p - 1)}>
             Prev
           </button>
 
-          <b>
-            Page {page} / {pages}
-          </b>
+          <b>Page {page} / {pages}</b>
 
-          <button disabled={page >= pages} onClick={() => setPage((p) => p + 1)}>
+          <button disabled={page >= pages} onClick={() => setPage(p => p + 1)}>
             Next
           </button>
         </div>
