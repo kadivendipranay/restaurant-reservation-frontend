@@ -3,12 +3,30 @@ import Navbar from "../components/Navbar";
 import "../styles/Home.css";
 
 const FEATURES = [
-  "Online Reservations",
-  "Admin Dashboard",
-  "Time Slot Booking",
-  "Cancel / Restore",
-  "Role Based Login",
-  "JWT Secure Auth",
+  {
+    title: "🍽 Online Reservations",
+    desc: "Users can easily book tables by selecting date, time slot, and number of guests.",
+  },
+  {
+    title: "📊 Admin Dashboard",
+    desc: "Admin can view, manage, cancel, and restore all reservations in one place.",
+  },
+  {
+    title: "⏰ Time Slot Booking",
+    desc: "Predefined time slots ensure organized scheduling and avoid booking conflicts.",
+  },
+  {
+    title: "❌ Cancel / Restore",
+    desc: "Reservations can be cancelled by users or restored by admin when needed.",
+  },
+  {
+    title: "👤 Role Based Login",
+    desc: "System redirects users to admin or user dashboard based on their role.",
+  },
+  {
+    title: "🔐 JWT Secure Auth",
+    desc: "Authentication is handled using JWT tokens for secure and protected access.",
+  },
 ];
 
 export default function Home() {
@@ -45,9 +63,9 @@ export default function Home() {
       <section className="features">
         <div className="features-grid">
           {FEATURES.map((feature) => (
-            <div key={feature} className="feature-card">
-              <h3>{feature}</h3>
-              <p>Professional full-stack implementation</p>
+            <div key={feature.title} className="feature-card">
+              <h3>{feature.title}</h3>
+              <p>{feature.desc}</p>
             </div>
           ))}
         </div>
@@ -55,7 +73,7 @@ export default function Home() {
 
       {/* FOOTER */}
       <footer className="footer">
-        © 2026 Royal Restaurant • Built by Pranay Kumar (MERN Stack)
+        © {new Date().getFullYear()} Royal Restaurant • Built by Pranay Kumar (MERN Stack)
       </footer>
     </div>
   );
