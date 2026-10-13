@@ -1,69 +1,220 @@
+
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import "../styles/HomePage.css";
 
 const FEATURES = [
-  "User Login & Register",
-  "Create Reservations",
-  "Time Slot Selection",
-  "Cancel Reservations",
-  "Admin Dashboard",
-  "Restore Cancelled Bookings",
+  {
+    icon: "🔐",
+    title: "Secure Login",
+    description: "Register and log in to access your personal dashboard.",
+  },
+  {
+    icon: "📅",
+    title: "Easy Reservations",
+    description: "Choose your preferred date, time slot, and guest count.",
+  },
+  {
+    icon: "🕒",
+    title: "Flexible Time Slots",
+    description: "Select from the available restaurant booking slots.",
+  },
+  {
+    icon: "❌",
+    title: "Cancel Bookings",
+    description: "Manage your active reservations when plans change.",
+  },
+  {
+    icon: "🛠️",
+    title: "Admin Dashboard",
+    description: "Manage bookings and review reservation information.",
+  },
+  {
+    icon: "🔄",
+    title: "Restore Bookings",
+    description: "Restore eligible cancelled reservations as an admin.",
+  },
 ];
 
 export default function HomePage() {
   const navigate = useNavigate();
 
-  const token = localStorage.getItem("token");
-  const role = (localStorage.getItem("role") || "").toUpperCase();
-
   const goDashboard = () => {
-    if (!token) return navigate("/login");
-    return navigate(role === "ADMIN" ? "/admin" : "/user");
+    const token = localStorage.getItem("token");
+    const role = (localStorage.getItem("role") || "").toUpperCase();
+
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    if (role === "ADMIN") {
+      navigate("/admin");
+    } else {
+      navigate("/user");
+    }
+  };
+
+  const goToLogin = () => {
+    navigate("/login");
   };
 
   return (
-    <div className="home-container">
+    <main className="home-container">
       <Navbar />
 
-      {/* HERO */}
+      {/* HERO SECTION */}
       <section className="hero-card">
-        <h1 className="hero-title">🍽️ Welcome to ReserveDine</h1>
+        <div className="hero-content">
+          <span className="hero-badge">
+            ✨ Your table, your time
+          </span>
 
-        <p className="hero-subtitle">
-          Book your table instantly. Manage reservations effortlessly.
-        </p>
+          <h1 className="hero-title">
+            Welcome to <span>ReserveDine</span>
+          </h1>
 
-        <button className="hero-btn" onClick={goDashboard}>
-          Go to Dashboard →
+          <p className="hero-subtitle">
+            Great food starts with a great reservation.
+            Book your table, choose your time, and make every
+            dining experience special.
+          </p>
+
+          <div className="hero-actions">
+            <button
+              type="button"
+              className="hero-btn"
+              onClick={goDashboard}
+            >
+              Go to Dashboard <span>→</span>
+            </button>
+
+            <button
+              type="button"
+              className="hero-secondary-btn"
+              onClick={goToLogin}
+            >
+              Sign In
+            </button>
+          </div>
+
+          <div className="hero-note">
+            🍽️ Simple booking · ⏰ Convenient time slots · 📱 Easy management
+          </div>
+        </div>
+
+        <div className="hero-visual" aria-hidden="true">
+          <div className="hero-plate">
+            <span>🍽️</span>
+          </div>
+          <span className="floating-icon floating-icon-one">🥗</span>
+          <span className="floating-icon floating-icon-two">✨</span>
+          <span className="floating-icon floating-icon-three">🍴</span>
+        </div>
+      </section>
+
+      {/* ABOUT SECTION */}
+      <section className="about-section">
+        <div className="section-heading">
+          <span className="section-eyebrow">ABOUT RESERVEDINE</span>
+          <h2>Dining reservations made simple</h2>
+          <p>
+            ReserveDine brings booking and reservation management
+            together in one convenient place.
+          </p>
+        </div>
+
+        <div className="about-card">
+          <div className="about-icon" aria-hidden="true">
+            🍽️
+          </div>
+
+          <div className="about-content">
+            <h3>Your dining experience, simplified</h3>
+
+            <p>
+              Whether you are a guest planning a meal or an
+              administrator managing restaurant bookings, ReserveDine
+              helps keep the reservation process organized. Create
+              bookings, view their status, and manage eligible
+              reservations from a simple dashboard.
+            </p>
+
+            <button
+              type="button"
+              className="about-link"
+              onClick={goDashboard}
+            >
+              Get started <span>→</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* FEATURES SECTION */}
+      <section className="features-section">
+        <div className="section-heading">
+          <span className="section-eyebrow">WHAT YOU CAN DO</span>
+          <h2>Everything you need in one place</h2>
+          <p>
+            Explore the features designed to make reservation
+            management easier.
+          </p>
+        </div>
+
+        <div className="features-grid">
+          {FEATURES.map((feature, index) => (
+            <article
+              key={feature.title}
+              className="feature-card"
+            >
+              <div className="feature-icon" aria-hidden="true">
+                {feature.icon}
+              </div>
+
+              <span className="feature-number">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+
+              <h3>{feature.title}</h3>
+              <p>{feature.description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* CALL TO ACTION */}
+      <section className="cta-card">
+        <div>
+          <span className="cta-eyebrow">YOUR NEXT MEAL STARTS HERE</span>
+          <h2>Ready to make a reservation?</h2>
+          <p>Sign in to manage your bookings and get started.</p>
+        </div>
+
+        <button
+          type="button"
+          className="cta-btn"
+          onClick={goDashboard}
+        >
+          Book Your Table <span>→</span>
         </button>
       </section>
 
-      {/* ABOUT */}
-      <section className="about-card">
-        <h2>About Our Restaurant</h2>
-        <p>
-          ReserveDine makes dining stress-free. Whether you are a guest
-          booking a table or an admin managing reservations — everything
-          happens in one place.
-        </p>
-      </section>
-
-      {/* FEATURES */}
-      <section className="features-grid">
-        {FEATURES.map((feature) => (
-          <div key={feature} className="feature-card">
-            <h4>{feature}</h4>
-            <p>Smooth and secure experience</p>
-          </div>
-        ))}
-      </section>
-
       {/* FOOTER */}
-      <footer className="footer">
-        <p>Built with ❤️ using React + Node + MongoDB</p>
-        <p>© {new Date().getFullYear()} ReserveDine</p>
+      <footer className="home-footer">
+        <div className="footer-brand">
+          <span className="footer-logo">🍽️</span>
+          <span>ReserveDine</span>
+        </div>
+
+        <p>
+          Built with React, Node.js, Express, and MongoDB.
+        </p>
+
+        <p className="footer-copyright">
+          © {new Date().getFullYear()} ReserveDine. All rights reserved.
+        </p>
       </footer>
-    </div>
+    </main>
   );
 }

@@ -4,6 +4,7 @@ const API = axios.create({
   baseURL: "https://restaurant-reservation-backend-6va5.onrender.com/api",
 });
 
+
 API.interceptors.request.use((req) => {
   const token = localStorage.getItem("token");
 

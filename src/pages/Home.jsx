@@ -1,80 +1,193 @@
+
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import "../styles/Home.css";
 
 const FEATURES = [
   {
-    title: "🍽 Online Reservations",
-    desc: "Users can easily book tables by selecting date, time slot, and number of guests.",
+    icon: "🍽️",
+    title: "Online Reservations",
+    desc: "Book your table by choosing a date, time slot, and number of guests.",
   },
   {
-    title: "📊 Admin Dashboard",
-    desc: "Admin can view, manage, cancel, and restore all reservations in one place.",
+    icon: "📊",
+    title: "Admin Dashboard",
+    desc: "Administrators can view, manage, cancel, and restore reservations.",
   },
   {
-    title: "⏰ Time Slot Booking",
-    desc: "Predefined time slots ensure organized scheduling and avoid booking conflicts.",
+    icon: "⏰",
+    title: "Time Slot Booking",
+    desc: "Choose an available time slot for an organized booking experience.",
   },
   {
-    title: "❌ Cancel / Restore",
-    desc: "Reservations can be cancelled by users or restored by admin when needed.",
+    icon: "🔄",
+    title: "Reservation Management",
+    desc: "Users can cancel eligible bookings, while admins can manage reservation statuses.",
   },
   {
-    title: "👤 Role Based Login",
-    desc: "System redirects users to admin or user dashboard based on their role.",
+    icon: "👤",
+    title: "Role-Based Access",
+    desc: "Users and administrators are directed to their respective dashboards.",
   },
   {
-    title: "🔐 JWT Secure Auth",
-    desc: "Authentication is handled using JWT tokens for secure and protected access.",
+    icon: "🔐",
+    title: "JWT Authentication",
+    desc: "Protected API endpoints use authentication and role-based authorization.",
   },
 ];
 
 export default function Home() {
   const navigate = useNavigate();
 
-  const token = localStorage.getItem("token");
-  const role = (localStorage.getItem("role") || "").toUpperCase();
-
   const goDashboard = () => {
-    if (!token) return navigate("/login");
-    return navigate(role === "ADMIN" ? "/admin" : "/user");
+    const token = localStorage.getItem("token");
+    const role = (localStorage.getItem("role") || "").toUpperCase();
+
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    if (role === "ADMIN") {
+      navigate("/admin");
+    } else {
+      navigate("/user");
+    }
+  };
+
+  const goToLogin = () => {
+    navigate("/login");
   };
 
   return (
-    <div className="home">
+    <main className="home">
       <Navbar />
 
-      {/* HERO */}
-      <section className="hero">
+      {/* HERO SECTION */}
+      <section className="hero" aria-labelledby="hero-title">
+        <div className="hero-overlay" />
+
         <div className="hero-content">
-          <h1 className="hero-title">🍽 Royal Restaurant</h1>
+          <span className="hero-badge">
+            ✨ Fine Dining • Memorable Experiences
+          </span>
+
+          <h1 id="hero-title" className="hero-title">
+            Welcome to <span>Royal Restaurant</span>
+          </h1>
 
           <p className="hero-subtitle">
-            Fine dining • Easy reservations • Premium experience
+            Fine dining, easy reservations, and a premium experience.
+            Your perfect table is just a few clicks away.
           </p>
 
-          <button className="hero-btn" onClick={goDashboard}>
-            Book a Table →
-          </button>
+          <div className="hero-actions">
+            <button
+              type="button"
+              className="hero-btn"
+              onClick={goDashboard}
+            >
+              Book a Table <span aria-hidden="true">→</span>
+            </button>
+
+            {!localStorage.getItem("token") && (
+              <button
+                type="button"
+                className="hero-login-btn"
+                onClick={goToLogin}
+              >
+                Sign In
+              </button>
+            )}
+          </div>
+
+          <div className="hero-highlights">
+            <span>✓ Easy Booking</span>
+            <span>✓ Flexible Time Slots</span>
+            <span>✓ Simple Management</span>
+          </div>
+        </div>
+
+        <a className="scroll-indicator" href="#features">
+          Explore Features <span aria-hidden="true">↓</span>
+        </a>
+      </section>
+
+      {/* FEATURES SECTION */}
+      <section
+        className="features"
+        id="features"
+        aria-labelledby="features-title"
+      >
+        <div className="section-heading">
+          <span className="section-eyebrow">WHY RESERVEDINE?</span>
+
+          <h2 id="features-title">
+            Everything You Need for Easy Reservations
+          </h2>
+
+          <p>
+            A simple and convenient platform for booking tables and managing
+            restaurant reservations.
+          </p>
+        </div>
+
+        <div className="features-grid">
+          {FEATURES.map((feature, index) => (
+            <article className="feature-card" key={feature.title}>
+              <div className="feature-icon" aria-hidden="true">
+                {feature.icon}
+              </div>
+
+              <span className="feature-number">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+
+              <h3>{feature.title}</h3>
+              <p>{feature.desc}</p>
+            </article>
+          ))}
         </div>
       </section>
 
-      {/* FEATURES */}
-      <section className="features">
-        <div className="features-grid">
-          {FEATURES.map((feature) => (
-            <div key={feature.title} className="feature-card">
-              <h3>{feature.title}</h3>
-              <p>{feature.desc}</p>
-            </div>
-          ))}
+      {/* CALL TO ACTION */}
+      <section className="cta-section">
+        <div className="cta-content">
+          <span className="section-eyebrow">YOUR TABLE IS WAITING</span>
+
+          <h2>Make Your Next Dining Experience Special</h2>
+
+          <p>
+            Get started today and manage your restaurant reservations
+            in one convenient place.
+          </p>
+
+          <button
+            type="button"
+            className="hero-btn cta-btn"
+            onClick={goDashboard}
+          >
+            {localStorage.getItem("token")
+              ? "Go to Dashboard"
+              : "Get Started"}{" "}
+            <span aria-hidden="true">→</span>
+          </button>
         </div>
       </section>
 
       {/* FOOTER */}
       <footer className="footer">
-        © {new Date().getFullYear()} Royal Restaurant • Built by Pranay Kumar (MERN Stack)
+        <div className="footer-brand">
+          <span aria-hidden="true">🍽️</span>
+          <strong>ReserveDine</strong>
+        </div>
+
+        <p>Making restaurant reservations simple and convenient.</p>
+
+        <p className="footer-copyright">
+          © {new Date().getFullYear()} ReserveDine. All rights reserved.
+        </p>
       </footer>
-    </div>
+    </main>
   );
 }
