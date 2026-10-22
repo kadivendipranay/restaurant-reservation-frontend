@@ -15,13 +15,13 @@ function App() {
   return (
     <>
       <Routes>
-        {/* Home */}
+        {/* Home Page */}
         <Route path="/" element={<Home />} />
 
-        {/* Login */}
+        {/* Login Page */}
         <Route path="/login" element={<Login />} />
 
-        {/* Admin */}
+        {/* Admin Dashboard */}
         <Route
           path="/admin"
           element={
@@ -31,7 +31,7 @@ function App() {
           }
         />
 
-        {/* User */}
+        {/* User Dashboard */}
         <Route
           path="/user"
           element={
@@ -47,20 +47,24 @@ function App() {
           element={<FoodRecommendations />}
         />
 
-        {/* 404 Fallback */}
+        {/* Redirect unknown routes */}
         <Route
           path="*"
           element={<Navigate to="/" replace />}
         />
       </Routes>
 
-      {/* Floating chatbot */}
+      {/* Floating AI Chatbot */}
       <AIChatbot />
 
-      {/* Toast notifications */}
+      {/* Toast Notifications */}
       <ToastContainer
         position="top-right"
         autoClose={3000}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        theme="light"
       />
     </>
   );

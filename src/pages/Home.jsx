@@ -39,6 +39,8 @@ const FEATURES = [
 export default function Home() {
   const navigate = useNavigate();
 
+  const isLoggedIn = Boolean(localStorage.getItem("token"));
+
   const goDashboard = () => {
     const token = localStorage.getItem("token");
     const role = (localStorage.getItem("role") || "").toUpperCase();
@@ -55,9 +57,10 @@ export default function Home() {
     }
   };
 
-  const goToLogin = () => {
-    navigate("/login");
-  };
+  const goToLogin = () => navigate("/login");
+
+  const goToFoodRecommendations = () =>
+    navigate("/food-recommendations");
 
   return (
     <main className="home">
@@ -90,7 +93,15 @@ export default function Home() {
               Book a Table <span aria-hidden="true">→</span>
             </button>
 
-            {!localStorage.getItem("token") && (
+            <button
+              type="button"
+              className="hero-login-btn"
+              onClick={goToFoodRecommendations}
+            >
+              🍴 Explore Food
+            </button>
+
+            {!isLoggedIn && (
               <button
                 type="button"
                 className="hero-login-btn"
@@ -150,7 +161,29 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CALL TO ACTION */}
+      {/* FOOD RECOMMENDATIONS CTA */}
+      <section className="cta-section">
+        <div className="cta-content">
+          <span className="section-eyebrow">DISCOVER OUR MENU</span>
+
+          <h2>Find Your Perfect Dish</h2>
+
+          <p>
+            Explore food recommendations based on your food preference,
+            budget, category, and spice level.
+          </p>
+
+          <button
+            type="button"
+            className="hero-btn cta-btn"
+            onClick={goToFoodRecommendations}
+          >
+            Explore Food Recommendations →
+          </button>
+        </div>
+      </section>
+
+      {/* RESERVATION CTA */}
       <section className="cta-section">
         <div className="cta-content">
           <span className="section-eyebrow">YOUR TABLE IS WAITING</span>
@@ -167,9 +200,7 @@ export default function Home() {
             className="hero-btn cta-btn"
             onClick={goDashboard}
           >
-            {localStorage.getItem("token")
-              ? "Go to Dashboard"
-              : "Get Started"}{" "}
+            {isLoggedIn ? "Go to Dashboard" : "Get Started"}{" "}
             <span aria-hidden="true">→</span>
           </button>
         </div>
