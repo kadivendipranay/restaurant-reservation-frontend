@@ -1,10 +1,7 @@
 
 import { useState } from "react";
 import "../styles/AIChatbot.css";
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  "http://localhost:5000/api";
+import { sendAIMessage } from "../services/aiService";
 
 export default function AIChatbot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -32,21 +29,7 @@ export default function AIChatbot() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/ai/chat`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: question }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.reply || data.message || "Request failed"
-        );
-      }
+      const data = await sendAIMessage(question);
 
       setMessages((previous) => [
         ...previous,
@@ -62,7 +45,9 @@ export default function AIChatbot() {
         ...previous,
         {
           sender: "bot",
-          text: "Unable to connect to the chatbot server. Please check your connection and try again.",
+          text:
+            error.response?.data?.reply ||
+            "Unable to connect to the chatbot server. Please check your connection and try again.",
         },
       ]);
     } finally {
