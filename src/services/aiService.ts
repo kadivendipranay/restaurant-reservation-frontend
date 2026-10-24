@@ -1,3 +1,4 @@
+
 import API from "../api/api";
 
 export interface AIChatResponse {
@@ -12,9 +13,10 @@ export interface AIChatResponse {
 export const sendAIMessage = async (
   message: string
 ): Promise<AIChatResponse> => {
-  const response = await API.post<AIChatResponse>("/ai/chat", {
-    message,
-  });
+  const response = await API.post<AIChatResponse>(
+    "/ai/chat",
+    { message }
+  );
 
   return response.data;
 };
