@@ -2769,3 +2769,114 @@
   .insight-chart-card { padding: 17px; }
   .insight-chart-body { height: 230px; }
 }
+
+
+/* ===== Admin dashboard visibility + responsive layout fixes ===== */
+html, body, #root {
+  max-width: 100%;
+  overflow-x: clip;
+}
+.admin-container {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+  background:
+    radial-gradient(ellipse at 5% 0%, rgba(99,102,241,.16), transparent 32rem),
+    radial-gradient(ellipse at 95% 12%, rgba(20,184,166,.14), transparent 30rem),
+    linear-gradient(180deg, #f4f6ff 0%, #f8fbff 48%, #f2f8ff 100%) !important;
+}
+.admin-container .admin-page-content {
+  width: 100%;
+  max-width: 1440px;
+  min-width: 0;
+  margin-inline: auto;
+  padding: 24px clamp(14px, 2.5vw, 36px) 30px;
+}
+.admin-container .admin-welcome {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 220px;
+  margin: 8px 0 24px;
+  padding: clamp(24px, 4vw, 42px);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.45);
+  border-radius: 24px;
+  color: #ffffff !important;
+  background: linear-gradient(115deg, #312e81 0%, #5145cd 48%, #087f8c 100%) !important;
+  box-shadow: 0 18px 42px rgba(49,46,129,.22);
+}
+.admin-container .admin-welcome h1,
+.admin-container .admin-welcome h2,
+.admin-container .admin-welcome .admin-eyebrow {
+  color: #ffffff !important;
+  text-shadow: 0 1px 1px rgba(20,20,70,.12);
+}
+.admin-container .admin-welcome p {
+  color: #eef2ff !important;
+}
+.admin-container .admin-welcome .welcome-meta,
+.admin-container .admin-welcome .welcome-meta span {
+  color: #ffffff !important;
+}
+.admin-container .admin-welcome-icon {
+  color: #ffffff !important;
+  background: rgba(255,255,255,.16) !important;
+  border-color: rgba(255,255,255,.32) !important;
+}
+.admin-container .admin-panel {
+  min-width: 0;
+  max-width: 100%;
+  background: linear-gradient(145deg, rgba(255,255,255,.98), rgba(245,248,255,.96)) !important;
+  border-color: #dfe5fa;
+  box-shadow: 0 10px 28px rgba(45,55,120,.07);
+}
+.admin-container .insight-card,
+.admin-container .stat-card,
+.admin-container .reservation-item,
+.admin-container .insight-chart-card,
+.admin-container .popular-slots,
+.admin-container .insight-recommendations {
+  min-width: 0;
+}
+.admin-container .reservation-item:nth-child(4n + 1) {
+  background: linear-gradient(135deg, #ffffff 0%, #f3f4ff 100%);
+}
+.admin-container .reservation-item:nth-child(4n + 2) {
+  background: linear-gradient(135deg, #ffffff 0%, #effcf8 100%);
+}
+.admin-container .reservation-item:nth-child(4n + 3) {
+  background: linear-gradient(135deg, #ffffff 0%, #fff4f1 100%);
+}
+.admin-container .reservation-item:nth-child(4n + 4) {
+  background: linear-gradient(135deg, #ffffff 0%, #eff7ff 100%);
+}
+.admin-container .reservation-detail {
+  overflow-wrap: anywhere;
+}
+.admin-container .insight-chart-body {
+  min-width: 0;
+}
+.admin-container .admin-filter-form > *,
+.admin-container .reservation-details > *,
+.admin-container .insights-grid > *,
+.admin-container .admin-stats > * {
+  min-width: 0;
+}
+.admin-container button,
+.admin-container input,
+.admin-container select {
+  max-width: 100%;
+}
+@media (max-width: 720px) {
+  .admin-container .admin-page-content {
+    padding: 14px 12px 24px;
+  }
+  .admin-container .admin-welcome {
+    min-height: 0;
+    padding: 24px 20px;
+    border-radius: 18px;
+  }
+}

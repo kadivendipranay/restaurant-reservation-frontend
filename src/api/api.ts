@@ -1,15 +1,20 @@
 
 import axios from "axios";
+import { getSession } from "../utils/auth";
 
 const API = axios.create({
-  baseURL: "https://restaurant-reservation-backend-6va5.onrender.com/api",
+  baseURL:
+    import.meta.env.VITE_API_BASE_URL ||
+    "https://restaurant-reservation-backend-6va5.onrender.com/api",
 });
 
 API.interceptors.request.use((req) => {
-  const token = localStorage.getItem("token");
+  const session = getSession();
 
-  if (token) {
-    req.headers.Authorization = `Bearer ${token}`;
+  if (session) {
+    req.headers.Authorization = `Bearer ${session.token}`;
+  } else {
+    delete req.headers.Authorization;
   }
 
   return req;

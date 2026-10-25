@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { jwtDecode } from "jwt-decode";
@@ -18,33 +19,66 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const getValidSession = (storedToken: string) => {
+  try {
+    const decoded = jwtDecode<JwtPayload>(storedToken);
+
+    if (
+      !decoded.exp ||
+      decoded.exp * 1000 <= Date.now() ||
+      !["ADMIN", "USER"].includes(decoded.role)
+    ) {
+      return null;
+    }
+
+    return {
+      token: storedToken,
+      role: decoded.role,
+    };
+  } catch {
+    return null;
+  }
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
   const [role, setRole] = useState<Role | null>(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem("token");
-    if (!stored) return;
+    const storedToken = localStorage.getItem("token");
 
-    try {
-      const decoded = jwtDecode<JwtPayload>(stored);
-      setToken(stored);
-      setRole(decoded.role);
-    } catch {
-      localStorage.clear();
+    if (!storedToken) return;
+
+    const session = getValidSession(storedToken);
+
+    if (!session) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      return;
     }
+
+    setToken(session.token);
+    setRole(session.role);
   }, []);
 
   const login = (newToken: string) => {
-    localStorage.setItem("token", newToken);
-    const decoded = jwtDecode<JwtPayload>(newToken);
+    const session = getValidSession(newToken);
 
-    setToken(newToken);
-    setRole(decoded.role);
+    if (!session) {
+      throw new Error("Invalid or expired login token.");
+    }
+
+    localStorage.setItem("token", session.token);
+    localStorage.setItem("role", session.role);
+
+    setToken(session.token);
+    setRole(session.role);
   };
 
   const logout = () => {
-    localStorage.clear();
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+
     setToken(null);
     setRole(null);
   };
@@ -58,6 +92,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+
+  if (!ctx) {
+    throw new Error("useAuth must be used inside AuthProvider");
+  }
+
   return ctx;
 };
