@@ -1,250 +1,501 @@
+
+
 /* ReserveDine User Dashboard — colorful, polished and responsive */
+
 :root {
+
   --ud-ink: #20233f;
+
   --ud-muted: #747b95;
+
   --ud-line: #e8e8f2;
+
   --ud-purple: #6558e8;
+
   --ud-purple-dark: #5144ce;
+
   --ud-teal: #0f9f91;
+
   --ud-bg: #f7f8fe;
+
 }
+
+
 
 .user-page {
+
   min-height: 100vh;
+
   color: var(--ud-ink);
+
   background:
+
     radial-gradient(ellipse at 0% 0%, rgba(112, 91, 232, .10), transparent 32rem),
+
     radial-gradient(ellipse at 100% 38%, rgba(15, 159, 145, .08), transparent 28rem),
+
     var(--ud-bg);
+
   font-family: Inter, "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+
 }
+
 .user-page * { box-sizing: border-box; }
+
 .user-dashboard { width: min(1440px, 100%); margin: 0 auto; padding: 28px clamp(16px, 3.3vw, 42px) 22px; }
+
 .user-page button, .user-page input, .user-page select { font: inherit; }
+
 .user-page button {
+
   display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+
   min-height: 42px; border: 1px solid transparent; border-radius: 12px;
+
   padding: 11px 16px; font-size: .9rem; font-weight: 750; cursor: pointer;
+
   transition: transform .22s ease, box-shadow .22s ease, background .22s ease,
+
     border-color .22s ease, color .22s ease, filter .22s ease;
+
 }
+
 .user-page button:hover:not(:disabled) { transform: translateY(-2px); }
+
 .user-page button:active:not(:disabled) { transform: translateY(0) scale(.985); }
+
 .user-page button:disabled { opacity: .58; cursor: not-allowed; box-shadow: none; }
+
 .user-page button:focus-visible, .user-page input:focus-visible, .user-page select:focus-visible {
+
   outline: 3px solid rgba(101, 88, 232, .25); outline-offset: 3px;
+
 }
+
 .user-page h1, .user-page h2, .user-page h3, .user-page p { margin-top: 0; }
+
 .user-page h2 { margin-bottom: 8px; font-size: clamp(1.3rem, 2vw, 1.65rem); letter-spacing: -.04em; }
+
 .user-page p { color: var(--ud-muted); line-height: 1.6; }
+
 .dashboard-welcome {
+
   position: relative; isolation: isolate; display: flex; align-items: center; justify-content: space-between;
+
   gap: 24px; min-height: 250px; overflow: hidden; padding: clamp(26px, 4vw, 48px);
+
   margin: 8px 0 24px; border: 1px solid rgba(255,255,255,.65); border-radius: 28px;
+
   color: white; background: linear-gradient(115deg, #282a70 0%, #6054df 54%, #0e9f91 120%);
+
   box-shadow: 0 20px 48px rgba(64, 61, 160, .20);
+
 }
+
 .welcome-copy { position: relative; z-index: 2; max-width: 710px; }
+
 .eyebrow { display: inline-flex; align-items: center; gap: 9px; margin-bottom: 17px; color: #e3e5ff; font-size: .72rem; font-weight: 850; letter-spacing: .16em; }
+
 .eyebrow-dot { width: 8px; height: 8px; border-radius: 50%; background: #8df0d6; box-shadow: 0 0 0 5px rgba(141,240,214,.13); }
+
 .dashboard-welcome h1 { max-width: 680px; margin: 0 0 13px; color: white; font-size: clamp(2.15rem, 4.1vw, 3.55rem); line-height: 1.08; letter-spacing: -.06em; }
+
 .dashboard-welcome h1 span { color: #bff7e9; }
+
 .dashboard-welcome p { max-width: 570px; margin-bottom: 20px; color: #e8e9ff; font-size: 1rem; }
+
 .welcome-highlights { display: flex; flex-wrap: wrap; gap: 10px 18px; }
+
 .welcome-highlights > span { display: inline-flex; align-items: center; gap: 7px; color: #f2f3ff; font-size: .82rem; }
+
 .highlight-check { display: grid; width: 19px; height: 19px; place-items: center; border-radius: 50%; color: #155e55; background: #bff7e9; font-size: .72rem; font-weight: 900; }
+
 .logout-button { position: relative; z-index: 3; align-self: flex-start; flex: 0 0 auto; color: white; border-color: rgba(255,255,255,.26) !important; background: rgba(255,255,255,.13); backdrop-filter: blur(8px); }
+
 .logout-button:hover:not(:disabled) { color: #fff; border-color: rgba(255,255,255,.5) !important; background: rgba(255,255,255,.23); box-shadow: 0 8px 22px rgba(12,15,60,.15); }
+
 .welcome-art { position: absolute; z-index: -1; top: 0; right: 0; width: 390px; height: 100%; pointer-events: none; }
+
 .art-circle { position: absolute; border: 1px solid rgba(255,255,255,.13); border-radius: 50%; }
+
 .art-circle-one { top: -135px; right: -35px; width: 390px; height: 390px; background: rgba(255,255,255,.035); }
+
 .art-circle-two { right: 45px; bottom: -180px; width: 320px; height: 320px; background: rgba(255,255,255,.035); }
+
 .art-plate { position: absolute; top: 50%; right: 88px; display: grid; width: 150px; height: 150px; place-items: center; border: 12px solid rgba(255,255,255,.14); border-radius: 50%; color: #fff1bd; background: rgba(255,255,255,.12); box-shadow: 0 18px 38px rgba(15,18,72,.12), inset 0 0 0 2px rgba(255,255,255,.13); transform: translateY(-50%) rotate(-10deg); }
+
 .art-plate > span { font-size: 2.5rem; }
+
 .plate-ring { position: absolute; inset: 13px; border: 1px dashed rgba(255,255,255,.35); border-radius: 50%; }
+
 .art-spark { position: absolute; color: #fff1bd; }
+
 .spark-one { top: 24%; right: 45px; font-size: 2rem; }
+
 .spark-two { bottom: 20%; right: 245px; font-size: 1.4rem; }
 
+
+
 .stats-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 17px; margin-bottom: 24px; }
+
 .stat-card { display: flex; align-items: center; gap: 16px; min-width: 0; padding: 21px; border: 1px solid var(--ud-line); border-radius: 20px; background: rgba(255,255,255,.92); box-shadow: 0 8px 24px rgba(38,42,88,.045); transition: transform .24s ease, box-shadow .24s ease, border-color .24s ease; }
+
 .stat-card:hover { transform: translateY(-5px); box-shadow: 0 16px 32px rgba(48,48,105,.10); }
+
 .stat-card-amber:hover { border-color: #f5d9a4; }
+
 .stat-card-green:hover { border-color: #b6edd6; }
+
 .stat-card-rose:hover { border-color: #ffc8d5; }
+
 .stat-icon { display: grid; flex: 0 0 52px; width: 52px; height: 52px; place-items: center; border-radius: 17px; font-size: 1.55rem; font-weight: 800; transition: transform .25s ease; }
+
 .stat-card:hover .stat-icon { transform: rotate(-7deg) scale(1.06); }
+
 .stat-icon-amber { color: #b76b12; background: linear-gradient(145deg, #fff2d5, #ffdf9d); }
+
 .stat-icon-green { color: #087f5b; background: linear-gradient(145deg, #d8fbe9, #a7f3d0); }
+
 .stat-icon-rose { color: #c13f69; background: linear-gradient(145deg, #ffe3eb, #ffc2d3); }
+
 .stat-content { min-width: 0; }
+
 .stat-label { display: block; margin-bottom: 5px; color: #747b95; font-size: .82rem; font-weight: 700; }
+
 .stat-content strong { display: block; color: #252747; font-size: 2rem; line-height: 1.15; letter-spacing: -.05em; }
+
 .stat-content small { display: block; margin-top: 5px; color: #9298ad; font-size: .75rem; }
 
+
+
 .dashboard-columns { display: grid; grid-template-columns: minmax(310px, .82fr) minmax(0, 1.45fr); align-items: start; gap: 22px; }
+
 .dashboard-panel { min-width: 0; padding: clamp(19px, 2.5vw, 29px); border: 1px solid rgba(229,230,242,.95); border-radius: 23px; background: rgba(255,255,255,.94); box-shadow: 0 9px 28px rgba(38,42,88,.05); transition: border-color .25s ease, box-shadow .25s ease; }
+
 .dashboard-panel:hover { border-color: #d8d7fb; box-shadow: 0 13px 34px rgba(64,61,160,.075); }
+
 .panel-heading { display: flex; align-items: center; gap: 13px; margin-bottom: 25px; }
+
 .panel-icon { display: grid; flex: 0 0 48px; width: 48px; height: 48px; place-items: center; border-radius: 16px; color: #6254dc; background: linear-gradient(145deg,#eeecff,#e0f2fe); font-size: 1.4rem; }
+
 .panel-kicker { display: block; margin-bottom: 7px; color: #0c9b8d; font-size: .68rem; font-weight: 900; letter-spacing: .15em; }
+
 .panel-heading h2, .reservations-title-row h2 { margin: 0 0 6px; color: #242642; }
+
 .panel-heading p, .reservations-title-row p { margin: 0; font-size: .86rem; }
+
 .booking-form { display: grid; gap: 19px; }
+
 .field-group { min-width: 0; }
+
 .field-group label { display: block; margin-bottom: 8px; color: #444965; font-size: .83rem; font-weight: 800; }
+
 .input-wrap { position: relative; display: flex; align-items: center; }
+
 .input-icon { position: absolute; left: 13px; z-index: 1; color: #7b72dd; font-size: 1.1rem; pointer-events: none; }
+
 .input-wrap input, .input-wrap select { width: 100%; min-width: 0; height: 48px; border: 1px solid #e0e3ef; border-radius: 12px; padding: 11px 13px 11px 42px; color: #2b304d; background: #fbfbff; outline: none; transition: border-color .2s ease, box-shadow .2s ease, background .2s ease; }
+
 .input-wrap select { appearance: auto; }
+
 .input-wrap input:hover, .input-wrap select:hover { border-color: #b9b5f6; background: #fff; }
+
 .input-wrap input:focus, .input-wrap select:focus { border-color: #7568e8; background: #fff; box-shadow: 0 0 0 4px rgba(101,88,232,.11); }
+
 .input-suffix { position: absolute; right: 12px; color: #9298ad; font-size: .78rem; pointer-events: none; }
+
 .input-wrap input[type="number"] { padding-right: 68px; }
+
 .field-help { display: block; margin-top: 7px; color: #9298ad; font-size: .75rem; }
+
 .book-submit { width: 100%; min-height: 49px !important; margin-top: 2px; color: #fff; background: linear-gradient(110deg, #6558e8, #8b5cf6 58%, #0f9f91); box-shadow: 0 8px 18px rgba(101,88,232,.22); }
+
 .book-submit:hover:not(:disabled) { box-shadow: 0 13px 25px rgba(101,88,232,.30); filter: saturate(1.1); }
+
 .book-submit > span:last-child { font-size: 1.2rem; transition: transform .2s ease; }
+
 .book-submit:hover > span:last-child { transform: translateX(4px); }
+
 .booking-note { display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 12px 13px; border: 1px solid #d9f4ed; border-radius: 12px; color: #16786f !important; background: #f0fdf9; font-size: .76rem; }
+
 .booking-note span { color: #0f9f91; }
 
+
+
 .reservations-title-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 22px; }
+
 .reservation-total { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 0 0 64px; width: 64px; height: 64px; border: 1px solid #dedcff; border-radius: 18px; color: #5b4ed5; background: linear-gradient(145deg,#f2f0ff,#e9f5ff); }
+
 .reservation-total strong { font-size: 1.45rem; line-height: 1.1; }
+
 .reservation-total span { margin-top: 3px; color: #7975b8; font-size: .67rem; font-weight: 750; }
+
 .reservation-toolbar { display: flex; align-items: center; gap: 10px; padding: 12px; margin-bottom: 17px; border: 1px solid #ececf6; border-radius: 15px; background: #fafaff; }
+
 .reservation-toolbar label { color: #6e7590; font-size: .82rem; font-weight: 800; }
+
 .reservation-toolbar select { flex: 1; min-width: 0; height: 40px; border: 1px solid #e1e3f0; border-radius: 10px; padding: 8px 10px; color: #3a3e5c; background: #fff; outline: none; }
+
 .reservation-toolbar select:focus { border-color: #7568e8; box-shadow: 0 0 0 3px rgba(101,88,232,.1); }
+
 .refresh-button { flex: 0 0 40px; width: 40px; min-height: 40px !important; padding: 0 !important; color: #5c52d7; border-color: #dedcff !important; background: #f0efff; font-size: 1.3rem !important; }
+
 .refresh-button:hover:not(:disabled) { color: #fff; background: #6558e8; box-shadow: 0 7px 15px rgba(101,88,232,.2); }
+
 .reservation-list { display: grid; gap: 14px; }
+
 .reservation-card { min-width: 0; padding: 17px; border: 1px solid #e9eaf4; border-radius: 17px; background: #fff; transition: transform .23s ease, border-color .23s ease, box-shadow .23s ease, background .23s ease; }
+
 .reservation-card:hover { transform: translateY(-3px); border-color: #c9c5fb; background: linear-gradient(135deg,#fff 55%,#f8f7ff); box-shadow: 0 13px 27px rgba(67,61,153,.09); }
+
 .reservation-card-top { display: flex; align-items: center; gap: 12px; min-width: 0; padding-bottom: 15px; border-bottom: 1px solid #eff0f7; }
+
 .reservation-restaurant-mark { display: grid; flex: 0 0 44px; width: 44px; height: 44px; place-items: center; border-radius: 14px; color: #6254dc; background: linear-gradient(145deg,#eeecff,#dcf9f1); font-size: 1.35rem; }
+
 .reservation-card-name { flex: 1; min-width: 0; }
+
 .reservation-card-name h3 { margin: 0 0 5px; color: #292d4a; font-size: .94rem; }
+
 .reservation-card-name span { color: #9298ad; font-size: .72rem; overflow-wrap: anywhere; }
+
 .status-pill { display: inline-flex; align-items: center; flex: 0 0 auto; padding: 6px 9px; border: 1px solid transparent; border-radius: 999px; font-size: .67rem; font-weight: 900; letter-spacing: .035em; }
+
 .status-active { color: #087b59; border-color: #b7efd7; background: #eafbf3; }
+
 .status-cancelled { color: #b83252; border-color: #ffd0d9; background: #fff0f3; }
+
 .status-completed { color: #2758bd; border-color: #c8dcff; background: #eff5ff; }
+
 .status-unknown { color: #666b80; border-color: #e2e4ec; background: #f4f5f9; }
+
 .reservation-info-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 9px; padding: 15px 0; }
+
 .reservation-info { min-width: 0; padding: 11px 10px; border: 1px solid #f0f0f7; border-radius: 11px; background: #fafaff; transition: border-color .2s ease, background .2s ease; }
+
 .reservation-card:hover .reservation-info { border-color: #e5e2ff; background: #fff; }
+
 .reservation-info span { display: block; margin-bottom: 6px; color: #9298ad; font-size: .7rem; font-weight: 750; }
+
 .reservation-info strong { display: block; color: #363b59; font-size: .78rem; line-height: 1.45; overflow-wrap: anywhere; }
+
 .reservation-card-actions { display: flex; justify-content: flex-end; padding-top: 13px; border-top: 1px solid #eff0f7; }
+
 .cancel-reservation-button { min-height: 37px !important; padding: 8px 12px !important; color: #b93252; border-color: #ffd2db !important; background: #fff3f5; font-size: .8rem !important; }
+
 .cancel-reservation-button:hover:not(:disabled) { color: #fff; border-color: #e34d6e !important; background: linear-gradient(110deg,#e34d6e,#f97373); box-shadow: 0 8px 17px rgba(227,77,110,.2); }
+
 .empty-reservations { padding: 42px 18px; border: 1px dashed #d8d9ed; border-radius: 17px; text-align: center; background: linear-gradient(145deg,#fcfcff,#f8f7ff); }
+
 .empty-illustration { display: grid; width: 62px; height: 62px; margin: 0 auto 15px; place-items: center; border-radius: 20px; color: #6558e8; background: linear-gradient(145deg,#eeecff,#dcf9f1); font-size: 1.9rem; }
+
 .empty-reservations h3 { margin-bottom: 7px; color: #303451; font-size: 1rem; }
+
 .empty-reservations p { max-width: 290px; margin: 0 auto; font-size: .84rem; }
+
 .reservation-loading { display: grid; min-height: 180px; place-items: center; }
+
 .dashboard-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 23px 4px 4px; color: #9298ad; font-size: .78rem; }
+
 .dashboard-footer span:first-child { color: #6254dc; font-weight: 800; }
+
 .button-spinner { display: inline-block; width: 15px; height: 15px; border: 2px solid rgba(255,255,255,.45); border-top-color: currentColor; border-radius: 50%; animation: ud-spin .7s linear infinite; }
+
 .button-spinner-dark { border-color: rgba(101,88,232,.22); border-top-color: #6558e8; }
+
 @keyframes ud-spin { to { transform: rotate(360deg); } }
 
+
+
 @media (max-width: 1120px) {
+
   .dashboard-columns { grid-template-columns: minmax(285px,.8fr) minmax(0,1.2fr); gap: 16px; }
+
   .reservation-info-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+
   .welcome-art { opacity: .75; transform: translateX(45px); }
+
 }
+
 @media (max-width: 850px) {
+
   .dashboard-columns { grid-template-columns: 1fr; }
+
   .booking-panel { order: 1; }
+
   .reservations-panel { order: 2; }
+
   .dashboard-welcome { min-height: 230px; }
+
   .welcome-art { opacity: .4; }
+
 }
+
 @media (max-width: 600px) {
+
   .user-dashboard { padding: 15px 12px 20px; }
+
   .dashboard-welcome { align-items: flex-start; flex-direction: column; gap: 18px; min-height: 0; padding: 25px 20px; border-radius: 21px; }
+
   .dashboard-welcome h1 { font-size: clamp(2rem, 9vw, 2.7rem); }
+
   .dashboard-welcome p { font-size: .91rem; }
+
   .welcome-art { right: -100px; opacity: .25; }
+
   .logout-button { align-self: flex-start; }
+
   .stats-grid { grid-template-columns: 1fr; gap: 11px; }
+
   .stat-card { padding: 16px; border-radius: 16px; }
+
   .stat-icon { flex-basis: 46px; width: 46px; height: 46px; border-radius: 14px; }
+
   .dashboard-panel { padding: 18px 14px; border-radius: 19px; }
+
   .reservations-title-row { align-items: flex-start; }
+
   .reservation-total { flex-basis: 56px; width: 56px; height: 56px; border-radius: 15px; }
+
   .reservation-card { padding: 13px; }
+
   .reservation-card-top { flex-wrap: wrap; }
+
   .reservation-card-name { flex-basis: calc(100% - 60px); }
+
   .status-pill { margin-left: 56px; }
+
   .reservation-info-grid { gap: 7px; }
+
   .reservation-info { padding: 9px; }
+
   .dashboard-footer { align-items: flex-start; flex-direction: column; padding-top: 18px; }
+
 }
+
 @media (max-width: 370px) {
+
   .reservation-info-grid { grid-template-columns: 1fr; }
+
   .reservation-toolbar { gap: 7px; padding: 9px; }
+
   .reservation-toolbar label { font-size: .75rem; }
+
 }
+
 @media (prefers-reduced-motion: reduce) {
+
   .user-page *, .user-page *::before, .user-page *::after {
+
     transition: none !important; animation-duration: .01ms !important;
+
     animation-iteration-count: 1 !important; scroll-behavior: auto !important;
+
   }
+
 }
+
+
+
 
 
 /* COLOR BOOST: warmer, more vibrant surfaces while preserving readability */
+
 .user-page {
+
   background:
+
     radial-gradient(ellipse at 5% 12%, rgba(124, 58, 237, .17), transparent 31rem),
+
     radial-gradient(ellipse at 95% 22%, rgba(6, 182, 212, .15), transparent 29rem),
+
     radial-gradient(ellipse at 48% 100%, rgba(236, 72, 153, .10), transparent 32rem),
+
     linear-gradient(135deg, #f1efff 0%, #eaf8ff 48%, #fff0f6 100%);
+
 }
+
 .dashboard-panel {
+
   background: linear-gradient(145deg, rgba(255,255,255,.97), rgba(244,247,255,.96));
+
   border-color: #dcdafa;
+
   box-shadow: 0 12px 32px rgba(80, 67, 180, .09);
+
 }
+
 .booking-panel {
+
   background: linear-gradient(155deg, #fff8ed 0%, #fff 42%, #f0fdfa 100%);
+
   border-color: #f0d9ce;
+
 }
+
 .reservations-panel {
+
   background: linear-gradient(155deg, #f2f5ff 0%, #fff 42%, #effcf9 100%);
+
   border-color: #d8defa;
+
 }
+
 .stat-card-amber { background: linear-gradient(135deg, #fff2d8, #fffaf0); border-color: #f4dfb7; }
+
 .stat-card-green { background: linear-gradient(135deg, #dffbed, #f4fff9); border-color: #c4f0dc; }
+
 .stat-card-rose { background: linear-gradient(135deg, #ffe7ef, #fff7fa); border-color: #f8d2df; }
+
 .reservation-toolbar {
+
   background: linear-gradient(105deg, #eeeaff, #e8f8ff 58%, #e9fbf5);
+
   border-color: #d9d8fa;
+
 }
+
 .reservation-card {
+
   background: linear-gradient(125deg, #ffffff 0%, #f6f4ff 54%, #edfbf8 100%);
+
   border-color: #dddafa;
+
   box-shadow: 0 5px 16px rgba(77, 71, 160, .045);
+
 }
+
 .reservation-card:nth-child(3n + 2) {
+
   background: linear-gradient(125deg, #fff 0%, #fff4e9 52%, #fff0f6 100%);
+
   border-color: #f3dfd6;
+
 }
+
 .reservation-card:nth-child(3n) {
+
   background: linear-gradient(125deg, #fff 0%, #eaf8ff 52%, #edfdf5 100%);
+
   border-color: #d2e9f2;
+
 }
+
 .reservation-info { background: rgba(255,255,255,.78); border-color: #e3e2f4; }
+
 .reservation-restaurant-mark { background: linear-gradient(145deg, #ded9ff, #c8f6ed); }
+
 .panel-icon { background: linear-gradient(145deg, #dcd7ff, #bcefe8); }
+
 .input-wrap input, .input-wrap select { background: rgba(255,255,255,.88); }
+
 .empty-reservations { background: linear-gradient(135deg, #eeeaff, #e8f9ff 58%, #e9fbf4); }
+
 @media (hover: hover) {
+
   .reservation-card:hover { background: linear-gradient(125deg, #fff 0%, #eae7ff 52%, #dffaf2 100%); }
+
   .reservation-card:nth-child(3n + 2):hover { background: linear-gradient(125deg, #fff 0%, #ffe8d5 52%, #ffe5ef 100%); }
+
   .reservation-card:nth-child(3n):hover { background: linear-gradient(125deg, #fff 0%, #dcf3ff 52%, #dcf9eb 100%); }
+
 }
