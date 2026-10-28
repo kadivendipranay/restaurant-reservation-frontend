@@ -1,50 +1,84 @@
 
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import "../styles/Navbar.css";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const { token, role, logout } = useAuth();
 
   const handleLogout = () => {
-    const ok = window.confirm("Are you sure you want to logout?");
-    if (!ok) return;
+    const confirmed = window.confirm("Are you sure you want to logout?");
+
+    if (!confirmed) return;
 
     logout();
     navigate("/login", { replace: true });
   };
 
   return (
-    <div className="navbar">
-      <h3 onClick={() => navigate("/")}>Restaurant Reservation</h3>
+    <header className="navbar">
+      <h3
+        className="navbar-brand"
+        onClick={() => navigate("/")}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            navigate("/");
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label="Restaurant Reservation home"
+      >
+        <span className="navbar-brand-accent" aria-hidden="true" />
+        Restaurant Reservation
+      </h3>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+      <div className="navbar-right">
         {token && role && (
-          <span>
+          <span className="navbar-role">
             Role: <b>{role}</b>
           </span>
         )}
 
-        <div className="navbar-buttons">
+        <nav className="navbar-buttons" aria-label="Main navigation">
           {token && role === "USER" && (
-            <button onClick={() => navigate("/user")}>
+            <button
+              type="button"
+              onClick={() => navigate("/user")}
+            >
               User Dashboard
             </button>
           )}
 
           {token && role === "ADMIN" && (
-            <button onClick={() => navigate("/admin")}>
+            <button
+              type="button"
+              onClick={() => navigate("/admin")}
+            >
               Admin Dashboard
             </button>
           )}
 
           {!token ? (
-            <button onClick={() => navigate("/login")}>Login</button>
+            <button
+              type="button"
+              onClick={() => navigate("/login")}
+            >
+              Login
+            </button>
           ) : (
-            <button onClick={handleLogout}>Logout</button>
+            <button
+              type="button"
+              className="logout-btn"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
           )}
-        </div>
+        </nav>
       </div>
-    </div>
+    </header>
   );
 }

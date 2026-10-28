@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import "../styles/AIChatbot.css";
 import {
@@ -14,6 +14,37 @@ type ChatMessage = {
   text: string;
 };
 
+const QUICK_ACTIONS = [
+  {
+    title: "How to book?",
+    subtitle: "Step-by-step guide",
+    icon: "📅",
+    style: "booking",
+    question: "How do I book a table?",
+  },
+  {
+    title: "Time slots",
+    subtitle: "View available slots",
+    icon: "🕒",
+    style: "time",
+    question: "What are the available time slots?",
+  },
+  {
+    title: "Cancel booking",
+    subtitle: "Manage your booking",
+    icon: "🗓️",
+    style: "cancel",
+    question: "How do I cancel my reservation?",
+  },
+  {
+    title: "Book a table",
+    subtitle: "Reserve your seat",
+    icon: "🍽️",
+    style: "table",
+    question: "",
+  },
+];
+
 export default function AIChatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -22,18 +53,41 @@ export default function AIChatbot() {
   const [pendingReservation, setPendingReservation] =
     useState<ReservationDetails | null>(null);
 
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       sender: "bot",
-      text: "Hello! Welcome to our restaurant. How can I help you today?",
+      text: "Welcome to ReserveDine! I'm your restaurant concierge. I can guide you through booking a table, checking time slots, and managing your reservations. How may I help you today?",
     },
   ]);
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    });
+  }, [messages, loading]);
+
   function addBotMessage(text: string) {
-    setMessages((previous) => [
-      ...previous,
-      { sender: "bot", text },
-    ]);
+    setMessages((previous) => [...previous, { sender: "bot", text }]);
+  }
+
+  function getErrorMessage(
+    error: unknown,
+    fallback: string,
+    includeReply = false
+  ) {
+    if (axios.isAxiosError(error)) {
+      const serverMessage = error.response?.data?.message;
+      const serverReply = error.response?.data?.reply;
+
+      if (typeof serverMessage === "string") return serverMessage;
+      if (includeReply && typeof serverReply === "string") return serverReply;
+    }
+
+    return fallback;
   }
 
   async function sendMessage(text = message) {
@@ -78,32 +132,22 @@ export default function AIChatbot() {
         setPendingReservation(details);
 
         addBotMessage(
-          `${data.message}\n\nPlease review your booking:\nDate: ${details.date}\nTime: ${details.timeSlot}\nGuests: ${details.guests}\nTable: ${data.availability.table?.tableNumber ?? "Assigned on confirmation"}\n\nIf everything is correct, select Confirm Booking below.`
+          `${data.message}\n\nPlease review your booking:\nDate: ${details.date}\nTime: ${details.timeSlot}\nGuests: ${details.guests}\nTable: ${data.availability.table?.tableNumber ?? "Assigned on confirmation"}\n\nSelect Confirm Booking below when you're ready.`
         );
       } else {
         const data = await sendAIMessage(question);
-        addBotMessage(
-          data.reply || "Sorry, I couldn't answer that."
-        );
+        addBotMessage(data.reply || "Sorry, I couldn't answer that.");
       }
     } catch (error: unknown) {
       console.error("Chatbot request failed:", error);
 
-      let errorMessage =
-        "Unable to connect to the chatbot server. Please check your connection and try again.";
-
-      if (axios.isAxiosError(error)) {
-        const serverMessage = error.response?.data?.message;
-        const serverReply = error.response?.data?.reply;
-
-        if (typeof serverMessage === "string") {
-          errorMessage = serverMessage;
-        } else if (typeof serverReply === "string") {
-          errorMessage = serverReply;
-        }
-      }
-
-      addBotMessage(errorMessage);
+      addBotMessage(
+        getErrorMessage(
+          error,
+          "I couldn't connect to the restaurant assistant. Please check your connection and try again.",
+          true
+        )
+      );
     } finally {
       setLoading(false);
     }
@@ -126,18 +170,13 @@ export default function AIChatbot() {
     } catch (error: unknown) {
       console.error("Reservation confirmation failed:", error);
 
-      let errorMessage =
-        "We couldn't confirm your reservation. Please try again.";
+      addBotMessage(
+        getErrorMessage(
+          error,
+          "We couldn't confirm your reservation. Please check your details and try again."
+        )
+      );
 
-      if (axios.isAxiosError(error)) {
-        const serverMessage = error.response?.data?.message;
-
-        if (typeof serverMessage === "string") {
-          errorMessage = serverMessage;
-        }
-      }
-
-      addBotMessage(errorMessage);
       setPendingReservation(null);
     } finally {
       setLoading(false);
@@ -151,24 +190,51 @@ export default function AIChatbot() {
     setPendingReservation(null);
 
     addBotMessage(
-      "Let's book a table! Tell me your preferred date, time slot, and number of guests. For example: Book a table on 2026-11-01 at 18:00-19:00 for 2 guests."
+      "Let's find a table for you. Please enter your preferred date, time slot, and number of guests.\n\nExample: Book a table on 2026-11-01 at 18:00-19:00 for 2 guests."
     );
+
+    window.setTimeout(() => inputRef.current?.focus(), 0);
+  }
+
+  function cancelBookingMode() {
+    if (loading) return;
+
+    setPendingReservation(null);
+    setBookingMode(false);
+    addBotMessage("Booking cancelled. What else can I help you with?");
+  }
+
+  function handleQuickAction(question: string) {
+    if (loading || bookingMode) return;
+
+    if (!question) {
+      startBooking();
+      return;
+    }
+
+    void sendMessage(question);
   }
 
   return (
     <div className="ai-chatbot">
       {isOpen && (
         <section
-          className="ai-chat-window"
-          aria-label="Restaurant assistant"
+          className={`ai-chat-window${bookingMode ? " booking-mode" : ""}`}
         >
           <header className="ai-chat-header">
-            <div>
-              <strong>Restaurant Assistant</strong>
+            <div className="ai-brand-avatar" aria-hidden="true">
+              🍽
+            </div>
+
+            <div className="ai-header-copy">
+              <strong>ReserveDine Concierge</strong>
               <small>
-                {bookingMode
-                  ? "AI table booking"
-                  : "Here to help you"}
+                <span className="ai-status-dot" />
+                {loading
+                  ? "Preparing your response..."
+                  : bookingMode
+                    ? "Table booking assistance"
+                    : "Here to help with your dining plans"}
               </small>
             </div>
 
@@ -176,84 +242,115 @@ export default function AIChatbot() {
               type="button"
               className="ai-close-button"
               onClick={() => setIsOpen(false)}
-              aria-label="Close chatbot"
+              aria-label="Close assistant"
             >
               ×
             </button>
           </header>
 
-          <div className="ai-chat-messages" aria-live="polite">
+          <div
+            className="ai-chat-messages"
+            aria-live="polite"
+            aria-relevant="additions text"
+            role="log"
+            aria-label="Conversation messages"
+          >
             {messages.map((item, index) => (
               <div
                 key={`${item.sender}-${index}`}
-                className={`ai-message ${item.sender}`}
+                className={`ai-message-row ${item.sender}`}
               >
-                {item.text}
+                {item.sender === "bot" && (
+                  <div className="ai-message-avatar" aria-hidden="true">
+                    ✦
+                  </div>
+                )}
+
+                <div className={`ai-message ${item.sender}`}>
+                  {item.text}
+                </div>
               </div>
             ))}
 
             {loading && (
-              <div className="ai-message bot">Typing...</div>
+              <div className="ai-message-row bot">
+                <div className="ai-message-avatar" aria-hidden="true">
+                  ✦
+                </div>
+
+                <div
+                  className="ai-typing"
+                  role="status"
+                  aria-label="Assistant is typing"
+                >
+                  <span />
+                  <span />
+                  <span />
+                </div>
+              </div>
             )}
+
+            <div ref={messagesEndRef} />
           </div>
 
-          <div className="ai-quick-questions">
-            <button
-              type="button"
-              disabled={loading}
-              onClick={() => void sendMessage("How do I book a table?")}
-            >
-              How to book?
-            </button>
+          <section className="ai-quick-area" aria-label="Quick actions">
+            <div className="ai-quick-heading">
+              <span>QUICK ACTIONS</span>
+              <span className="ai-heading-line" />
+            </div>
 
-            <button
-              type="button"
-              disabled={loading}
-              onClick={() => void sendMessage("What are the time slots?")}
-            >
-              Time slots
-            </button>
+            <div className="ai-quick-questions">
+              {QUICK_ACTIONS.map((action) => (
+                <button
+                  key={action.title}
+                  type="button"
+                  className={`ai-action-card ${action.style}`}
+                  disabled={loading || bookingMode}
+                  onClick={() => handleQuickAction(action.question)}
+                >
+                  <span className="ai-action-icon" aria-hidden="true">
+                    {action.icon}
+                  </span>
 
-            <button
-              type="button"
-              disabled={loading}
-              onClick={() =>
-                void sendMessage("How do I cancel my reservation?")
-              }
-            >
-              Cancel booking
-            </button>
+                  <span className="ai-action-copy">
+                    <strong>{action.title}</strong>
+                    <small>{action.subtitle}</small>
+                  </span>
 
-            <button
-              type="button"
-              disabled={loading}
-              onClick={startBooking}
-            >
-              Book a table
-            </button>
-          </div>
+                  <span className="ai-action-arrow" aria-hidden="true">
+                    ›
+                  </span>
+                </button>
+              ))}
+            </div>
+          </section>
 
           {bookingMode && pendingReservation && (
             <div className="ai-booking-confirm">
-              <button
-                type="button"
-                disabled={loading}
-                onClick={() => void handleConfirmBooking()}
-              >
-                {loading ? "Confirming..." : "Confirm Booking"}
-              </button>
+              <div className="ai-confirm-copy">
+                <strong>Ready to confirm?</strong>
+                <span>Review your reservation details above.</span>
+              </div>
 
-              <button
-                type="button"
-                disabled={loading}
-                onClick={() => {
-                  setPendingReservation(null);
-                  setBookingMode(false);
-                  addBotMessage("Booking cancelled. How else can I help?");
-                }}
-              >
-                Cancel
-              </button>
+              <div className="ai-confirm-actions">
+                <button
+                  type="button"
+                  className="ai-confirm-button"
+                  disabled={loading}
+                  onClick={() => void handleConfirmBooking()}
+                >
+                  {loading ? "Confirming..." : "Confirm booking"}
+                </button>
+
+                <button
+                  type="button"
+                  className="ai-cancel-button"
+                  disabled={loading}
+                  onClick={cancelBookingMode}
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           )}
 
@@ -265,23 +362,26 @@ export default function AIChatbot() {
             }}
           >
             <input
+              ref={inputRef}
               type="text"
               value={message}
               onChange={(event) => setMessage(event.target.value)}
               placeholder={
                 bookingMode
                   ? "Enter date, time slot and guests..."
-                  : "Ask your question..."
+                  : "Ask about your dining plans..."
               }
               maxLength={500}
+              autoComplete="off"
               aria-label="Message to restaurant assistant"
+              disabled={loading}
             />
 
             <button
               type="submit"
               disabled={loading || !message.trim()}
             >
-              {loading ? "Sending..." : "Send"}
+              {loading ? "..." : "Send"}
             </button>
           </form>
         </section>
@@ -292,7 +392,7 @@ export default function AIChatbot() {
         className="ai-chat-toggle"
         onClick={() => setIsOpen((previous) => !previous)}
         aria-expanded={isOpen}
-        aria-label={isOpen ? "Close assistant" : "Open assistant"}
+        aria-label={isOpen ? "Close assistant" : "Open restaurant assistant"}
       >
         {isOpen ? "×" : "💬"}
       </button>

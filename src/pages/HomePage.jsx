@@ -64,20 +64,19 @@ export default function HomePage() {
       <Navbar />
 
       {/* HERO SECTION */}
-      <section className="hero-card">
+      <section className="hero-card" aria-labelledby="home-hero-title">
         <div className="hero-content">
           <span className="hero-badge">
             ✨ Your table, your time
           </span>
 
-          <h1 className="hero-title">
+          <h1 className="hero-title" id="home-hero-title">
             Welcome to <span>ReserveDine</span>
           </h1>
 
           <p className="hero-subtitle">
-            Great food starts with a great reservation.
-            Book your table, choose your time, and make every
-            dining experience special.
+            Great food starts with a great reservation. Book your table,
+            choose your time, and make every dining experience special.
           </p>
 
           <div className="hero-actions">
@@ -86,7 +85,7 @@ export default function HomePage() {
               className="hero-btn"
               onClick={goDashboard}
             >
-              Go to Dashboard <span>→</span>
+              Go to Dashboard <span aria-hidden="true">→</span>
             </button>
 
             <button
@@ -107,6 +106,7 @@ export default function HomePage() {
           <div className="hero-plate">
             <span>🍽️</span>
           </div>
+
           <span className="floating-icon floating-icon-one">🥗</span>
           <span className="floating-icon floating-icon-two">✨</span>
           <span className="floating-icon floating-icon-three">🍴</span>
@@ -114,13 +114,13 @@ export default function HomePage() {
       </section>
 
       {/* ABOUT SECTION */}
-      <section className="about-section">
+      <section className="about-section" aria-labelledby="about-title">
         <div className="section-heading">
           <span className="section-eyebrow">ABOUT RESERVEDINE</span>
-          <h2>Dining reservations made simple</h2>
+          <h2 id="about-title">Dining reservations made simple</h2>
           <p>
-            ReserveDine brings booking and reservation management
-            together in one convenient place.
+            ReserveDine brings booking and reservation management together
+            in one convenient place.
           </p>
         </div>
 
@@ -133,11 +133,10 @@ export default function HomePage() {
             <h3>Your dining experience, simplified</h3>
 
             <p>
-              Whether you are a guest planning a meal or an
-              administrator managing restaurant bookings, ReserveDine
-              helps keep the reservation process organized. Create
-              bookings, view their status, and manage eligible
-              reservations from a simple dashboard.
+              Whether you are a guest planning a meal or an administrator
+              managing restaurant bookings, ReserveDine helps keep the
+              reservation process organized. Create bookings, view their
+              status, and manage eligible reservations from a simple dashboard.
             </p>
 
             <button
@@ -145,34 +144,30 @@ export default function HomePage() {
               className="about-link"
               onClick={goDashboard}
             >
-              Get started <span>→</span>
+              Get started <span aria-hidden="true">→</span>
             </button>
           </div>
         </div>
       </section>
 
       {/* FEATURES SECTION */}
-      <section className="features-section">
+      <section className="features-section" aria-labelledby="features-title">
         <div className="section-heading">
           <span className="section-eyebrow">WHAT YOU CAN DO</span>
-          <h2>Everything you need in one place</h2>
+          <h2 id="features-title">Everything you need in one place</h2>
           <p>
-            Explore the features designed to make reservation
-            management easier.
+            Explore the features designed to make reservation management easier.
           </p>
         </div>
 
         <div className="features-grid">
           {FEATURES.map((feature, index) => (
-            <article
-              key={feature.title}
-              className="feature-card"
-            >
+            <article className="feature-card" key={feature.title}>
               <div className="feature-icon" aria-hidden="true">
                 {feature.icon}
               </div>
 
-              <span className="feature-number">
+              <span className="feature-number" aria-hidden="true">
                 {String(index + 1).padStart(2, "0")}
               </span>
 
@@ -184,10 +179,10 @@ export default function HomePage() {
       </section>
 
       {/* CALL TO ACTION */}
-      <section className="cta-card">
-        <div>
+      <section className="cta-card" aria-labelledby="cta-title">
+        <div className="cta-content">
           <span className="cta-eyebrow">YOUR NEXT MEAL STARTS HERE</span>
-          <h2>Ready to make a reservation?</h2>
+          <h2 id="cta-title">Ready to make a reservation?</h2>
           <p>Sign in to manage your bookings and get started.</p>
         </div>
 
@@ -196,20 +191,20 @@ export default function HomePage() {
           className="cta-btn"
           onClick={goDashboard}
         >
-          Book Your Table <span>→</span>
+          Book Your Table <span aria-hidden="true">→</span>
         </button>
       </section>
 
       {/* FOOTER */}
       <footer className="home-footer">
         <div className="footer-brand">
-          <span className="footer-logo">🍽️</span>
+          <span className="footer-logo" aria-hidden="true">
+            🍽️
+          </span>
           <span>ReserveDine</span>
         </div>
 
-        <p>
-          Built with React, Node.js, Express, and MongoDB.
-        </p>
+        <p>Built with React, Node.js, Express, and MongoDB.</p>
 
         <p className="footer-copyright">
           © {new Date().getFullYear()} ReserveDine. All rights reserved.

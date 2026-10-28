@@ -697,3 +697,69 @@ a {
     transition: none;
   }
 }
+
+
+
+/* ==========================================
+   FORGOT PASSWORD
+========================================== */
+
+.forgot-password-row {
+  display: flex;
+  justify-content: flex-end;
+  margin: -5px 0 18px;
+}
+
+.forgot-password-link {
+  padding: 4px 0;
+  border: none;
+  background: transparent;
+  color: #176b55;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.forgot-password-link:hover {
+  color: #a47b32;
+  text-decoration: underline;
+}
+
+.forgot-password-link:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.back-to-login {
+  display: block;
+  margin: 18px auto 0;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #176b55;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.back-to-login:hover:not(:disabled) {
+  background: #f3f5ed;
+  color: #a47b32;
+}
+
+.back-to-login:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.forgot-password-link:focus-visible,
+.back-to-login:focus-visible {
+  outline: 2px solid #c8a65b;
+  outline-offset: 3px;
+}
+
