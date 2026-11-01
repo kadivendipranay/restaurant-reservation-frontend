@@ -1,6 +1,13 @@
 
 import { useEffect, useMemo, useState } from "react";
-import { menuData } from "../data/menuData";
+
+import {
+  menuData,
+  LOCAL_FOOD_IMAGE,
+  MENU_CATEGORIES,
+  formatMenuPrice,
+} from "../data/menuData";
+
 import "../styles/FoodRecommendations.css";
 
 const DEFAULTS = {
@@ -12,26 +19,44 @@ const DEFAULTS = {
   sort: "recommended",
 };
 
+// Reusable image component with fallback support
 function FoodImage({ src, alt }) {
-  const [failed, setFailed] = useState(false);
+  const [imageSrc, setImageSrc] = useState(
+    src || LOCAL_FOOD_IMAGE
+  );
+  const [fallbackFailed, setFallbackFailed] = useState(false);
 
   useEffect(() => {
-    setFailed(false);
+    setImageSrc(src || LOCAL_FOOD_IMAGE);
+    setFallbackFailed(false);
   }, [src]);
+
+  const handleImageError = () => {
+    if (imageSrc !== LOCAL_FOOD_IMAGE) {
+      setImageSrc(LOCAL_FOOD_IMAGE);
+    } else {
+      setFallbackFailed(true);
+    }
+  };
 
   return (
     <div className="fr-image-wrap">
-      {src && !failed ? (
+      {!fallbackFailed ? (
         <img
-          src={src}
+          src={imageSrc}
           alt={alt}
           className="fr-food-image"
           loading="lazy"
-          onError={() => setFailed(true)}
+          decoding="async"
+          onError={handleImageError}
         />
       ) : (
-        <div className="fr-image-placeholder">
-          <span>🍽️</span>
+        <div
+          className="fr-image-placeholder"
+          role="img"
+          aria-label={alt}
+        >
+          <span aria-hidden="true">🍽️</span>
           <small>{alt}</small>
         </div>
       )}
@@ -47,32 +72,27 @@ export default function FoodRecommendations() {
   const [search, setSearch] = useState(DEFAULTS.search);
   const [sort, setSort] = useState(DEFAULTS.sort);
 
-  const categories = useMemo(
-    () => [
-      ...new Set(
-        menuData.map((food) => food.category).filter(Boolean)
-      ),
-    ].sort(),
-    []
-  );
-
+  // Filter and sort menu items
   const foods = useMemo(() => {
     const term = search.trim().toLowerCase();
+    const maximumPrice = Number(budget);
 
     const result = menuData.filter((food) => {
       const matchesType =
         type === "All" || food.type === type;
 
       const matchesCategory =
-        category === "All" || food.category === category;
+        category === "All" ||
+        food.category === category;
 
       const matchesSpice =
         spice === "Any" || food.spice === spice;
 
       const matchesBudget =
-        Number(food.price) <= Number(budget);
+        Number.isFinite(maximumPrice) &&
+        Number(food.price) <= maximumPrice;
 
-      const text = [
+      const searchableText = [
         food.name,
         food.description,
         food.category,
@@ -82,37 +102,54 @@ export default function FoodRecommendations() {
         .join(" ")
         .toLowerCase();
 
+      const matchesSearch =
+        !term || searchableText.includes(term);
+
       return (
         matchesType &&
         matchesCategory &&
         matchesSpice &&
         matchesBudget &&
-        (!term || text.includes(term))
+        matchesSearch
       );
     });
 
+    // Sort filtered results without modifying menuData
     if (sort === "low") {
       result.sort((a, b) => a.price - b.price);
     } else if (sort === "high") {
       result.sort((a, b) => b.price - a.price);
     } else if (sort === "name") {
-      result.sort((a, b) => a.name.localeCompare(b.name));
+      result.sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
     }
 
     return result;
   }, [type, category, spice, budget, search, sort]);
 
-  function resetFilters() {
+  // Count actual filters, excluding sorting
+  const activeFilterCount = [
+    type !== "All",
+    category !== "All",
+    spice !== "Any",
+    budget !== DEFAULTS.budget,
+    search.trim() !== "",
+  ].filter(Boolean).length;
+
+  const resetFilters = () => {
     setType(DEFAULTS.type);
     setCategory(DEFAULTS.category);
     setSpice(DEFAULTS.spice);
     setBudget(DEFAULTS.budget);
     setSearch(DEFAULTS.search);
     setSort(DEFAULTS.sort);
-  }
+  };
 
   return (
     <main className="fr-page">
+
+      {/* HERO SECTION */}
       <section className="fr-hero">
         <div className="fr-hero-content">
           <span className="fr-eyebrow">
@@ -136,60 +173,99 @@ export default function FoodRecommendations() {
             <span>✓ Your budget</span>
             <span>✓ Your choice</span>
           </div>
+
+          <a className="fr-hero-cta" href="#fr-menu">
+            Explore our menu
+            <span aria-hidden="true">↗</span>
+          </a>
         </div>
 
         <div className="fr-hero-art">
           <img
-            src="/images/food-spread.avif"
-            alt="A selection of delicious food"
+            src={LOCAL_FOOD_IMAGE}
+            alt="A selection of delicious restaurant food"
+            fetchPriority="high"
             onError={(event) => {
-              event.currentTarget.style.display = "none";
+              event.currentTarget.style.visibility = "hidden";
             }}
           />
+
           <div className="fr-hero-note">
             <span>GOOD FOOD</span>
             <strong>Good mood.</strong>
           </div>
+
+          <div className="fr-hero-stamp" aria-hidden="true">
+            ✦
+            <span>MADE FRESH</span>
+          </div>
         </div>
       </section>
 
+      {/* DISCOVERY AND FILTERS */}
       <section className="fr-discovery">
         <div className="fr-section-heading">
           <div>
-            <span className="fr-kicker">YOUR PERSONAL MENU</span>
+            <span className="fr-kicker">
+              YOUR PERSONAL MENU
+            </span>
+
             <h2>What are you craving?</h2>
-            <p>Make your selection and discover your perfect dish.</p>
+
+            <p>
+              Make your selection and discover your perfect dish.
+            </p>
           </div>
 
           <button
             type="button"
             className="fr-reset"
             onClick={resetFilters}
+            disabled={
+              activeFilterCount === 0 &&
+              sort === "recommended"
+            }
           >
             ↺ Reset all
           </button>
         </div>
 
+        {/* SEARCH */}
         <div className="fr-search">
           <span aria-hidden="true">⌕</span>
+
           <input
             type="search"
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event) =>
+              setSearch(event.target.value)
+            }
             placeholder="Search biryani, paneer, dessert..."
             aria-label="Search food"
           />
+
           {search && (
-            <button type="button" onClick={() => setSearch("")}>
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              aria-label="Clear search"
+            >
               Clear
             </button>
           )}
         </div>
 
+        {/* FILTERS */}
         <div className="fr-filters">
           <label>
             <span>Food preference</span>
-            <select value={type} onChange={(e) => setType(e.target.value)}>
+
+            <select
+              value={type}
+              onChange={(event) =>
+                setType(event.target.value)
+              }
+            >
               <option value="All">All foods</option>
               <option value="Veg">Vegetarian</option>
               <option value="Non-Veg">Non-vegetarian</option>
@@ -198,20 +274,32 @@ export default function FoodRecommendations() {
 
           <label>
             <span>Category</span>
+
             <select
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={(event) =>
+                setCategory(event.target.value)
+              }
             >
-              <option value="All">All categories</option>
-              {categories.map((item) => (
-                <option key={item} value={item}>{item}</option>
+              {MENU_CATEGORIES.map((item) => (
+                <option key={item} value={item}>
+                  {item === "All"
+                    ? "All categories"
+                    : item}
+                </option>
               ))}
             </select>
           </label>
 
           <label>
             <span>Spice level</span>
-            <select value={spice} onChange={(e) => setSpice(e.target.value)}>
+
+            <select
+              value={spice}
+              onChange={(event) =>
+                setSpice(event.target.value)
+              }
+            >
               <option value="Any">Any spice level</option>
               <option value="Mild">Mild</option>
               <option value="Medium">Medium</option>
@@ -221,9 +309,12 @@ export default function FoodRecommendations() {
 
           <label>
             <span>Maximum price</span>
+
             <select
               value={budget}
-              onChange={(e) => setBudget(e.target.value)}
+              onChange={(event) =>
+                setBudget(event.target.value)
+              }
             >
               <option value="50">Up to ₹50</option>
               <option value="100">Up to ₹100</option>
@@ -236,7 +327,13 @@ export default function FoodRecommendations() {
 
           <label>
             <span>Sort by</span>
-            <select value={sort} onChange={(e) => setSort(e.target.value)}>
+
+            <select
+              value={sort}
+              onChange={(event) =>
+                setSort(event.target.value)
+              }
+            >
               <option value="recommended">Recommended</option>
               <option value="low">Price: low to high</option>
               <option value="high">Price: high to low</option>
@@ -244,33 +341,78 @@ export default function FoodRecommendations() {
             </select>
           </label>
         </div>
+
+        {activeFilterCount > 0 && (
+          <div className="fr-active-filters">
+            <span>
+              {activeFilterCount} active{" "}
+              {activeFilterCount === 1
+                ? "filter"
+                : "filters"}
+            </span>
+
+            <button
+              type="button"
+              onClick={resetFilters}
+            >
+              Clear filters
+            </button>
+          </div>
+        )}
       </section>
 
-      <section className="fr-menu">
+      {/* FOOD MENU */}
+      <section className="fr-menu" id="fr-menu">
         <div className="fr-menu-heading">
           <div>
-            <span className="fr-kicker">MADE TO BE ENJOYED</span>
-            <h2>Explore the menu<span>.</span></h2>
+            <span className="fr-kicker">
+              MADE TO BE ENJOYED
+            </span>
+
+            <h2>
+              Explore the menu<span>.</span>
+            </h2>
+
+            <p>
+              Discover flavours made to make every meal special.
+            </p>
           </div>
-          <div className="fr-result-count">
-            {foods.length} {foods.length === 1 ? "dish" : "dishes"}
+
+          <div
+            className="fr-result-count"
+            aria-live="polite"
+          >
+            <strong>{foods.length}</strong>
+            {foods.length === 1
+              ? " dish found"
+              : " dishes found"}
           </div>
         </div>
 
         {foods.length > 0 ? (
           <div className="fr-grid">
             {foods.map((food) => (
-              <article className="fr-card" key={food.id}>
+              <article
+                className="fr-card"
+                key={food.id}
+              >
                 <div className="fr-card-photo">
-                  <FoodImage src={food.image} alt={food.name} />
+                  <FoodImage
+                    src={food.image}
+                    alt={food.name}
+                  />
 
                   <span
                     className={`fr-type ${
-                      food.type === "Veg" ? "fr-veg" : "fr-nonveg"
+                      food.type === "Veg"
+                        ? "fr-veg"
+                        : "fr-nonveg"
                     }`}
                   >
-                    <i />
-                    {food.type === "Veg" ? "VEG" : "NON-VEG"}
+                    <i aria-hidden="true" />
+                    {food.type === "Veg"
+                      ? "VEG"
+                      : "NON-VEG"}
                   </span>
 
                   <span className="fr-card-category">
@@ -281,25 +423,38 @@ export default function FoodRecommendations() {
                 <div className="fr-card-content">
                   <div className="fr-card-title-row">
                     <h3>{food.name}</h3>
-                    <strong>₹{Number(food.price).toLocaleString("en-IN")}</strong>
+
+                    <strong>
+                      {formatMenuPrice(food.price)}
+                    </strong>
                   </div>
 
                   <p className="fr-description">
-                    {food.description || "A delicious restaurant favourite."}
+                    {food.description ||
+                      "A delicious restaurant favourite."}
                   </p>
 
                   <div className="fr-card-meta">
-                    <span>🌶 {food.spice || "Regular"}</span>
                     <span>
-                      {Number(food.price) <= 150
+                      🌶 {food.spice || "Regular"}
+                    </span>
+
+                    <span>
+                      {food.price <= 150
                         ? "Budget friendly"
-                        : "Guest favourite"}
+                        : "Special selection"}
                     </span>
                   </div>
 
                   <div className="fr-card-bottom">
                     <span>Discover your taste</span>
-                    <span className="fr-arrow" aria-hidden="true">↗</span>
+
+                    <span
+                      className="fr-arrow"
+                      aria-hidden="true"
+                    >
+                      ↗
+                    </span>
                   </div>
                 </div>
               </article>
@@ -307,20 +462,31 @@ export default function FoodRecommendations() {
           </div>
         ) : (
           <div className="fr-empty">
-            <span>🍽️</span>
+            <span aria-hidden="true">🍽️</span>
+
             <h3>No dishes found</h3>
-            <p>Try another search or change your filters.</p>
-            <button type="button" onClick={resetFilters}>
+
+            <p>
+              We couldn't find a match. Try another search
+              or adjust your filters.
+            </p>
+
+            <button
+              type="button"
+              onClick={resetFilters}
+            >
               Show all dishes
             </button>
           </div>
         )}
       </section>
 
+      {/* FOOTER */}
       <footer className="fr-footer">
-        <span>✦</span>
+        <span aria-hidden="true">✦</span>
         <p>Made with a love for good food.</p>
       </footer>
+
     </main>
   );
 }

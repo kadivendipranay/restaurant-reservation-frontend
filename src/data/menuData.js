@@ -1,5 +1,15 @@
 
-const LOCAL_FOOD_IMAGE = "/images/food-spread.avif";
+export const LOCAL_FOOD_IMAGE = "/images/food-spread.avif";
+
+export const MENU_CATEGORIES = [
+  "All",
+  "Main Course",
+  "Starter",
+  "Breakfast",
+  "Snacks",
+  "Dessert",
+  "Beverage",
+];
 
 export const menuData = [
   // MAIN COURSE
@@ -365,6 +375,33 @@ export const menuData = [
   },
 ];
 
-// Use this path as a fallback in your FoodImage component.
-// The image must exist in public/images/food-spread.avif.
-export { LOCAL_FOOD_IMAGE };
+// HELPER FUNCTIONS
+export const getMenuByCategory = (category) => {
+  if (category === "All") return [...menuData];
+
+  return menuData.filter(
+    (food) => food.category === category
+  );
+};
+
+export const getMenuByType = (type) => {
+  if (type === "All") return [...menuData];
+
+  return menuData.filter(
+    (food) => food.type === type
+  );
+};
+
+export const getMenuItemById = (id) => {
+  return menuData.find(
+    (food) => food.id === Number(id)
+  );
+};
+
+export const formatMenuPrice = (price) => {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(Number(price) || 0);
+};
