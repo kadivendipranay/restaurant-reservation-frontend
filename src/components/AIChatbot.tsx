@@ -50,8 +50,14 @@ export default function AIChatbot() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [bookingMode, setBookingMode] = useState(false);
+
   const [pendingReservation, setPendingReservation] =
     useState<ReservationDetails | null>(null);
+
+  // The table number comes from the availability response,
+  // not from ReservationDetails.
+  const [pendingTableNumber, setPendingTableNumber] =
+    useState<string | number | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -68,10 +74,13 @@ export default function AIChatbot() {
       behavior: "smooth",
       block: "end",
     });
-  }, [messages, loading]);
+  }, [messages, loading, pendingReservation]);
 
   function addBotMessage(text: string) {
-    setMessages((previous) => [...previous, { sender: "bot", text }]);
+    setMessages((previous) => [
+      ...previous,
+      { sender: "bot", text },
+    ]);
   }
 
   function getErrorMessage(
@@ -84,7 +93,9 @@ export default function AIChatbot() {
       const serverReply = error.response?.data?.reply;
 
       if (typeof serverMessage === "string") return serverMessage;
-      if (includeReply && typeof serverReply === "string") return serverReply;
+      if (includeReply && typeof serverReply === "string") {
+        return serverReply;
+      }
     }
 
     return fallback;
@@ -109,12 +120,15 @@ export default function AIChatbot() {
 
         if (!data.ready) {
           setPendingReservation(null);
+          setPendingTableNumber(null);
           addBotMessage(data.message);
           return;
         }
 
         if (!data.availability?.available) {
           setPendingReservation(null);
+          setPendingTableNumber(null);
+
           addBotMessage(
             data.message ||
               data.availability?.reason ||
@@ -130,13 +144,20 @@ export default function AIChatbot() {
         };
 
         setPendingReservation(details);
+        setPendingTableNumber(
+          data.availability.table?.tableNumber ?? null
+        );
 
         addBotMessage(
-          `${data.message}\n\nPlease review your booking:\nDate: ${details.date}\nTime: ${details.timeSlot}\nGuests: ${details.guests}\nTable: ${data.availability.table?.tableNumber ?? "Assigned on confirmation"}\n\nSelect Confirm Booking below when you're ready.`
+          data.message ||
+            "Great! We found an available table. Please review your reservation details below."
         );
       } else {
         const data = await sendAIMessage(question);
-        addBotMessage(data.reply || "Sorry, I couldn't answer that.");
+
+        addBotMessage(
+          data.reply || "Sorry, I couldn't answer that."
+        );
       }
     } catch (error: unknown) {
       console.error("Chatbot request failed:", error);
@@ -166,6 +187,7 @@ export default function AIChatbot() {
       );
 
       setPendingReservation(null);
+      setPendingTableNumber(null);
       setBookingMode(false);
     } catch (error: unknown) {
       console.error("Reservation confirmation failed:", error);
@@ -178,6 +200,7 @@ export default function AIChatbot() {
       );
 
       setPendingReservation(null);
+      setPendingTableNumber(null);
     } finally {
       setLoading(false);
     }
@@ -188,6 +211,7 @@ export default function AIChatbot() {
 
     setBookingMode(true);
     setPendingReservation(null);
+    setPendingTableNumber(null);
 
     addBotMessage(
       "Let's find a table for you. Please enter your preferred date, time slot, and number of guests.\n\nExample: Book a table on 2026-11-01 at 18:00-19:00 for 2 guests."
@@ -200,8 +224,12 @@ export default function AIChatbot() {
     if (loading) return;
 
     setPendingReservation(null);
+    setPendingTableNumber(null);
     setBookingMode(false);
-    addBotMessage("Booking cancelled. What else can I help you with?");
+
+    addBotMessage(
+      "Booking cancelled. What else can I help you with?"
+    );
   }
 
   function handleQuickAction(question: string) {
@@ -326,13 +354,71 @@ export default function AIChatbot() {
           </section>
 
           {bookingMode && pendingReservation && (
-            <div className="ai-booking-confirm">
-              <div className="ai-confirm-copy">
-                <strong>Ready to confirm?</strong>
-                <span>Review your reservation details above.</span>
+            <section
+              className="ai-booking-card"
+              aria-label="Reservation review"
+            >
+              <div className="ai-booking-card-heading">
+                <div className="ai-booking-card-icon" aria-hidden="true">
+                  ✓
+                </div>
+
+                <div>
+                  <span className="ai-booking-eyebrow">
+                    AVAILABILITY CONFIRMED
+                  </span>
+                  <h3>Review your reservation</h3>
+                  <p>Your table is available. Confirm the details below.</p>
+                </div>
               </div>
 
-              <div className="ai-confirm-actions">
+              <div className="ai-booking-details">
+                <div className="ai-booking-detail">
+                  <span className="ai-detail-icon" aria-hidden="true">
+                    📅
+                  </span>
+                  <div>
+                    <small>Date</small>
+                    <strong>{pendingReservation.date}</strong>
+                  </div>
+                </div>
+
+                <div className="ai-booking-detail">
+                  <span className="ai-detail-icon" aria-hidden="true">
+                    🕒
+                  </span>
+                  <div>
+                    <small>Time slot</small>
+                    <strong>{pendingReservation.timeSlot}</strong>
+                  </div>
+                </div>
+
+                <div className="ai-booking-detail">
+                  <span className="ai-detail-icon" aria-hidden="true">
+                    👥
+                  </span>
+                  <div>
+                    <small>Guests</small>
+                    <strong>{pendingReservation.guests}</strong>
+                  </div>
+                </div>
+
+                <div className="ai-booking-detail">
+                  <span className="ai-detail-icon" aria-hidden="true">
+                    🍽️
+                  </span>
+                  <div>
+                    <small>Table</small>
+                    <strong>
+                      {pendingTableNumber !== null
+                        ? `Table ${pendingTableNumber}`
+                        : "Assigned on confirmation"}
+                    </strong>
+                  </div>
+                </div>
+              </div>
+
+              <div className="ai-booking-card-actions">
                 <button
                   type="button"
                   className="ai-confirm-button"
@@ -351,7 +437,11 @@ export default function AIChatbot() {
                   Cancel
                 </button>
               </div>
-            </div>
+
+              <p className="ai-booking-card-note">
+                Your reservation will be submitted when you confirm.
+              </p>
+            </section>
           )}
 
           <form
@@ -392,7 +482,9 @@ export default function AIChatbot() {
         className="ai-chat-toggle"
         onClick={() => setIsOpen((previous) => !previous)}
         aria-expanded={isOpen}
-        aria-label={isOpen ? "Close assistant" : "Open restaurant assistant"}
+        aria-label={
+          isOpen ? "Close assistant" : "Open restaurant assistant"
+        }
       >
         {isOpen ? "×" : "💬"}
       </button>

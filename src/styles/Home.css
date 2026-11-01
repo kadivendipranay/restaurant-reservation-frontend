@@ -404,9 +404,13 @@ button {
 
 /* DISH CARDS */
 
-.home .dish-grid {
+/* .home .dish-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr)); */
+  .home .dish-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
   gap: 16px;
   max-width: 1450px;
   margin: 0 auto;
