@@ -1,62 +1,62 @@
-
+// src/pages/HomePage.jsx
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { useAuth } from "../context/AuthContext";
 import "../styles/HomePage.css";
 
 const FEATURES = [
   {
-    icon: "🔐",
-    title: "Secure Login",
-    description: "Register and log in to access your personal dashboard.",
+    icon: "🤖",
+    title: "AI Dining & Booking Assistant",
+    description:
+      "Ask about veg/non-veg dishes, budget combos in ₹, or book a table naturally in chat.",
   },
   {
     icon: "📅",
-    title: "Easy Reservations",
-    description: "Choose your preferred date, time slot, and guest count.",
+    title: "Live Slot & Table Matching",
+    description:
+      "See real-time open table counts per time slot and get best-fit seating automatically.",
   },
   {
-    icon: "🕒",
-    title: "Flexible Time Slots",
-    description: "Select from the available restaurant booking slots.",
-  },
-  {
-    icon: "❌",
-    title: "Cancel Bookings",
-    description: "Manage your active reservations when plans change.",
-  },
-  {
-    icon: "🛠️",
-    title: "Admin Dashboard",
-    description: "Manage bookings and review reservation information.",
+    icon: "✨",
+    title: "Occasions & Special Requests",
+    description:
+      "Personalize birthdays, anniversaries, or dietary and seating notes with every booking.",
   },
   {
     icon: "🔄",
-    title: "Restore Bookings",
-    description: "Restore eligible cancelled reservations as an admin.",
+    title: "Instant Rescheduling",
+    description:
+      "Modify your active reservation's date, time, or party size in one click without cancelling.",
+  },
+  {
+    icon: "🗺️",
+    title: "Live Floor & Table Grid",
+    description:
+      "Admins can monitor real-time table occupancy by zone and manage seating capacity live.",
+  },
+  {
+    icon: "📊",
+    title: "Analytics & Shift Export",
+    description:
+      "Track peak dining hours, status trends with interactive charts, and export CSV shift sheets.",
   },
 ];
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const { token, role } = useAuth();
+
+  const isAuthenticated = Boolean(token || localStorage.getItem("token"));
+  const resolvedRole = (role || localStorage.getItem("role") || "").toUpperCase();
+  const isAdmin = isAuthenticated && resolvedRole === "ADMIN";
 
   const goDashboard = () => {
-    const token = localStorage.getItem("token");
-    const role = (localStorage.getItem("role") || "").toUpperCase();
-
-    if (!token) {
+    if (!isAuthenticated) {
       navigate("/login");
       return;
     }
-
-    if (role === "ADMIN") {
-      navigate("/admin");
-    } else {
-      navigate("/user");
-    }
-  };
-
-  const goToLogin = () => {
-    navigate("/login");
+    navigate(isAdmin ? "/admin" : "/user");
   };
 
   return (
@@ -67,7 +67,7 @@ export default function HomePage() {
       <section className="hero-card" aria-labelledby="home-hero-title">
         <div className="hero-content">
           <span className="hero-badge">
-            ✨ Your table, your time
+            ✨ AI-Powered Dining & Table Reservations
           </span>
 
           <h1 className="hero-title" id="home-hero-title">
@@ -75,8 +75,8 @@ export default function HomePage() {
           </h1>
 
           <p className="hero-subtitle">
-            Great food starts with a great reservation. Book your table,
-            choose your time, and make every dining experience special.
+            Great food starts with a great reservation. Check live table availability,
+            chat with our AI dining assistant, and customize every visit effortlessly.
           </p>
 
           <div className="hero-actions">
@@ -85,20 +85,27 @@ export default function HomePage() {
               className="hero-btn"
               onClick={goDashboard}
             >
-              Go to Dashboard <span aria-hidden="true">→</span>
+              {isAuthenticated
+                ? isAdmin
+                  ? "Open Admin Command Centre"
+                  : "Go to My Dashboard"
+                : "Book a Table Now"}{" "}
+              <span aria-hidden="true">→</span>
             </button>
 
-            <button
-              type="button"
-              className="hero-secondary-btn"
-              onClick={goToLogin}
-            >
-              Sign In
-            </button>
+            {!isAuthenticated && (
+              <button
+                type="button"
+                className="hero-secondary-btn"
+                onClick={() => navigate("/login")}
+              >
+                Sign In
+              </button>
+            )}
           </div>
 
           <div className="hero-note">
-            🍽️ Simple booking · ⏰ Convenient time slots · 📱 Easy management
+            🤖 AI Menu & Booking Help · ⏰ 5 PM – 9 PM Slots · 🔄 Instant Rescheduling
           </div>
         </div>
 
@@ -119,8 +126,8 @@ export default function HomePage() {
           <span className="section-eyebrow">ABOUT RESERVEDINE</span>
           <h2 id="about-title">Dining reservations made simple</h2>
           <p>
-            ReserveDine brings booking and reservation management together
-            in one convenient place.
+            ReserveDine brings live table availability, AI assistance, and floor operations
+            together in one seamless platform.
           </p>
         </div>
 
@@ -133,10 +140,9 @@ export default function HomePage() {
             <h3>Your dining experience, simplified</h3>
 
             <p>
-              Whether you are a guest planning a meal or an administrator
-              managing restaurant bookings, ReserveDine helps keep the
-              reservation process organized. Create bookings, view their
-              status, and manage eligible reservations from a simple dashboard.
+              Whether you are a guest planning a celebration or an administrator
+              overseeing live floor occupancy, ReserveDine keeps every table and time slot
+              organized—from instant best-fit table matching to real-time shift insights.
             </p>
 
             <button
@@ -144,7 +150,8 @@ export default function HomePage() {
               className="about-link"
               onClick={goDashboard}
             >
-              Get started <span aria-hidden="true">→</span>
+              {isAuthenticated ? "Continue to Dashboard" : "Get started"}{" "}
+              <span aria-hidden="true">→</span>
             </button>
           </div>
         </div>
@@ -156,7 +163,7 @@ export default function HomePage() {
           <span className="section-eyebrow">WHAT YOU CAN DO</span>
           <h2 id="features-title">Everything you need in one place</h2>
           <p>
-            Explore the features designed to make reservation management easier.
+            Explore the smart features built for guests and restaurant teams alike.
           </p>
         </div>
 
@@ -183,7 +190,11 @@ export default function HomePage() {
         <div className="cta-content">
           <span className="cta-eyebrow">YOUR NEXT MEAL STARTS HERE</span>
           <h2 id="cta-title">Ready to make a reservation?</h2>
-          <p>Sign in to manage your bookings and get started.</p>
+          <p>
+            {isAuthenticated
+              ? "Jump back into your dashboard to book, reschedule, or manage tables."
+              : "Sign in to check live table availability and reserve your spot."}
+          </p>
         </div>
 
         <button
@@ -191,7 +202,8 @@ export default function HomePage() {
           className="cta-btn"
           onClick={goDashboard}
         >
-          Book Your Table <span aria-hidden="true">→</span>
+          {isAuthenticated ? "Open Dashboard" : "Book Your Table"}{" "}
+          <span aria-hidden="true">→</span>
         </button>
       </section>
 
@@ -204,7 +216,7 @@ export default function HomePage() {
           <span>ReserveDine</span>
         </div>
 
-        <p>Built with React, Node.js, Express, and MongoDB.</p>
+        <p>Built with React, Node.js, Express, MongoDB, and OpenAI.</p>
 
         <p className="footer-copyright">
           © {new Date().getFullYear()} ReserveDine. All rights reserved.

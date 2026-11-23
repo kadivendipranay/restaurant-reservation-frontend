@@ -1,4 +1,4 @@
-//UserPage.jsx
+// src/pages/UserPage.jsx
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
@@ -14,6 +14,8 @@ const TIME_SLOTS = [
   "19:00-20:00",
   "20:00-21:00",
 ];
+
+const OCCASIONS = ["None", "Birthday", "Anniversary", "Business", "Date Night"];
 
 const getLocalDate = (date = new Date()) => {
   const year = date.getFullYear();
@@ -65,10 +67,19 @@ export default function UserPage() {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
+  // Booking / Reschedule form state
+  const [editingReservation, setEditingReservation] = useState(null);
   const [date, setDate] = useState("");
   const [timeSlot, setTimeSlot] = useState(TIME_SLOTS[0]);
-  const [guests, setGuests] = useState("1");
-  const [reservations, setReservations] = useState([]);
+  const [guests, setGuests] = useState("2");
+  const [occasion, setOccasion] = useState("None");
+  const [specialRequests, setSpecialRequests] = useState("");
+
+  // Live slot availability map: { "17:00-18:00": 3, ... }
+  const [slotAvailability, setSlotAvailability] = useState({});
+
+  // All user reservations (filtered locally so top stat cards stay accurate)
+  const [allReservations, setAllReservations] = useState([]);
   const [statusFilter, setStatusFilter] = useState("ACTIVE");
   const [loading, setLoading] = useState(false);
   const [loadingList, setLoadingList] = useState(false);
@@ -77,11 +88,19 @@ export default function UserPage() {
   const today = useMemo(() => getLocalDate(), []);
   const maxDate = useMemo(() => getMaxReservationDate(), []);
 
-  const counts = useMemo(() => ({
-    active: reservations.filter((item) => item.status === "ACTIVE").length,
-    completed: reservations.filter((item) => item.status === "COMPLETED").length,
-    cancelled: reservations.filter((item) => item.status === "CANCELLED").length,
-  }), [reservations]);
+  const counts = useMemo(
+    () => ({
+      active: allReservations.filter((item) => item.status === "ACTIVE").length,
+      completed: allReservations.filter((item) => item.status === "COMPLETED").length,
+      cancelled: allReservations.filter((item) => item.status === "CANCELLED").length,
+    }),
+    [allReservations]
+  );
+
+  const visibleReservations = useMemo(() => {
+    if (statusFilter === "ALL") return allReservations;
+    return allReservations.filter((item) => item.status === statusFilter);
+  }, [allReservations, statusFilter]);
 
   const handleLogout = () => {
     if (!window.confirm("Are you sure you want to sign out?")) return;
@@ -92,24 +111,77 @@ export default function UserPage() {
   const fetchMyReservations = useCallback(async () => {
     setLoadingList(true);
     try {
-      const response = await API.get("/reservations/my", {
-        params: statusFilter === "ALL" ? {} : { status: statusFilter },
-      });
+      const response = await API.get("/reservations/my");
       const data = response?.data;
-      setReservations(Array.isArray(data) ? data : Array.isArray(data?.reservations) ? data.reservations : []);
+      setAllReservations(
+        Array.isArray(data)
+          ? data
+          : Array.isArray(data?.reservations)
+          ? data.reservations
+          : []
+      );
     } catch (error) {
-      setReservations([]);
+      setAllReservations([]);
       toast.error(getErrorMessage(error, "Failed to load your reservations."));
     } finally {
       setLoadingList(false);
     }
-  }, [statusFilter]);
+  }, []);
 
   useEffect(() => {
     fetchMyReservations();
   }, [fetchMyReservations]);
 
-  const handleCreateReservation = async (event) => {
+  // Fetch live slot availability whenever date or guest count changes
+  useEffect(() => {
+    const guestCount = Number(guests);
+    if (!date || !Number.isInteger(guestCount) || guestCount < 1 || guestCount > 20) {
+      setSlotAvailability({});
+      return;
+    }
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await API.get("/reservations/availability", {
+          params: { date, guests: guestCount },
+        });
+        if (cancelled) return;
+        const map = {};
+        (res.data?.slots || []).forEach((s) => {
+          map[s.timeSlot] = s.availableTables;
+        });
+        setSlotAvailability(map);
+      } catch {
+        if (!cancelled) setSlotAvailability({});
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [date, guests]);
+
+  const resetForm = () => {
+    setEditingReservation(null);
+    setDate("");
+    setTimeSlot(TIME_SLOTS[0]);
+    setGuests("2");
+    setOccasion("None");
+    setSpecialRequests("");
+  };
+
+  const handleStartReschedule = (reservation) => {
+    setEditingReservation(reservation);
+    setDate(String(reservation.date || "").slice(0, 10));
+    setTimeSlot(reservation.timeSlot || TIME_SLOTS[0]);
+    setGuests(String(reservation.guests || "2"));
+    setOccasion(reservation.occasion || "None");
+    setSpecialRequests(reservation.specialRequests || "");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleSubmitReservation = async (event) => {
     event.preventDefault();
 
     if (!date || !timeSlot) {
@@ -133,18 +205,40 @@ export default function UserPage() {
 
     setLoading(true);
     try {
-      const response = await API.post("/reservations", {
+      const payload = {
         date,
         timeSlot,
         guests: guestCount,
-      });
-      toast.success(response?.data?.message || "Reservation created successfully!");
-      setDate("");
-      setTimeSlot(TIME_SLOTS[0]);
-      setGuests("1");
+        occasion,
+        specialRequests: specialRequests.trim(),
+      };
+
+      if (editingReservation) {
+        const response = await API.patch(
+          `/reservations/${editingReservation._id}`,
+          payload
+        );
+        toast.success(
+          response?.data?.message || "Reservation rescheduled successfully!"
+        );
+      } else {
+        const response = await API.post("/reservations", payload);
+        toast.success(
+          response?.data?.message || "Reservation created successfully!"
+        );
+      }
+
+      resetForm();
       await fetchMyReservations();
     } catch (error) {
-      toast.error(getErrorMessage(error, "Reservation failed. Please try again."));
+      toast.error(
+        getErrorMessage(
+          error,
+          editingReservation
+            ? "Unable to reschedule reservation."
+            : "Reservation failed. Please try again."
+        )
+      );
     } finally {
       setLoading(false);
     }
@@ -158,6 +252,7 @@ export default function UserPage() {
     try {
       const response = await API.patch(`/reservations/${id}/cancel`);
       toast.success(response?.data?.message || "Reservation cancelled successfully.");
+      if (editingReservation?._id === id) resetForm();
       await fetchMyReservations();
     } catch (error) {
       toast.error(getErrorMessage(error, "Unable to cancel this reservation."));
@@ -173,12 +268,22 @@ export default function UserPage() {
       <main className="user-dashboard">
         <section className="dashboard-welcome">
           <div className="welcome-copy">
-            <span className="eyebrow"><span className="eyebrow-dot" /> YOUR DINING SPACE</span>
-            <h1>Your next great meal <span>starts here.</span></h1>
-            <p>Book your table, keep track of your plans, and make every meal special.</p>
+            <span className="eyebrow">
+              <span className="eyebrow-dot" /> YOUR DINING SPACE
+            </span>
+            <h1>
+              Your next great meal <span>starts here.</span>
+            </h1>
+            <p>
+              Book your table, customize your occasion, and make every meal special.
+            </p>
             <div className="welcome-highlights">
-              <span><span className="highlight-check">✓</span> Easy reservations</span>
-              <span><span className="highlight-check">✓</span> Simple booking management</span>
+              <span>
+                <span className="highlight-check">✓</span> Instant table matching
+              </span>
+              <span>
+                <span className="highlight-check">✓</span> Easy rescheduling
+              </span>
             </div>
           </div>
 
@@ -189,7 +294,10 @@ export default function UserPage() {
           <div className="welcome-art" aria-hidden="true">
             <div className="art-circle art-circle-one" />
             <div className="art-circle art-circle-two" />
-            <div className="art-plate"><span>✦</span><div className="plate-ring" /></div>
+            <div className="art-plate">
+              <span>✦</span>
+              <div className="plate-ring" />
+            </div>
             <span className="art-spark spark-one">✧</span>
             <span className="art-spark spark-two">✦</span>
           </div>
@@ -197,7 +305,9 @@ export default function UserPage() {
 
         <section className="stats-grid" aria-label="Reservation overview">
           <article className="stat-card stat-card-amber">
-            <div className="stat-icon stat-icon-amber" aria-hidden="true">⌂</div>
+            <div className="stat-icon stat-icon-amber" aria-hidden="true">
+              ⌂
+            </div>
             <div className="stat-content">
               <span className="stat-label">Active bookings</span>
               <strong>{counts.active}</strong>
@@ -205,7 +315,9 @@ export default function UserPage() {
             </div>
           </article>
           <article className="stat-card stat-card-green">
-            <div className="stat-icon stat-icon-green" aria-hidden="true">✓</div>
+            <div className="stat-icon stat-icon-green" aria-hidden="true">
+              ✓
+            </div>
             <div className="stat-content">
               <span className="stat-label">Completed</span>
               <strong>{counts.completed}</strong>
@@ -213,7 +325,9 @@ export default function UserPage() {
             </div>
           </article>
           <article className="stat-card stat-card-rose">
-            <div className="stat-icon stat-icon-rose" aria-hidden="true">↺</div>
+            <div className="stat-icon stat-icon-rose" aria-hidden="true">
+              ↺
+            </div>
             <div className="stat-content">
               <span className="stat-label">Cancelled</span>
               <strong>{counts.cancelled}</strong>
@@ -227,49 +341,171 @@ export default function UserPage() {
             <div className="panel-heading">
               <div className="panel-icon">✦</div>
               <div>
-                <span className="panel-kicker">PLAN A VISIT</span>
-                <h2>Reserve your table</h2>
-                <p>A few details and you're all set.</p>
+                <span className="panel-kicker">
+                  {editingReservation ? "MODIFY BOOKING" : "PLAN A VISIT"}
+                </span>
+                <h2>
+                  {editingReservation ? "Reschedule reservation" : "Reserve your table"}
+                </h2>
+                <p>
+                  {editingReservation
+                    ? `Updating Booking ID · ${String(editingReservation._id)
+                        .slice(-8)
+                        .toUpperCase()}`
+                    : "A few details and you're all set."}
+                </p>
               </div>
             </div>
 
-            <form className="booking-form" onSubmit={handleCreateReservation}>
+            <form className="booking-form" onSubmit={handleSubmitReservation}>
               <div className="field-group">
                 <label htmlFor="reservationDate">Reservation date</label>
                 <div className="input-wrap">
-                  <span className="input-icon" aria-hidden="true">▦</span>
-                  <input id="reservationDate" type="date" value={date} min={today} max={maxDate}
-                    onChange={(event) => setDate(event.target.value)} required disabled={loading} />
+                  <span className="input-icon" aria-hidden="true">
+                    ▦
+                  </span>
+                  <input
+                    id="reservationDate"
+                    type="date"
+                    value={date}
+                    min={today}
+                    max={maxDate}
+                    onChange={(event) => setDate(event.target.value)}
+                    required
+                    disabled={loading}
+                  />
                 </div>
                 <small className="field-help">Book from today up to one year ahead.</small>
               </div>
 
               <div className="field-group">
-                <label htmlFor="timeSlot">Preferred time</label>
-                <div className="input-wrap">
-                  <span className="input-icon" aria-hidden="true">◷</span>
-                  <select id="timeSlot" value={timeSlot}
-                    onChange={(event) => setTimeSlot(event.target.value)} required disabled={loading}>
-                    {TIME_SLOTS.map((slot) => <option key={slot} value={slot}>{formatTime(slot)}</option>)}
-                  </select>
-                </div>
-              </div>
-
-              <div className="field-group">
                 <label htmlFor="guests">Number of guests</label>
                 <div className="input-wrap">
-                  <span className="input-icon" aria-hidden="true">♧</span>
-                  <input id="guests" type="number" min="1" max="20" step="1" value={guests}
-                    onChange={(event) => setGuests(event.target.value)} required disabled={loading} />
+                  <span className="input-icon" aria-hidden="true">
+                    ♧
+                  </span>
+                  <input
+                    id="guests"
+                    type="number"
+                    min="1"
+                    max="20"
+                    step="1"
+                    value={guests}
+                    onChange={(event) => setGuests(event.target.value)}
+                    required
+                    disabled={loading}
+                  />
                   <span className="input-suffix">people</span>
                 </div>
                 <small className="field-help">For groups of 1–20 guests.</small>
               </div>
 
-              <button type="submit" className="book-submit" disabled={loading || loadingList}>
-                {loading ? <><span className="button-spinner" /> Booking your table…</> : <>Confirm reservation <span aria-hidden="true">→</span></>}
+              <div className="field-group">
+                <label htmlFor="timeSlot">Preferred time</label>
+                <div className="input-wrap">
+                  <span className="input-icon" aria-hidden="true">
+                    ◷
+                  </span>
+                  <select
+                    id="timeSlot"
+                    value={timeSlot}
+                    onChange={(event) => setTimeSlot(event.target.value)}
+                    required
+                    disabled={loading}
+                  >
+                    {TIME_SLOTS.map((slot) => {
+                      const availCount = slotAvailability[slot];
+                      const availabilityLabel =
+                        availCount === undefined
+                          ? ""
+                          : availCount === 0
+                          ? " — Sold out"
+                          : ` — ${availCount} ${
+                              availCount === 1 ? "table" : "tables"
+                            } left`;
+                      return (
+                        <option key={slot} value={slot}>
+                          {formatTime(slot)}
+                          {availabilityLabel}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+              </div>
+
+              <div className="field-group">
+                <label htmlFor="occasion">Occasion (optional)</label>
+                <div className="input-wrap">
+                  <span className="input-icon" aria-hidden="true">
+                    ★
+                  </span>
+                  <select
+                    id="occasion"
+                    value={occasion}
+                    onChange={(event) => setOccasion(event.target.value)}
+                    disabled={loading}
+                  >
+                    {OCCASIONS.map((item) => (
+                      <option key={item} value={item}>
+                        {item === "None" ? "Regular dining" : item}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="field-group">
+                <label htmlFor="specialRequests">Special requests (optional)</label>
+                <div className="input-wrap">
+                  <span className="input-icon" aria-hidden="true">
+                    ✎
+                  </span>
+                  <input
+                    id="specialRequests"
+                    type="text"
+                    maxLength={200}
+                    placeholder="Window seat, Jain food, high chair..."
+                    value={specialRequests}
+                    onChange={(event) => setSpecialRequests(event.target.value)}
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="book-submit"
+                disabled={loading || loadingList}
+              >
+                {loading ? (
+                  <>
+                    <span className="button-spinner" />
+                    {editingReservation ? "Updating booking…" : "Booking your table…"}
+                  </>
+                ) : (
+                  <>
+                    {editingReservation ? "Save changes" : "Confirm reservation"}{" "}
+                    <span aria-hidden="true">→</span>
+                  </>
+                )}
               </button>
-              <p className="booking-note"><span aria-hidden="true">♧</span> Your table will be assigned based on your group size.</p>
+
+              {editingReservation && (
+                <button
+                  type="button"
+                  className="cancel-edit-button"
+                  onClick={resetForm}
+                  disabled={loading}
+                >
+                  Cancel editing
+                </button>
+              )}
+
+              <p className="booking-note">
+                <span aria-hidden="true">♧</span> Your table will be assigned based on
+                your group size.
+              </p>
             </form>
           </section>
 
@@ -280,73 +516,155 @@ export default function UserPage() {
                 <h2>My reservations</h2>
                 <p>All your dining plans, in one place.</p>
               </div>
-              <div className="reservation-total"><strong>{reservations.length}</strong><span>shown</span></div>
+              <div className="reservation-total">
+                <strong>{visibleReservations.length}</strong>
+                <span>shown</span>
+              </div>
             </div>
 
             <div className="reservation-toolbar">
               <label htmlFor="reservationStatus">Show</label>
-              <select id="reservationStatus" value={statusFilter}
-                onChange={(event) => setStatusFilter(event.target.value)}>
+              <select
+                id="reservationStatus"
+                value={statusFilter}
+                onChange={(event) => setStatusFilter(event.target.value)}
+              >
                 <option value="ACTIVE">Active bookings</option>
                 <option value="CANCELLED">Cancelled</option>
                 <option value="COMPLETED">Completed</option>
                 <option value="ALL">All reservations</option>
               </select>
-              <button type="button" className="refresh-button" onClick={fetchMyReservations}
-                disabled={loadingList} aria-label="Refresh reservations" title="Refresh reservations">
-                {loadingList ? <span className="button-spinner button-spinner-dark" /> : "↻"}
+              <button
+                type="button"
+                className="refresh-button"
+                onClick={fetchMyReservations}
+                disabled={loadingList}
+                aria-label="Refresh reservations"
+                title="Refresh reservations"
+              >
+                {loadingList ? (
+                  <span className="button-spinner button-spinner-dark" />
+                ) : (
+                  "↻"
+                )}
               </button>
             </div>
 
             {loadingList ? (
-              <div className="reservation-loading"><Spinner text="Loading your reservations..." /></div>
-            ) : reservations.length === 0 ? (
+              <div className="reservation-loading">
+                <Spinner text="Loading your reservations..." />
+              </div>
+            ) : visibleReservations.length === 0 ? (
               <div className="empty-reservations">
-                <div className="empty-illustration" aria-hidden="true">♧</div>
+                <div className="empty-illustration" aria-hidden="true">
+                  ♧
+                </div>
                 <h3>No bookings here yet</h3>
                 <p>Your reservations will appear here once you book a table.</p>
               </div>
             ) : (
               <div className="reservation-list">
-                {reservations.map((reservation) => (
-                  <article key={reservation._id} className="reservation-card">
-                    <div className="reservation-card-top">
-                      <div className="reservation-restaurant-mark" aria-hidden="true">♧</div>
-                      <div className="reservation-card-name">
-                        <h3>Restaurant reservation</h3>
-                        <span>Booking ID · {String(reservation._id || "").slice(-8).toUpperCase()}</span>
-                      </div>
-                      <span className={`status-pill status-${String(reservation.status || "unknown").toLowerCase()}`}>
-                        {reservation.status || "UNKNOWN"}
-                      </span>
-                    </div>
+                {visibleReservations.map((reservation) => {
+                  const statusClass = String(
+                    reservation.status || "active"
+                  ).toLowerCase();
 
-                    <div className="reservation-info-grid">
-                      <div className="reservation-info"><span>Date</span><strong>{formatDate(reservation.date)}</strong></div>
-                      <div className="reservation-info"><span>Time</span><strong>{formatTime(reservation.timeSlot)}</strong></div>
-                      <div className="reservation-info"><span>Guests</span><strong>{reservation.guests} {Number(reservation.guests) === 1 ? "guest" : "guests"}</strong></div>
-                      <div className="reservation-info"><span>Table</span><strong>{reservation.table?.tableNumber ?? "Assigned by restaurant"}</strong></div>
-                    </div>
-
-                    {reservation.status === "ACTIVE" && (
-                      <div className="reservation-card-actions">
-                        <button type="button" className="cancel-reservation-button"
-                          disabled={loading || actionLoadingId !== null}
-                          onClick={() => handleCancelReservation(reservation._id)}>
-                          {actionLoadingId === reservation._id ? <><span className="button-spinner" /> Cancelling…</> : "Cancel booking"}
-                        </button>
+                  return (
+                    <article
+                      key={reservation._id}
+                      className={`reservation-card reservation-card-${statusClass}`}
+                    >
+                      <div className="reservation-card-top">
+                        <div className="reservation-restaurant-mark" aria-hidden="true">
+                          ♧
+                        </div>
+                        <div className="reservation-card-name">
+                          <h3>
+                            Restaurant reservation
+                            {reservation.occasion && reservation.occasion !== "None"
+                              ? ` · ${reservation.occasion}`
+                              : ""}
+                          </h3>
+                          <span>
+                            Booking ID ·{" "}
+                            {String(reservation._id || "").slice(-8).toUpperCase()}
+                          </span>
+                        </div>
+                        <span className={`status-pill status-${statusClass}`}>
+                          {reservation.status || "UNKNOWN"}
+                        </span>
                       </div>
-                    )}
-                  </article>
-                ))}
+
+                      <div className="reservation-info-grid">
+                        <div className="reservation-info">
+                          <span>Date</span>
+                          <strong>{formatDate(reservation.date)}</strong>
+                        </div>
+                        <div className="reservation-info">
+                          <span>Time</span>
+                          <strong>{formatTime(reservation.timeSlot)}</strong>
+                        </div>
+                        <div className="reservation-info">
+                          <span>Guests</span>
+                          <strong>
+                            {reservation.guests}{" "}
+                            {Number(reservation.guests) === 1 ? "guest" : "guests"}
+                          </strong>
+                        </div>
+                        <div className="reservation-info">
+                          <span>Table</span>
+                          <strong>
+                            {reservation.table?.tableNumber ?? "Assigned by restaurant"}
+                          </strong>
+                        </div>
+                      </div>
+
+                      {reservation.specialRequests && (
+                        <p className="reservation-special-note">
+                          <strong>Note:</strong> {reservation.specialRequests}
+                        </p>
+                      )}
+
+                      {reservation.status === "ACTIVE" && (
+                        <div className="reservation-card-actions">
+                          <button
+                            type="button"
+                            className="reschedule-reservation-button"
+                            disabled={loading || actionLoadingId !== null}
+                            onClick={() => handleStartReschedule(reservation)}
+                          >
+                            Reschedule / Edit
+                          </button>
+
+                          <button
+                            type="button"
+                            className="cancel-reservation-button"
+                            disabled={loading || actionLoadingId !== null}
+                            onClick={() => handleCancelReservation(reservation._id)}
+                          >
+                            {actionLoadingId === reservation._id ? (
+                              <>
+                                <span className="button-spinner" /> Cancelling…
+                              </>
+                            ) : (
+                              "Cancel booking"
+                            )}
+                          </button>
+                        </div>
+                      )}
+                    </article>
+                  );
+                })}
               </div>
             )}
           </section>
         </div>
 
-        <footer className="dashboard-footer">
+       <footer className="dashboard-footer">
           <span>Made for memorable meals.</span>
-          <span>ReserveDine · Restaurant Reservation System</span>
+          <span>
+            Created by <strong>Pranay Kumar</strong> · ReserveDine
+          </span>
         </footer>
       </main>
     </div>

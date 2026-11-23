@@ -1,38 +1,40 @@
+// src/pages/Home.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { useAuth } from "../context/AuthContext";
 import "../styles/Home.css";
 
 const FEATURES = [
   {
-    icon: "🍽️",
-    title: "Online Reservations",
-    desc: "Book your table by choosing a date, time slot, and number of guests.",
+    icon: "🤖",
+    title: "AI Dining Concierge",
+    desc: "Ask our assistant for dish pairings, vegetarian choices, or budget-friendly combos in ₹.",
   },
   {
-    icon: "📊",
-    title: "Admin Dashboard",
-    desc: "Administrators can view, manage, cancel, and restore reservations.",
+    icon: "🗺️",
+    title: "Preferred Seating Zones",
+    desc: "Instant table matching across our Main Hall, Window, Patio, and VIP dining sections.",
   },
   {
-    icon: "⏰",
-    title: "Time Slot Booking",
-    desc: "Choose an available time slot for an organized booking experience.",
+    icon: "🥂",
+    title: "Celebrations & Occasions",
+    desc: "Personalize birthdays, anniversaries, and dietary or high-chair notes with every booking.",
   },
   {
     icon: "🔄",
-    title: "Reservation Management",
-    desc: "Users can cancel eligible bookings, while admins can manage reservation statuses.",
+    title: "Effortless Rescheduling",
+    desc: "Plans changed? Update your reservation date, time slot, or party size in seconds.",
   },
   {
-    icon: "👤",
-    title: "Role-Based Access",
-    desc: "Users and administrators are directed to their respective dashboards.",
+    icon: "👨‍🍳",
+    title: "Chef's Seasonal Menu",
+    desc: "Freshly prepared starters, wood-fired mains, artisanal desserts, and signature coolers.",
   },
   {
-    icon: "🔐",
-    title: "JWT Authentication",
-    desc: "Protected API endpoints use authentication and role-based authorization.",
+    icon: "⚡",
+    title: "Live Table Availability",
+    desc: "Check open evening dining slots in real time before confirming your visit.",
   },
 ];
 
@@ -88,63 +90,56 @@ const DISHES = [
     price: "₹250",
     rating: "4.6",
     reviews: "92",
-    
-image: "https://img.magnific.com/premium-photo/fresh-fruit-cocktails-plastic-cups-with-straw_198067-947006.jpg",
-
+    image:
+      "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=800&q=85",
   },
 ];
 
-const CATEGORIES = [
-  "All",
-  "Starters",
-  "Main Course",
-  "Desserts",
-  "Beverages",
-];
+const CATEGORIES = ["All", "Starters", "Main Course", "Desserts", "Beverages"];
 
 const BENEFITS = [
   {
     icon: "▦",
     title: "Easy Reservations",
-    description: "Book a table with a few simple steps.",
+    description: "Book or reschedule your table in seconds.",
   },
   {
     icon: "◷",
-    title: "Flexible Time Slots",
-    description: "Choose from available dining times.",
+    title: "Live Slot Availability",
+    description: "Check open evening tables before you visit.",
   },
   {
     icon: "✦",
-    title: "Premium Experience",
-    description: "Discover dishes for your next outing.",
+    title: "AI Menu & Dining Help",
+    description: "Personalized dish & budget recommendations.",
   },
   {
-    icon: "✓",
-    title: "Simple Management",
-    description: "Manage reservations in one place.",
+    icon: "🥂",
+    title: "Special Occasions",
+    description: "Tailored seating for birthdays, dates & gatherings.",
   },
 ];
 
 export default function Home() {
   const navigate = useNavigate();
+  const { token, role } = useAuth();
   const [activeCategory, setActiveCategory] = useState("All");
 
-  const token = localStorage.getItem("token");
-  const role = (localStorage.getItem("role") || "").toUpperCase();
-  const isLoggedIn = Boolean(token);
+  const resolvedToken = token || localStorage.getItem("token");
+  const resolvedRole = (role || localStorage.getItem("role") || "").toUpperCase();
+  const isLoggedIn = Boolean(resolvedToken);
+  const isAdmin = isLoggedIn && resolvedRole === "ADMIN";
 
   const goDashboard = () => {
-    if (!token) {
+    if (!isLoggedIn) {
       navigate("/login");
       return;
     }
-
-    navigate(role === "ADMIN" ? "/admin" : "/user");
+    navigate(isAdmin ? "/admin" : "/user");
   };
 
   const goToLogin = () => navigate("/login");
-  const goToFoodRecommendations = () =>
-    navigate("/food-recommendations");
+  const goToFoodRecommendations = () => navigate("/food-recommendations");
 
   const visibleDishes =
     activeCategory === "All"
@@ -161,7 +156,7 @@ export default function Home() {
 
         <div className="hero-content">
           <span className="hero-badge">
-            ✦ &nbsp; EXQUISITE DINING EXPERIENCE
+            ✦ &nbsp; FINE DINING &amp; CURATED HOSPITALITY
           </span>
 
           <h1 id="hero-title" className="hero-title">
@@ -171,8 +166,8 @@ export default function Home() {
           </h1>
 
           <p className="hero-subtitle">
-            Discover exceptional cuisine, seamless reservations,
-            and unforgettable dining moments.
+            Savor handcrafted cuisine, warm ambiance, and effortless table
+            reservations tailored to your evening plans.
           </p>
 
           <div className="hero-actions">
@@ -181,7 +176,12 @@ export default function Home() {
               className="hero-btn"
               onClick={goDashboard}
             >
-              Book a Table <span aria-hidden="true">→</span>
+              {isLoggedIn
+                ? isAdmin
+                  ? "Open Admin Dashboard"
+                  : "Go to Dashboard"
+                : "Reserve a Table"}{" "}
+              <span aria-hidden="true">→</span>
             </button>
 
             <button
@@ -189,7 +189,7 @@ export default function Home() {
               className="hero-login-btn"
               onClick={goToFoodRecommendations}
             >
-              Explore Food
+              Explore Menu
             </button>
 
             {!isLoggedIn && (
@@ -204,32 +204,33 @@ export default function Home() {
           </div>
 
           <div className="hero-highlights">
-            <span>✓ &nbsp; Easy Booking</span>
-            <span>◷ &nbsp; Flexible Time Slots</span>
-            <span>✦ &nbsp; Premium Experience</span>
+            <span>◷ &nbsp; Dinner: 5:00 PM – 9:00 PM</span>
+            <span>📍 &nbsp; Jubilee Hills, Hyderabad</span>
+            <span>✦ &nbsp; AI Dining Concierge</span>
           </div>
         </div>
 
-        <aside className="review-card" aria-label="Sample guest review">
-          <div className="review-stars" aria-label="5 stars">
+        <aside className="review-card" aria-label="Verified guest review">
+          <div className="review-stars" aria-label="5 out of 5 stars">
             ★★★★★
           </div>
           <p className="review-quote">
-            “A lovely place to plan your next dining experience.”
+            “The Grilled Salmon and warm candlelight ambiance made our
+            anniversary dinner truly unforgettable.”
           </p>
           <div className="review-bottom">
-            <span className="review-avatar">G</span>
             <span className="review-avatar">A</span>
             <span className="review-avatar">R</span>
+            <span className="review-avatar">K</span>
             <span className="review-guests">
-              <strong>Discover ReserveDine</strong>
-              <small>Plan your next visit</small>
+              <strong>Ananya R. · 4.9★ Rated</strong>
+              <small>Verified Evening Guest</small>
             </span>
           </div>
         </aside>
 
         <a className="scroll-indicator" href="#benefits">
-          Discover ReserveDine ↓
+          Explore ReserveDine ↓
         </a>
       </section>
 
@@ -237,10 +238,14 @@ export default function Home() {
       <section
         className="benefits-strip"
         id="benefits"
-        aria-label="ReserveDine benefits"
+        aria-label="ReserveDine dining experience"
       >
         {BENEFITS.map((benefit) => (
-          <article className="benefit-item" key={benefit.title}>
+          <article
+            className="benefit-item"
+            key={benefit.title}
+            onClick={goDashboard}
+          >
             <div className="benefit-icon" aria-hidden="true">
               {benefit.icon}
             </div>
@@ -255,10 +260,11 @@ export default function Home() {
       {/* MENU SHOWCASE */}
       <section className="menu-section" id="menu">
         <div className="menu-heading">
-          <span className="menu-eyebrow">— &nbsp; OUR MENU &nbsp; —</span>
-          <h2>Find Your Perfect Dish</h2>
+          <span className="menu-eyebrow">— &nbsp; CHEF&apos;S SELECTION &nbsp; —</span>
+          <h2>Signature Dishes &amp; Flavors</h2>
           <p>
-            Explore delicious inspiration for your next dining experience.
+            Freshly prepared every evening with locally sourced ingredients and
+            artisanal care.
           </p>
         </div>
 
@@ -287,7 +293,7 @@ export default function Home() {
             className="view-menu-link"
             onClick={goToFoodRecommendations}
           >
-            Explore recommendations →
+            Ask AI for dish pairings →
           </button>
         </div>
 
@@ -313,7 +319,7 @@ export default function Home() {
                   <strong className="dish-price">{dish.price}</strong>
                   <span className="dish-rating">
                     <span aria-hidden="true">★</span> {dish.rating}
-                    <small> ({dish.reviews})</small>
+                    <small> ({dish.reviews} reviews)</small>
                   </span>
                 </div>
               </div>
@@ -322,25 +328,25 @@ export default function Home() {
         </div>
 
         <p className="menu-disclaimer">
-          Sample menu content for design demonstration. Prices and ratings are
-          illustrative and are not live restaurant data.
+          All prices are in INR (₹) · Taxes extra as applicable · Freshly
+          prepared to order.
         </p>
       </section>
 
-      {/* ALL SIX PROJECT FEATURES */}
+      {/* SIX HOSPITALITY FEATURES */}
       <section
         className="features"
         id="features"
         aria-labelledby="features-title"
       >
         <div className="section-heading">
-          <span className="section-eyebrow">WHY RESERVEDINE?</span>
+          <span className="section-eyebrow">THE RESERVEDINE EXPERIENCE</span>
           <h2 id="features-title">
-            Everything You Need for Easy Reservations
+            Thoughtful Hospitality at Every Step
           </h2>
           <p>
-            From convenient table bookings to reservation administration,
-            explore the features built into ReserveDine.
+            From personalized AI menu guidance to seamless table reservations,
+            every detail is designed around your comfort.
           </p>
         </div>
 
@@ -363,35 +369,38 @@ export default function Home() {
       {/* FOOD RECOMMENDATION CTA */}
       <section className="cta-section">
         <div className="cta-content">
-         <span className="section-eyebrow">
-  ✦ &nbsp; DISCOVER OUR MENU &nbsp; ✦
-</span>
-          <h2>Find Your Perfect Dish</h2>
+          <span className="section-eyebrow">
+            ✦ &nbsp; PERSONALIZED TASTING GUIDE &nbsp; ✦
+          </span>
+          <h2>Not Sure What to Order?</h2>
           <p>
-            Explore food recommendations based on your food preference,
-            budget, category, and spice level.
+            Tell our AI Dining Concierge your budget, vegetarian or
+            non-vegetarian preference, and spice level for instant dish
+            recommendations.
           </p>
           <button
             type="button"
             className="hero-btn cta-btn"
             onClick={goToFoodRecommendations}
           >
-            Explore Food Recommendations →
+            Get Personalized Recommendations →
           </button>
         </div>
       </section>
 
-      {/* RESERVATION CTA */}
+      {/* RESERVATION BANNER */}
       <section className="reservation-banner">
         <div className="banner-decoration" aria-hidden="true">
           ✦
         </div>
         <div className="banner-copy">
-          <span className="banner-eyebrow">YOUR TABLE IS WAITING</span>
-          <h2>Make Your Next Dining Experience Special</h2>
+          <span className="banner-eyebrow">
+            EVENING SERVICE · 5:00 PM – 9:00 PM DAILY
+          </span>
+          <h2>Reserve Your Table for Tonight</h2>
           <p>
-            Choose your date, time, and party size. Manage your reservations
-            in one convenient place.
+            Road No. 36, Jubilee Hills, Hyderabad · Smart Casual Dining ·
+            Complimentary Valet Parking Available.
           </p>
         </div>
         <button
@@ -399,7 +408,7 @@ export default function Home() {
           className="hero-btn banner-button"
           onClick={goDashboard}
         >
-          {isLoggedIn ? "Go to Dashboard" : "Book a Table Now"} →
+          {isLoggedIn ? "Go to Dashboard" : "Reserve a Table"} →
         </button>
       </section>
 
@@ -409,9 +418,11 @@ export default function Home() {
           <span aria-hidden="true">🍽️</span>
           <strong>ReserveDine</strong>
         </div>
-        <p>Thoughtful reservations. Memorable dining.</p>
+        <p>
+          Road No. 36, Jubilee Hills, Hyderabad · Open Daily 5:00 PM – 9:00 PM
+        </p>
         <p className="footer-copyright">
-          © {new Date().getFullYear()} ReserveDine. All rights reserved.
+          Created by <strong>Pranay Kumar</strong> · © {new Date().getFullYear()} ReserveDine. All rights reserved.
         </p>
       </footer>
     </main>

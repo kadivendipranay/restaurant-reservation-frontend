@@ -499,3 +499,225 @@
   .reservation-card:nth-child(3n):hover { background: linear-gradient(125deg, #fff 0%, #dcf3ff 52%, #dcf9eb 100%); }
 
 }
+.cancel-edit-button {
+  margin-top: 0.65rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #334155;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.reservation-special-note {
+  margin: 0.75rem 0 0;
+  padding: 0.6rem 0.85rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px dashed #cbd5e1;
+  font-size: 0.85rem;
+  color: #334155;
+}
+
+.reservation-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.reschedule-reservation-button {
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #93c5fd;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.reschedule-reservation-button:hover:not(:disabled) {
+  background: #dbeafe;
+}
+
+/* Status-tinted card variants */
+.reservation-card-cancelled {
+  background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 55%, #fff7ed 100%);
+  border-color: #fecdd3;
+}
+.reservation-card-cancelled::before {
+  background: linear-gradient(180deg, #f43f5e, #e11d48);
+}
+
+.reservation-card-completed {
+  background: linear-gradient(135deg, #eff6ff 0%, #eef2ff 55%, #f5f3ff 100%);
+  border-color: #bfdbfe;
+}
+.reservation-card-completed::before {
+  background: linear-gradient(180deg, #3b82f6, #6366f1);
+}
+
+
+/* COLOR BOOST: warmer, more vibrant surfaces while preserving readability */
+.user-page {
+  background:
+    radial-gradient(ellipse at 5% 12%, rgba(124, 58, 237, .17), transparent 31rem),
+    radial-gradient(ellipse at 95% 22%, rgba(6, 182, 212, .15), transparent 29rem),
+    radial-gradient(ellipse at 48% 100%, rgba(236, 72, 153, .10), transparent 32rem),
+    linear-gradient(135deg, #f1efff 0%, #eaf8ff 48%, #fff0f6 100%);
+}
+
+.dashboard-panel {
+  background: linear-gradient(145deg, rgba(255,255,255,.97), rgba(244,247,255,.96));
+  border-color: #dcdafa;
+  box-shadow: 0 12px 32px rgba(80, 67, 180, .09);
+}
+
+.booking-panel {
+  background: linear-gradient(155deg, #fff8ed 0%, #fff 42%, #f0fdfa 100%);
+  border-color: #f0d9ce;
+}
+
+.reservations-panel {
+  background: linear-gradient(155deg, #f2f5ff 0%, #fff 42%, #effcf9 100%);
+  border-color: #d8defa;
+}
+
+.stat-card-amber { background: linear-gradient(135deg, #fff2d8, #fffaf0); border-color: #f4dfb7; }
+.stat-card-green { background: linear-gradient(135deg, #dffbed, #f4fff9); border-color: #c4f0dc; }
+.stat-card-rose { background: linear-gradient(135deg, #ffe7ef, #fff7fa); border-color: #f8d2df; }
+
+.reservation-toolbar {
+  background: linear-gradient(105deg, #eeeaff, #e8f8ff 58%, #e9fbf5);
+  border-color: #d9d8fa;
+}
+
+/* Base & Active Reservation Cards (with left status accent bar) */
+.reservation-card {
+  position: relative;
+  overflow: hidden;
+  padding-left: 21px;
+  background: linear-gradient(125deg, #ffffff 0%, #f6f4ff 54%, #edfbf8 100%);
+  border-color: #dddafa;
+  box-shadow: 0 5px 16px rgba(77, 71, 160, .045);
+}
+
+.reservation-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: linear-gradient(180deg, #10b981, #059669);
+  transition: width .22s ease;
+}
+
+.reservation-card:hover::before {
+  width: 7px;
+}
+
+.reservation-card.reservation-card-active:nth-child(3n + 2) {
+  background: linear-gradient(125deg, #fff 0%, #fff4e9 52%, #fff0f6 100%);
+  border-color: #f3dfd6;
+}
+
+.reservation-card.reservation-card-active:nth-child(3n) {
+  background: linear-gradient(125deg, #fff 0%, #eaf8ff 52%, #edfdf5 100%);
+  border-color: #d2e9f2;
+}
+
+/* Status-tinted card variants (higher specificity so they override nth-child) */
+.reservation-card.reservation-card-cancelled {
+  background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 55%, #fff7ed 100%);
+  border-color: #fecdd3;
+}
+.reservation-card.reservation-card-cancelled::before {
+  background: linear-gradient(180deg, #f43f5e, #e11d48);
+}
+
+.reservation-card.reservation-card-completed {
+  background: linear-gradient(135deg, #eff6ff 0%, #eef2ff 55%, #f5f3ff 100%);
+  border-color: #bfdbfe;
+}
+.reservation-card.reservation-card-completed::before {
+  background: linear-gradient(180deg, #3b82f6, #6366f1);
+}
+
+.reservation-info { background: rgba(255,255,255,.82); border-color: #e3e2f4; }
+.reservation-restaurant-mark { background: linear-gradient(145deg, #ded9ff, #c8f6ed); }
+.panel-icon { background: linear-gradient(145deg, #dcd7ff, #bcefe8); }
+.input-wrap input, .input-wrap select { background: rgba(255,255,255,.88); }
+.empty-reservations { background: linear-gradient(135deg, #eeeaff, #e8f9ff 58%, #e9fbf4); }
+
+@media (hover: hover) {
+  .reservation-card:hover {
+    transform: translateY(-4px);
+    background: linear-gradient(125deg, #fff 0%, #eae7ff 52%, #dffaf2 100%);
+    box-shadow: 0 15px 30px rgba(67, 61, 153, .11);
+  }
+  .reservation-card.reservation-card-active:nth-child(3n + 2):hover {
+    background: linear-gradient(125deg, #fff 0%, #ffe8d5 52%, #ffe5ef 100%);
+  }
+  .reservation-card.reservation-card-active:nth-child(3n):hover {
+    background: linear-gradient(125deg, #fff 0%, #dcf3ff 52%, #dcf9eb 100%);
+  }
+  .reservation-card.reservation-card-cancelled:hover {
+    background: linear-gradient(135deg, #ffe4e6 0%, #fecdd3 55%, #ffedd5 100%);
+    border-color: #fda4af;
+  }
+  .reservation-card.reservation-card-completed:hover {
+    background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 55%, #ede9fe 100%);
+    border-color: #93c5fd;
+  }
+}
+
+/* Special Request Note & Reschedule Buttons */
+.reservation-special-note {
+  margin: 0 0 13px;
+  padding: 9px 12px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px dashed #c7d2fe;
+  font-size: .82rem;
+  color: #363b59;
+  line-height: 1.45;
+}
+
+.reservation-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.reschedule-reservation-button {
+  min-height: 37px !important;
+  padding: 8px 12px !important;
+  border-color: #bfdbfe !important;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: .8rem !important;
+}
+
+.reschedule-reservation-button:hover:not(:disabled) {
+  color: #fff;
+  border-color: #3b82f6 !important;
+  background: linear-gradient(110deg, #3b82f6, #6366f1);
+  box-shadow: 0 8px 17px rgba(59, 130, 246, .22);
+}
+
+.cancel-edit-button {
+  width: 100%;
+  min-height: 42px !important;
+  border-color: #cbd5e1 !important;
+  background: #f8fafc;
+  color: #475569;
+  font-size: .86rem !important;
+}
+
+.cancel-edit-button:hover:not(:disabled) {
+  background: #e2e8f0;
+  color: #1e293b;
+}

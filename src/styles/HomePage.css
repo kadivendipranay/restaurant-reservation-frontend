@@ -833,3 +833,144 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ==========================================
+   RESERVEDINE — COLORFUL ACCENTS & ANIMATIONS
+========================================== */
+
+/* Subtle warm pastel backdrop on page container */
+.home-container {
+  background:
+    radial-gradient(circle at 6% 4%, rgba(255, 224, 231, 0.45) 0%, transparent 34%),
+    radial-gradient(circle at 94% 28%, rgba(245, 231, 255, 0.5) 0%, transparent 36%),
+    radial-gradient(circle at 12% 78%, rgba(224, 242, 254, 0.4) 0%, transparent 36%),
+    #fffdfb;
+}
+
+/* Multi-color pastel tints & icon badges for Feature Cards */
+.feature-card {
+  background: linear-gradient(145deg, #ffffff 0%, #fff7fa 100%);
+  animation: heroFadeUp 0.6s ease backwards;
+}
+
+.feature-card:nth-child(2) {
+  background: linear-gradient(145deg, #ffffff 0%, #f3f4ff 100%);
+  animation-delay: 0.08s;
+}
+.feature-card:nth-child(2) .feature-icon {
+  background: #eef2ff;
+}
+
+.feature-card:nth-child(3) {
+  background: linear-gradient(145deg, #ffffff 0%, #f0fdf9 100%);
+  animation-delay: 0.16s;
+}
+.feature-card:nth-child(3) .feature-icon {
+  background: #dcfce7;
+}
+
+.feature-card:nth-child(4) {
+  background: linear-gradient(145deg, #ffffff 0%, #fffbeb 100%);
+  animation-delay: 0.24s;
+}
+.feature-card:nth-child(4) .feature-icon {
+  background: #fef3c7;
+}
+
+.feature-card:nth-child(5) {
+  background: linear-gradient(145deg, #ffffff 0%, #f0f9ff 100%);
+  animation-delay: 0.32s;
+}
+.feature-card:nth-child(5) .feature-icon {
+  background: #e0f2fe;
+}
+
+.feature-card:nth-child(6) {
+  background: linear-gradient(145deg, #ffffff 0%, #faf5ff 100%);
+  animation-delay: 0.4s;
+}
+.feature-card:nth-child(6) .feature-icon {
+  background: #f3e8ff;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  border-color: #e5b3ca;
+  box-shadow: 0 14px 30px rgba(197, 30, 101, 0.1);
+}
+
+/* Hero entrance */
+.hero-content {
+  animation: heroFadeUp 0.8s ease backwards;
+}
+
+.hero-visual {
+  animation: heroFadeUp 1s ease backwards;
+}
+
+/* Floating food illustrations */
+.floating-icon-one {
+  animation: gentleFloat 4s ease-in-out infinite;
+}
+
+.floating-icon-two {
+  animation: gentleFloat 5s ease-in-out infinite 0.5s;
+}
+
+.floating-icon-three {
+  animation: gentleFloat 4.5s ease-in-out infinite 1s;
+}
+
+/* Premium button interactions */
+.hero-btn:hover,
+.cta-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(221, 36, 118, 0.26);
+}
+
+.hero-secondary-btn:hover {
+  transform: translateY(-3px);
+}
+
+/* About card interaction */
+.about-card {
+  background: linear-gradient(135deg, #ffffff 0%, #fff8fb 100%);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.about-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(37, 48, 71, 0.08);
+}
+
+/* Keyframes */
+@keyframes heroFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gentleFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+
+/* Single Consolidated Accessibility Block */
+@media (prefers-reduced-motion: reduce) {
+  .home-container *,
+  .home-container *::before,
+  .home-container *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
