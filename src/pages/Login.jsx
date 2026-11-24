@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +5,8 @@ import API from "../api/api";
 import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
 import "../styles/Login.css";
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Login() {
   const [activeTab, setActiveTab] = useState("LOGIN");
@@ -68,15 +69,13 @@ export default function Login() {
       return;
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+    if (!EMAIL_REGEX.test(trimmedEmail)) {
       setError("Please enter a valid email address.");
       return;
     }
 
-    // Forgot password request
     if (forgotPassword) {
       setLoading(true);
-
       try {
         await API.post("/auth/forgot-password", {
           email: trimmedEmail,
@@ -87,7 +86,6 @@ export default function Login() {
         );
       } catch (err) {
         console.error("Forgot password request failed:", err);
-
         setError(
           err.response?.data?.message ||
             "Unable to process your request. Please try again."
@@ -95,11 +93,9 @@ export default function Login() {
       } finally {
         setLoading(false);
       }
-
       return;
     }
 
-    // Registration validation
     if (activeTab === "REGISTER" && !name.trim()) {
       setError("Please enter your full name.");
       return;
@@ -125,7 +121,6 @@ export default function Login() {
         });
 
         const token = response.data?.token;
-
         if (!token) {
           throw new Error(
             "The server did not return an authentication token."
@@ -141,7 +136,6 @@ export default function Login() {
         }
 
         const role = String(decoded.role || "").toUpperCase();
-
         if (role !== "ADMIN" && role !== "USER") {
           throw new Error(
             "Your account role is invalid. Please contact support."
@@ -149,7 +143,6 @@ export default function Login() {
         }
 
         login(token);
-
         navigate(role === "ADMIN" ? "/admin" : "/user", {
           replace: true,
         });
@@ -165,14 +158,10 @@ export default function Login() {
         setName("");
         setPassword("");
         setShowPassword(false);
-
-        setSuccess(
-          "Registration successful! Please sign in with your account."
-        );
+        setSuccess("Registration successful! Please sign in with your account.");
       }
     } catch (err) {
       console.error("Authentication request failed:", err);
-
       setError(
         err.response?.data?.message ||
           err.message ||
@@ -227,9 +216,7 @@ export default function Login() {
                 aria-controls="login-form"
                 disabled={loading}
                 onClick={() => switchTab("LOGIN")}
-                className={`tab-btn ${
-                  activeTab === "LOGIN" ? "active" : ""
-                }`}
+                className={`tab-btn ${activeTab === "LOGIN" ? "active" : ""}`}
               >
                 Sign In
               </button>
@@ -242,9 +229,7 @@ export default function Login() {
                 aria-controls="login-form"
                 disabled={loading}
                 onClick={() => switchTab("REGISTER")}
-                className={`tab-btn ${
-                  activeTab === "REGISTER" ? "active" : ""
-                }`}
+                className={`tab-btn ${activeTab === "REGISTER" ? "active" : ""}`}
               >
                 Register
               </button>
@@ -265,11 +250,7 @@ export default function Login() {
             </div>
           )}
 
-          <form
-            id="login-form"
-            onSubmit={handleSubmit}
-            noValidate
-          >
+          <form id="login-form" onSubmit={handleSubmit} noValidate>
             {activeTab === "REGISTER" && !forgotPassword && (
               <div className="form-group">
                 <label htmlFor="register-name">Full Name</label>
@@ -361,9 +342,7 @@ export default function Login() {
                   <button
                     type="button"
                     className="password-toggle"
-                    onClick={() =>
-                      setShowPassword((visible) => !visible)
-                    }
+                    onClick={() => setShowPassword((visible) => !visible)}
                     aria-label={
                       showPassword ? "Hide password" : "Show password"
                     }
@@ -395,30 +374,21 @@ export default function Login() {
               </div>
             )}
 
-            {!forgotPassword &&
-              activeTab === "LOGIN" && (
-                <div className="login-extra">
-                  <span>🔐 Secure authentication</span>
-                </div>
-              )}
+            {!forgotPassword && activeTab === "LOGIN" && (
+              <div className="login-extra">
+                <span>🔐 Secure authentication</span>
+              </div>
+            )}
 
-            <button
-              type="submit"
-              className="login-btn"
-              disabled={loading}
-            >
+            <button type="submit" className="login-btn" disabled={loading}>
               {loading ? (
                 <>
-                  <span
-                    className="loading-spinner"
-                    aria-hidden="true"
-                  />
+                  <span className="loading-spinner" aria-hidden="true" />
                   Please wait...
                 </>
               ) : forgotPassword ? (
                 <>
-                  Send Reset Instructions{" "}
-                  <span aria-hidden="true">→</span>
+                  Send Reset Instructions <span aria-hidden="true">→</span>
                 </>
               ) : activeTab === "LOGIN" ? (
                 <>
@@ -426,8 +396,7 @@ export default function Login() {
                 </>
               ) : (
                 <>
-                  Create Account{" "}
-                  <span aria-hidden="true">→</span>
+                  Create Account <span aria-hidden="true">→</span>
                 </>
               )}
             </button>
@@ -460,14 +429,10 @@ export default function Login() {
                   className="switch-link"
                   disabled={loading}
                   onClick={() =>
-                    switchTab(
-                      activeTab === "LOGIN" ? "REGISTER" : "LOGIN"
-                    )
+                    switchTab(activeTab === "LOGIN" ? "REGISTER" : "LOGIN")
                   }
                 >
-                  {activeTab === "LOGIN"
-                    ? "Create an account"
-                    : "Sign in"}
+                  {activeTab === "LOGIN" ? "Create an account" : "Sign in"}
                 </button>
               </p>
             </>

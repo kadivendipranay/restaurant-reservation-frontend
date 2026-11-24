@@ -1,4 +1,3 @@
-// src/pages/UserPage.jsx
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
@@ -43,7 +42,8 @@ const formatDate = (value) => {
 };
 
 const formatClockTime = (value) => {
-  const [hours, minutes] = value.split(":").map(Number);
+  const [hours, minutes] = String(value || "").split(":").map(Number);
+  if (Number.isNaN(hours) || Number.isNaN(minutes)) return value || "";
   const date = new Date();
   date.setHours(hours, minutes, 0, 0);
   return new Intl.DateTimeFormat("en-IN", {
@@ -91,8 +91,10 @@ export default function UserPage() {
   const counts = useMemo(
     () => ({
       active: allReservations.filter((item) => item.status === "ACTIVE").length,
-      completed: allReservations.filter((item) => item.status === "COMPLETED").length,
-      cancelled: allReservations.filter((item) => item.status === "CANCELLED").length,
+      completed: allReservations.filter((item) => item.status === "COMPLETED")
+        .length,
+      cancelled: allReservations.filter((item) => item.status === "CANCELLED")
+        .length,
     }),
     [allReservations]
   );
@@ -108,18 +110,35 @@ export default function UserPage() {
     navigate("/login", { replace: true });
   };
 
+  const resetForm = useCallback(() => {
+    setEditingReservation(null);
+    setDate("");
+    setTimeSlot(TIME_SLOTS[0]);
+    setGuests("2");
+    setOccasion("None");
+    setSpecialRequests("");
+    setSlotAvailability({});
+  }, []);
+
   const fetchMyReservations = useCallback(async () => {
     setLoadingList(true);
     try {
       const response = await API.get("/reservations/my");
       const data = response?.data;
-      setAllReservations(
-        Array.isArray(data)
-          ? data
-          : Array.isArray(data?.reservations)
-          ? data.reservations
-          : []
-      );
+      const list = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.reservations)
+        ? data.reservations
+        : [];
+      setAllReservations(list);
+
+      setEditingReservation((currentEditing) => {
+        if (!currentEditing) return null;
+        const stillExists = list.some(
+          (item) => item._id === currentEditing._id && item.status === "ACTIVE"
+        );
+        return stillExists ? currentEditing : null;
+      });
     } catch (error) {
       setAllReservations([]);
       toast.error(getErrorMessage(error, "Failed to load your reservations."));
@@ -135,7 +154,12 @@ export default function UserPage() {
   // Fetch live slot availability whenever date or guest count changes
   useEffect(() => {
     const guestCount = Number(guests);
-    if (!date || !Number.isInteger(guestCount) || guestCount < 1 || guestCount > 20) {
+    if (
+      !date ||
+      !Number.isInteger(guestCount) ||
+      guestCount < 1 ||
+      guestCount > 20
+    ) {
       setSlotAvailability({});
       return;
     }
@@ -148,8 +172,8 @@ export default function UserPage() {
         });
         if (cancelled) return;
         const map = {};
-        (res.data?.slots || []).forEach((s) => {
-          map[s.timeSlot] = s.availableTables;
+        (res.data?.slots || []).forEach((slotItem) => {
+          map[slotItem.timeSlot] = slotItem.availableTables;
         });
         setSlotAvailability(map);
       } catch {
@@ -161,15 +185,6 @@ export default function UserPage() {
       cancelled = true;
     };
   }, [date, guests]);
-
-  const resetForm = () => {
-    setEditingReservation(null);
-    setDate("");
-    setTimeSlot(TIME_SLOTS[0]);
-    setGuests("2");
-    setOccasion("None");
-    setSpecialRequests("");
-  };
 
   const handleStartReschedule = (reservation) => {
     setEditingReservation(reservation);
@@ -246,12 +261,16 @@ export default function UserPage() {
 
   const handleCancelReservation = async (id) => {
     if (actionLoadingId !== null || loading || !id) return;
-    if (!window.confirm("Are you sure you want to cancel this reservation?")) return;
+    if (!window.confirm("Are you sure you want to cancel this reservation?")) {
+      return;
+    }
 
     setActionLoadingId(id);
     try {
       const response = await API.patch(`/reservations/${id}/cancel`);
-      toast.success(response?.data?.message || "Reservation cancelled successfully.");
+      toast.success(
+        response?.data?.message || "Reservation cancelled successfully."
+      );
       if (editingReservation?._id === id) resetForm();
       await fetchMyReservations();
     } catch (error) {
@@ -275,7 +294,8 @@ export default function UserPage() {
               Your next great meal <span>starts here.</span>
             </h1>
             <p>
-              Book your table, customize your occasion, and make every meal special.
+              Book your table, customize your occasion, and make every meal
+              special.
             </p>
             <div className="welcome-highlights">
               <span>
@@ -345,7 +365,9 @@ export default function UserPage() {
                   {editingReservation ? "MODIFY BOOKING" : "PLAN A VISIT"}
                 </span>
                 <h2>
-                  {editingReservation ? "Reschedule reservation" : "Reserve your table"}
+                  {editingReservation
+                    ? "Reschedule reservation"
+                    : "Reserve your table"}
                 </h2>
                 <p>
                   {editingReservation
@@ -375,7 +397,9 @@ export default function UserPage() {
                     disabled={loading}
                   />
                 </div>
-                <small className="field-help">Book from today up to one year ahead.</small>
+                <small className="field-help">
+                  Book from today up to one year ahead.
+                </small>
               </div>
 
               <div className="field-group">
@@ -456,7 +480,9 @@ export default function UserPage() {
               </div>
 
               <div className="field-group">
-                <label htmlFor="specialRequests">Special requests (optional)</label>
+                <label htmlFor="specialRequests">
+                  Special requests (optional)
+                </label>
                 <div className="input-wrap">
                   <span className="input-icon" aria-hidden="true">
                     ✎
@@ -481,11 +507,15 @@ export default function UserPage() {
                 {loading ? (
                   <>
                     <span className="button-spinner" />
-                    {editingReservation ? "Updating booking…" : "Booking your table…"}
+                    {editingReservation
+                      ? "Updating booking…"
+                      : "Booking your table…"}
                   </>
                 ) : (
                   <>
-                    {editingReservation ? "Save changes" : "Confirm reservation"}{" "}
+                    {editingReservation
+                      ? "Save changes"
+                      : "Confirm reservation"}{" "}
                     <span aria-hidden="true">→</span>
                   </>
                 )}
@@ -503,8 +533,8 @@ export default function UserPage() {
               )}
 
               <p className="booking-note">
-                <span aria-hidden="true">♧</span> Your table will be assigned based on
-                your group size.
+                <span aria-hidden="true">♧</span> Your table will be assigned
+                based on your group size.
               </p>
             </form>
           </section>
@@ -566,7 +596,7 @@ export default function UserPage() {
               <div className="reservation-list">
                 {visibleReservations.map((reservation) => {
                   const statusClass = String(
-                    reservation.status || "active"
+                    reservation.status || "unknown"
                   ).toLowerCase();
 
                   return (
@@ -575,19 +605,25 @@ export default function UserPage() {
                       className={`reservation-card reservation-card-${statusClass}`}
                     >
                       <div className="reservation-card-top">
-                        <div className="reservation-restaurant-mark" aria-hidden="true">
+                        <div
+                          className="reservation-restaurant-mark"
+                          aria-hidden="true"
+                        >
                           ♧
                         </div>
                         <div className="reservation-card-name">
                           <h3>
                             Restaurant reservation
-                            {reservation.occasion && reservation.occasion !== "None"
+                            {reservation.occasion &&
+                            reservation.occasion !== "None"
                               ? ` · ${reservation.occasion}`
                               : ""}
                           </h3>
                           <span>
                             Booking ID ·{" "}
-                            {String(reservation._id || "").slice(-8).toUpperCase()}
+                            {String(reservation._id || "")
+                              .slice(-8)
+                              .toUpperCase()}
                           </span>
                         </div>
                         <span className={`status-pill status-${statusClass}`}>
@@ -608,13 +644,16 @@ export default function UserPage() {
                           <span>Guests</span>
                           <strong>
                             {reservation.guests}{" "}
-                            {Number(reservation.guests) === 1 ? "guest" : "guests"}
+                            {Number(reservation.guests) === 1
+                              ? "guest"
+                              : "guests"}
                           </strong>
                         </div>
                         <div className="reservation-info">
                           <span>Table</span>
                           <strong>
-                            {reservation.table?.tableNumber ?? "Assigned by restaurant"}
+                            {reservation.table?.tableNumber ??
+                              "Assigned by restaurant"}
                           </strong>
                         </div>
                       </div>
@@ -640,7 +679,9 @@ export default function UserPage() {
                             type="button"
                             className="cancel-reservation-button"
                             disabled={loading || actionLoadingId !== null}
-                            onClick={() => handleCancelReservation(reservation._id)}
+                            onClick={() =>
+                              handleCancelReservation(reservation._id)
+                            }
                           >
                             {actionLoadingId === reservation._id ? (
                               <>
@@ -660,7 +701,7 @@ export default function UserPage() {
           </section>
         </div>
 
-       <footer className="dashboard-footer">
+        <footer className="dashboard-footer">
           <span>Made for memorable meals.</span>
           <span>
             Created by <strong>Pranay Kumar</strong> · ReserveDine
