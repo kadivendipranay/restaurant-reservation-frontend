@@ -1,5 +1,5 @@
 /* =========================================================
-   ReserveDine — Navbar.css
+   ReserveDine — Navbar.css (Desktop Preserved + Mobile Fix)
    ========================================================= */
 
 .navbar,
@@ -26,37 +26,51 @@
 }
 
 /* ---------- Brand ---------- */
-.navbar-brand {
+.navbar .navbar-brand {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   flex-shrink: 0;
   padding: 6px 8px;
   border-radius: 8px;
+  background: transparent;
   white-space: nowrap;
   cursor: pointer;
   user-select: none;
   transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
-.navbar-brand:hover {
+.navbar .navbar-brand:hover {
   background: rgba(255, 255, 255, 0.06);
   transform: translateY(-1px);
 }
 
-.navbar-brand-icon {
+.navbar .navbar-brand:focus-visible {
+  outline: 2px solid #f5c85c;
+  outline-offset: 2px;
+}
+
+.navbar .navbar-brand-icon,
+.navbar .navbar-brand-text {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.navbar .navbar-brand-icon {
   color: #f5c85c;
   transition: transform 0.2s ease;
 }
 
-.navbar-brand:hover .navbar-brand-icon {
+.navbar .navbar-brand:hover .navbar-brand-icon {
   transform: scale(1.1);
 }
 
-.navbar-brand-text {
+.navbar .navbar-brand-text {
   font-family: "Playfair Display", Georgia, serif;
   font-size: 20px;
   font-weight: 700;
@@ -64,51 +78,71 @@
 }
 
 /* ---------- Center Navigation Links ---------- */
-.navbar-center-links {
+.navbar .navbar-center-links {
   display: flex;
   align-items: center;
   gap: 22px;
 }
 
-.nav-link-btn {
+.navbar .nav-link-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 4px;
+  padding: 6px 8px;
   border: 0;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.78);
+  border-radius: 6px;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: rgba(255, 255, 255, 0.82);
   font-family: inherit;
   font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
   cursor: pointer;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
 }
 
-.link-symbol {
+.navbar .nav-link-btn span,
+.navbar .navbar-actions button span {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.navbar .link-symbol {
   color: #f5c85c;
+  flex-shrink: 0;
   transition: transform 0.2s ease;
 }
 
-.nav-link-btn:hover {
-  color: #ffffff;
+.navbar .nav-link-btn:hover,
+.navbar .nav-link-btn.active-link {
+  color: #ffe39b;
+  background: rgba(245, 200, 92, 0.12) !important;
   transform: translateY(-1px);
 }
 
-.nav-link-btn:hover .link-symbol {
+.navbar .nav-link-btn:hover .link-symbol,
+.navbar .nav-link-btn.active-link .link-symbol {
   transform: scale(1.12);
 }
 
+.navbar .nav-link-btn:focus-visible {
+  outline: 2px solid #f5c85c;
+  outline-offset: 2px;
+}
+
 /* ---------- Right Controls ---------- */
-.navbar-right {
+.navbar .navbar-right {
   display: flex;
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
 }
 
-.navbar-role {
+.navbar .navbar-role {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -122,26 +156,26 @@
   transition: border-color 0.2s ease;
 }
 
-.navbar-role:hover {
+.navbar .navbar-role:hover {
   border-color: #f5c85c;
 }
 
-.role-symbol {
+.navbar .role-symbol {
   color: #f5c85c;
 }
 
-.navbar-role b {
+.navbar .navbar-role b {
   color: #f5c85c;
   font-weight: 700;
 }
 
-.navbar-actions {
+.navbar .navbar-actions {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.navbar-actions button {
+.navbar .navbar-actions button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -161,115 +195,154 @@
     transform 0.2s ease;
 }
 
-.action-symbol {
+.navbar .action-symbol {
+  flex-shrink: 0;
   transition: transform 0.2s ease;
 }
 
-.navbar-actions button:hover:not(:disabled) .action-symbol {
+.navbar .navbar-actions button:hover:not(:disabled) .action-symbol {
   transform: scale(1.12);
 }
 
-.navbar-actions button:disabled {
+.navbar .navbar-actions button:focus-visible {
+  outline: 2px solid #f5c85c;
+  outline-offset: 2px;
+}
+
+.navbar .navbar-actions button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.navbar-actions button.nav-dashboard-btn {
+.navbar .navbar-actions button.nav-dashboard-btn {
   border: 1px solid rgba(255, 255, 255, 0.24);
   background: rgba(255, 255, 255, 0.06);
   color: #ffffff;
 }
 
-.navbar-actions button.nav-dashboard-btn .action-symbol {
+.navbar .navbar-actions button.nav-dashboard-btn .action-symbol {
   color: #f5c85c;
 }
 
-.navbar-actions button.nav-dashboard-btn:hover:not(:disabled) {
+.navbar .navbar-actions button.nav-dashboard-btn:hover:not(:disabled) {
   border-color: #f5c85c;
   background: rgba(245, 200, 92, 0.14);
   color: #ffe39b;
   transform: translateY(-1px);
 }
 
-.navbar-actions button.nav-login-btn {
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: transparent;
+.navbar .navbar-actions button.nav-login-btn {
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.04);
   color: #ffffff;
 }
 
-.navbar-actions button.nav-login-btn:hover:not(:disabled) {
+.navbar .navbar-actions button.nav-login-btn:hover:not(:disabled) {
   border-color: #f5c85c;
   color: #ffe39b;
   transform: translateY(-1px);
 }
 
-.navbar-actions button.nav-signup-btn {
+.navbar .navbar-actions button.nav-signup-btn {
   border: 1px solid #f5c85c;
   background: #f5c85c;
   color: #141514;
   font-weight: 700;
 }
 
-.navbar-actions button.nav-signup-btn:hover:not(:disabled) {
+.navbar .navbar-actions button.nav-signup-btn:hover:not(:disabled) {
   background: #ffd670;
   transform: translateY(-1px);
 }
 
-.navbar-actions button.nav-logout-btn {
+.navbar .navbar-actions button.nav-logout-btn {
   border: 1px solid rgba(255, 255, 255, 0.22);
   background: rgba(255, 255, 255, 0.05);
   color: #ffffff;
 }
 
-.navbar-actions button.nav-logout-btn .action-symbol {
+.navbar .navbar-actions button.nav-logout-btn .action-symbol {
   color: #fca5a5;
 }
 
-.navbar-actions button.nav-logout-btn:hover:not(:disabled) {
+.navbar .navbar-actions button.nav-logout-btn:hover:not(:disabled) {
   border-color: #f87171;
   background: rgba(220, 38, 38, 0.22);
   color: #fecaca;
   transform: translateY(-1px);
 }
 
-/* ---------- Mobile Responsive ---------- */
+/* =========================================================
+   MOBILE RESPONSIVE FIX (<= 900px) — No Clipping, No Grey Pills
+   ========================================================= */
 @media (max-width: 900px) {
   .navbar {
     flex-wrap: wrap;
-    padding: 10px 14px;
-    gap: 8px;
+    padding: 8px 12px;
+    gap: 6px;
   }
 
-  .navbar-center-links {
+  .navbar .navbar-brand {
+    padding: 4px 2px;
+    gap: 6px;
+  }
+
+  .navbar .navbar-brand-text {
+    font-size: 18px;
+  }
+
+  .navbar .navbar-center-links {
     order: 3;
     width: 100%;
-    overflow-x: auto;
-    gap: 16px;
-    padding-top: 8px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    padding-top: 7px;
     margin-top: 2px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    scrollbar-width: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  .navbar-center-links::-webkit-scrollbar {
-    display: none;
+  .navbar .nav-link-btn {
+    padding: 5px 6px;
+    font-size: 11.5px;
+    gap: 4px;
   }
 
-  .navbar-role {
-    font-size: 11px;
-    padding: 4px 8px;
+  .navbar .link-symbol {
+    width: 12px;
+    height: 12px;
   }
 
-  .navbar-actions button {
-    height: 32px;
+  .navbar .navbar-role {
+    font-size: 10.5px;
+    padding: 4px 7px;
+  }
+
+  .navbar .navbar-actions {
+    gap: 6px;
+  }
+
+  .navbar .navbar-actions button {
+    height: 31px;
     padding: 0 10px;
     font-size: 11.5px;
+    gap: 5px;
   }
 }
 
 @media (max-width: 480px) {
-  .navbar-role {
+  .navbar .navbar-role {
     display: none;
+  }
+
+  .navbar .navbar-center-links {
+    justify-content: flex-start;
+    gap: 4px 10px;
+  }
+
+  .navbar .nav-link-btn {
+    font-size: 11px;
+    padding: 4px 5px;
   }
 }
 

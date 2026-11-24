@@ -1,5 +1,5 @@
 /* =========================================================
-   ReserveDine — Home.css (Balanced Left Overlay + Mobile Polish)
+   ReserveDine — Home.css (Full Code, Desktop + Mobile Polish)
    ========================================================= */
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap');
 
@@ -39,7 +39,7 @@
 }
 
 /* =========================================================
-   1. HERO SECTION (EVEN, NON-BLACK LEFT OVERLAY)
+   1. HERO SECTION
    ========================================================= */
 .home .hero {
   position: relative;
@@ -675,14 +675,14 @@
     align-items: flex-start;
     justify-content: flex-start;
     min-height: 460px;
-    padding: 36px 16px 32px;
-    gap: 20px;
+    padding: 28px 14px 28px;
+    gap: 16px;
     background-image:
       linear-gradient(
         180deg,
-        rgba(6, 12, 10, 0.52) 0%,
-        rgba(6, 15, 12, 0.62) 55%,
-        rgba(6, 14, 11, 0.74) 100%
+        rgba(6, 12, 10, 0.32) 0%,
+        rgba(6, 15, 12, 0.42) 55%,
+        rgba(6, 14, 11, 0.56) 100%
       ),
       url('/images/restaurant.jpg'),
       url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=2200&q=90');
@@ -691,8 +691,10 @@
   .home .hero-content {
     max-width: 100%;
     width: 100%;
-    padding: 18px 18px;
-    background: rgba(8, 16, 13, 0.62);
+    padding: 18px 16px;
+    background: rgba(8, 16, 13, 0.42);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 224, 152, 0.22);
   }
 
   .home .hero-badge {

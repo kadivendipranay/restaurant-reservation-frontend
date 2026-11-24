@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Utensils,
   Home,
@@ -16,14 +16,32 @@ import {
 import { useAuth } from "../context/AuthContext";
 import "../styles/Navbar.css";
 
+function safeGetStorage(key: string): string | null {
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
 export default function Navbar() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { token, role, logout } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const scrollTimerRef = useRef<number | null>(null);
 
-  const activeToken = token || localStorage.getItem("token");
-  const normalizedRole = (role || localStorage.getItem("role") || "").toUpperCase();
+  const activeToken = token || safeGetStorage("token");
+  const normalizedRole = (role || safeGetStorage("role") || "").toUpperCase();
   const isAuthenticated = Boolean(activeToken);
+
+  useEffect(() => {
+    return () => {
+      if (scrollTimerRef.current !== null) {
+        window.clearTimeout(scrollTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleLogout = () => {
     if (isLoggingOut) return;
@@ -42,15 +60,25 @@ export default function Navbar() {
     }
   };
 
-  const goToSection = (sectionId: string) => {
-    if (window.location.pathname !== "/") {
+  const scrollToTarget = (sectionId: string, fallbackId?: string) => {
+    const el =
+      document.getElementById(sectionId) ||
+      (fallbackId ? document.getElementById(fallbackId) : null);
+    el?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const goToSection = (sectionId: string, fallbackId?: string) => {
+    if (pathname !== "/") {
       navigate("/");
-      setTimeout(() => {
-        document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
-      }, 120);
+      if (scrollTimerRef.current !== null) {
+        window.clearTimeout(scrollTimerRef.current);
+      }
+      scrollTimerRef.current = window.setTimeout(() => {
+        scrollToTarget(sectionId, fallbackId);
+      }, 140);
       return;
     }
-    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+    scrollToTarget(sectionId, fallbackId);
   };
 
   return (
@@ -70,26 +98,38 @@ export default function Navbar() {
       </div>
 
       <nav className="navbar-center-links" aria-label="Section navigation">
-        <button type="button" className="nav-link-btn" onClick={() => navigate("/")}>
+        <button
+          type="button"
+          className={`nav-link-btn ${pathname === "/" ? "active-link" : ""}`}
+          onClick={() => navigate("/")}
+        >
           <Home size={14} className="link-symbol" aria-hidden="true" />
           <span>Home</span>
         </button>
 
-        <button type="button" className="nav-link-btn" onClick={() => goToSection("features")}>
+        <button
+          type="button"
+          className="nav-link-btn"
+          onClick={() => goToSection("features")}
+        >
           <Sparkles size={14} className="link-symbol" aria-hidden="true" />
           <span>Features</span>
         </button>
 
         <button
           type="button"
-          className="nav-link-btn"
+          className={`nav-link-btn ${pathname === "/food-recommendations" ? "active-link" : ""}`}
           onClick={() => navigate("/food-recommendations")}
         >
           <UtensilsCrossed size={14} className="link-symbol" aria-hidden="true" />
           <span>Food Recommendations</span>
         </button>
 
-        <button type="button" className="nav-link-btn" onClick={() => goToSection("benefits")}>
+        <button
+          type="button"
+          className="nav-link-btn"
+          onClick={() => goToSection("benefits", "features")}
+        >
           <Info size={14} className="link-symbol" aria-hidden="true" />
           <span>About</span>
         </button>
