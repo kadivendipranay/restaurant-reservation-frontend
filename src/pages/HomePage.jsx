@@ -1,4 +1,3 @@
-// src/pages/HomePage.jsx
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
@@ -10,45 +9,63 @@ const FEATURES = [
     title: "AI Dining & Booking Assistant",
     description:
       "Ask about veg/non-veg dishes, budget combos in ₹, or book a table naturally in chat.",
+    target: "ai",
   },
   {
     icon: "📅",
     title: "Live Slot & Table Matching",
     description:
       "See real-time open table counts per time slot and get best-fit seating automatically.",
+    target: "dashboard",
   },
   {
     icon: "✨",
     title: "Occasions & Special Requests",
     description:
       "Personalize birthdays, anniversaries, or dietary and seating notes with every booking.",
+    target: "dashboard",
   },
   {
     icon: "🔄",
     title: "Instant Rescheduling",
     description:
       "Modify your active reservation's date, time, or party size in one click without cancelling.",
+    target: "dashboard",
   },
   {
     icon: "🗺️",
     title: "Live Floor & Table Grid",
     description:
       "Admins can monitor real-time table occupancy by zone and manage seating capacity live.",
+    target: "dashboard",
   },
   {
     icon: "📊",
     title: "Analytics & Shift Export",
     description:
       "Track peak dining hours, status trends with interactive charts, and export CSV shift sheets.",
+    target: "dashboard",
   },
 ];
+
+function safeGetStorage(key) {
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
 
 export default function HomePage() {
   const navigate = useNavigate();
   const { token, role } = useAuth();
 
-  const isAuthenticated = Boolean(token || localStorage.getItem("token"));
-  const resolvedRole = (role || localStorage.getItem("role") || "").toUpperCase();
+  const isAuthenticated = Boolean(token || safeGetStorage("token"));
+  const resolvedRole = (
+    role ||
+    safeGetStorage("role") ||
+    ""
+  ).toUpperCase();
   const isAdmin = isAuthenticated && resolvedRole === "ADMIN";
 
   const goDashboard = () => {
@@ -59,6 +76,25 @@ export default function HomePage() {
     navigate(isAdmin ? "/admin" : "/user");
   };
 
+  const goToAiMenu = () => {
+    navigate("/food-recommendations");
+  };
+
+  const handleFeatureClick = (target) => {
+    if (target === "ai") {
+      goToAiMenu();
+      return;
+    }
+    goDashboard();
+  };
+
+  const handleFeatureKeyDown = (event, target) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleFeatureClick(target);
+    }
+  };
+
   return (
     <main className="home-container">
       <Navbar />
@@ -67,7 +103,7 @@ export default function HomePage() {
       <section className="hero-card" aria-labelledby="home-hero-title">
         <div className="hero-content">
           <span className="hero-badge">
-            ✨ AI-Powered Dining & Table Reservations
+            ✨ AI-Powered Dining &amp; Table Reservations
           </span>
 
           <h1 className="hero-title" id="home-hero-title">
@@ -75,16 +111,13 @@ export default function HomePage() {
           </h1>
 
           <p className="hero-subtitle">
-            Great food starts with a great reservation. Check live table availability,
-            chat with our AI dining assistant, and customize every visit effortlessly.
+            Great food starts with a great reservation. Check live table
+            availability, chat with our AI dining assistant, and customize every
+            visit effortlessly.
           </p>
 
           <div className="hero-actions">
-            <button
-              type="button"
-              className="hero-btn"
-              onClick={goDashboard}
-            >
+            <button type="button" className="hero-btn" onClick={goDashboard}>
               {isAuthenticated
                 ? isAdmin
                   ? "Open Admin Command Centre"
@@ -93,19 +126,18 @@ export default function HomePage() {
               <span aria-hidden="true">→</span>
             </button>
 
-            {!isAuthenticated && (
-              <button
-                type="button"
-                className="hero-secondary-btn"
-                onClick={() => navigate("/login")}
-              >
-                Sign In
-              </button>
-            )}
+            <button
+              type="button"
+              className="hero-secondary-btn"
+              onClick={isAuthenticated ? goToAiMenu : () => navigate("/login")}
+            >
+              {isAuthenticated ? "Explore AI Menu" : "Sign In"}
+            </button>
           </div>
 
           <div className="hero-note">
-            🤖 AI Menu & Booking Help · ⏰ 5 PM – 9 PM Slots · 🔄 Instant Rescheduling
+            🤖 AI Menu &amp; Booking Help · ⏰ 5 PM – 9 PM Slots · 🔄 Instant
+            Rescheduling
           </div>
         </div>
 
@@ -126,8 +158,8 @@ export default function HomePage() {
           <span className="section-eyebrow">ABOUT RESERVEDINE</span>
           <h2 id="about-title">Dining reservations made simple</h2>
           <p>
-            ReserveDine brings live table availability, AI assistance, and floor operations
-            together in one seamless platform.
+            ReserveDine brings live table availability, AI assistance, and floor
+            operations together in one seamless platform.
           </p>
         </div>
 
@@ -141,15 +173,12 @@ export default function HomePage() {
 
             <p>
               Whether you are a guest planning a celebration or an administrator
-              overseeing live floor occupancy, ReserveDine keeps every table and time slot
-              organized—from instant best-fit table matching to real-time shift insights.
+              overseeing live floor occupancy, ReserveDine keeps every table and
+              time slot organized—from instant best-fit table matching to
+              real-time shift insights.
             </p>
 
-            <button
-              type="button"
-              className="about-link"
-              onClick={goDashboard}
-            >
+            <button type="button" className="about-link" onClick={goDashboard}>
               {isAuthenticated ? "Continue to Dashboard" : "Get started"}{" "}
               <span aria-hidden="true">→</span>
             </button>
@@ -163,13 +192,21 @@ export default function HomePage() {
           <span className="section-eyebrow">WHAT YOU CAN DO</span>
           <h2 id="features-title">Everything you need in one place</h2>
           <p>
-            Explore the smart features built for guests and restaurant teams alike.
+            Explore the smart features built for guests and restaurant teams
+            alike.
           </p>
         </div>
 
         <div className="features-grid">
           {FEATURES.map((feature, index) => (
-            <article className="feature-card" key={feature.title}>
+            <article
+              className="feature-card"
+              key={feature.title}
+              role="button"
+              tabIndex={0}
+              onClick={() => handleFeatureClick(feature.target)}
+              onKeyDown={(event) => handleFeatureKeyDown(event, feature.target)}
+            >
               <div className="feature-icon" aria-hidden="true">
                 {feature.icon}
               </div>
@@ -197,11 +234,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        <button
-          type="button"
-          className="cta-btn"
-          onClick={goDashboard}
-        >
+        <button type="button" className="cta-btn" onClick={goDashboard}>
           {isAuthenticated ? "Open Dashboard" : "Book Your Table"}{" "}
           <span aria-hidden="true">→</span>
         </button>
