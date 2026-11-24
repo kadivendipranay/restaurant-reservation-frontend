@@ -1,10 +1,29 @@
-// src/pages/AdminPage.jsx
 import { useCallback, useEffect, useState } from "react";
 import {
-  CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, CircleUserRound,
-  ClipboardList, Clock3, Download, Filter, Hash, LayoutDashboard, RotateCcw,
-  Search, Armchair, Users, XCircle, RefreshCw, BarChart3, TrendingUp,
-  AlertTriangle, Mail, Utensils, Sparkles, MessageSquareText
+  CalendarDays,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  CircleUserRound,
+  ClipboardList,
+  Clock3,
+  Download,
+  Filter,
+  Hash,
+  LayoutDashboard,
+  RotateCcw,
+  Search,
+  Armchair,
+  Users,
+  XCircle,
+  RefreshCw,
+  BarChart3,
+  TrendingUp,
+  AlertTriangle,
+  Mail,
+  Utensils,
+  Sparkles,
+  MessageSquareText,
 } from "lucide-react";
 import API from "../api/api";
 import Navbar from "../components/Navbar";
@@ -12,8 +31,16 @@ import Spinner from "../components/Spinner";
 import AdminTableManager from "../components/AdminTableManager";
 import { toast } from "react-toastify";
 import {
-  BarChart, Bar, CartesianGrid, Cell, Pie, PieChart,
-  ResponsiveContainer, Tooltip, XAxis, YAxis
+  BarChart,
+  Bar,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts";
 import "../styles/AdminPage.css";
 
@@ -27,8 +54,9 @@ const STATUS_OPTIONS = [
 
 const formatDate = (dateString) => {
   if (!dateString) return "Not available";
-  const date = new Date(`${dateString}T00:00:00`);
-  if (Number.isNaN(date.getTime())) return dateString;
+  const normalized = String(dateString).slice(0, 10);
+  const date = new Date(`${normalized}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return normalized;
   return date.toLocaleDateString("en-IN", {
     day: "2-digit",
     month: "short",
@@ -37,7 +65,9 @@ const formatDate = (dateString) => {
 };
 
 const getStatusLabel = (status) =>
-  ({ ACTIVE: "Active", CANCELLED: "Cancelled", COMPLETED: "Completed" }[status] ||
+  ({ ACTIVE: "Active", CANCELLED: "Cancelled", COMPLETED: "Completed" }[
+    status
+  ] ||
     status ||
     "Unknown");
 
@@ -71,7 +101,7 @@ export default function AdminPage() {
           date: appliedFilters.date,
         },
       });
-      const result = response.data || {};
+      const result = response?.data || {};
       setReservations(Array.isArray(result.data) ? result.data : []);
       setTotal(num(result.total));
       setPages(Math.max(1, num(result.pages) || 1));
@@ -80,7 +110,8 @@ export default function AdminPage() {
       setTotal(0);
       setPages(1);
       toast.error(
-        error?.response?.data?.message || "Unable to load reservations. Please try again."
+        error?.response?.data?.message ||
+          "Unable to load reservations. Please try again."
       );
     } finally {
       setLoading(false);
@@ -95,10 +126,12 @@ export default function AdminPage() {
     setInsightsLoading(true);
     try {
       const response = await API.get("/insights");
-      setInsights(response.data);
+      setInsights(response?.data || null);
     } catch (error) {
       setInsights(null);
-      toast.error(error?.response?.data?.message || "Unable to load admin insights.");
+      toast.error(
+        error?.response?.data?.message || "Unable to load admin insights."
+      );
     } finally {
       setInsightsLoading(false);
     }
@@ -128,17 +161,19 @@ export default function AdminPage() {
   };
 
   const performAdminAction = async (id, action, successMessage) => {
-    if (actionLoadingId) return;
+    if (actionLoadingId || !id) return;
     if (!window.confirm("Are you sure you want to continue?")) return;
     setActionLoadingId(id);
     setActionLoadingLabel(action);
     try {
       const response = await API.patch(`/reservations/${action}/${id}`);
-      toast.success(response.data?.message || successMessage);
+      toast.success(response?.data?.message || successMessage);
       setFloorRefreshKey((prev) => prev + 1);
       await Promise.all([fetchAllReservations(), fetchInsights()]);
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Unable to update the reservation.");
+      toast.error(
+        error?.response?.data?.message || "Unable to update the reservation."
+      );
     } finally {
       setActionLoadingId(null);
       setActionLoadingLabel("");
@@ -150,10 +185,16 @@ export default function AdminPage() {
   const handleAdminRestore = (id) =>
     performAdminAction(id, "admin-restore", "Reservation restored successfully.");
   const handleAdminComplete = (id) =>
-    performAdminAction(id, "admin-complete", "Reservation marked as completed.");
+    performAdminAction(
+      id,
+      "admin-complete",
+      "Reservation marked as completed."
+    );
 
-  const handlePreviousPage = () => setPage((current) => Math.max(1, current - 1));
-  const handleNextPage = () => setPage((current) => Math.min(pages, current + 1));
+  const handlePreviousPage = () =>
+    setPage((current) => Math.max(1, current - 1));
+  const handleNextPage = () =>
+    setPage((current) => Math.min(pages, current + 1));
 
   const handleExportCSV = () => {
     if (!reservations.length) {
@@ -180,13 +221,13 @@ export default function AdminPage() {
       r._id,
       r.user?.name || "Guest",
       r.user?.email || "",
-      r.date,
-      r.timeSlot,
+      String(r.date || "").slice(0, 10),
+      r.timeSlot || "",
       r.table?.tableNumber ?? "Unassigned",
-      r.guests,
+      num(r.guests),
       r.occasion && r.occasion !== "None" ? r.occasion : "Regular",
       r.specialRequests || "",
-      r.status,
+      r.status || "",
     ]);
 
     const csvContent = [headers, ...rows]
@@ -209,8 +250,12 @@ export default function AdminPage() {
   };
 
   const selectedStatus =
-    STATUS_OPTIONS.find((item) => item.value === statusFilter)?.label || "Active";
-  const cancellationRate = Math.min(100, Math.max(0, num(insights?.cancellationRate)));
+    STATUS_OPTIONS.find((item) => item.value === statusFilter)?.label ||
+    "Active";
+  const cancellationRate = Math.min(
+    100,
+    Math.max(0, num(insights?.cancellationRate))
+  );
   const statusCounts = insights?.statusCounts || {
     ACTIVE: 0,
     CANCELLED: 0,
@@ -233,8 +278,8 @@ export default function AdminPage() {
             </span>
             <h1>Admin Dashboard</h1>
             <p>
-              Your reservation command centre. Track bookings, review trends, and keep every
-              service running smoothly.
+              Your reservation command centre. Track bookings, review trends, and
+              keep every service running smoothly.
             </p>
             <div className="welcome-meta">
               <span>
@@ -267,7 +312,10 @@ export default function AdminPage() {
               onClick={fetchInsights}
               disabled={insightsLoading}
             >
-              <RefreshCw size={16} className={insightsLoading ? "spin-icon" : ""} />
+              <RefreshCw
+                size={16}
+                className={insightsLoading ? "spin-icon" : ""}
+              />
               {insightsLoading ? "Refreshing…" : "Refresh insights"}
             </button>
           </div>
@@ -287,7 +335,9 @@ export default function AdminPage() {
                     <span className="insight-overline">LIFETIME</span>
                   </div>
                   <p>Total reservations</p>
-                  <h3>{num(insights.totalReservations).toLocaleString("en-IN")}</h3>
+                  <h3>
+                    {num(insights.totalReservations).toLocaleString("en-IN")}
+                  </h3>
                   <span className="insight-caption">All recorded bookings</span>
                 </article>
 
@@ -300,7 +350,9 @@ export default function AdminPage() {
                   </div>
                   <p>Active reservations</p>
                   <h3>{num(statusCounts.ACTIVE).toLocaleString("en-IN")}</h3>
-                  <span className="insight-caption">Currently active bookings</span>
+                  <span className="insight-caption">
+                    Currently active bookings
+                  </span>
                 </article>
 
                 <article className="insight-card insight-red">
@@ -324,7 +376,9 @@ export default function AdminPage() {
                   </div>
                   <p>Completed reservations</p>
                   <h3>{num(statusCounts.COMPLETED).toLocaleString("en-IN")}</h3>
-                  <span className="insight-caption">Successfully completed</span>
+                  <span className="insight-caption">
+                    Successfully completed
+                  </span>
                 </article>
               </div>
 
@@ -332,7 +386,9 @@ export default function AdminPage() {
                 <div className="insight-section-heading">
                   <div>
                     <h3>Cancellation rate</h3>
-                    <p>Share of all recorded reservations that were cancelled.</p>
+                    <p>
+                      Share of all recorded reservations that were cancelled.
+                    </p>
                   </div>
                   <strong className="cancellation-percentage">
                     {cancellationRate.toFixed(2)}%
@@ -382,7 +438,10 @@ export default function AdminPage() {
                   <div className="insight-chart-legend">
                     {statusChartData.map((item) => (
                       <span key={item.name}>
-                        <i className="legend-dot" style={{ background: item.fill }} />
+                        <i
+                          className="legend-dot"
+                          style={{ background: item.fill }}
+                        />
                         {item.name}: {item.value}
                       </span>
                     ))}
@@ -404,15 +463,27 @@ export default function AdminPage() {
                             timeSlot: slot.timeSlot,
                             activeReservations: num(slot.activeReservations),
                           }))}
-                          margin={{ top: 12, right: 10, left: -20, bottom: 8 }}
+                          margin={{
+                            top: 12,
+                            right: 10,
+                            left: -20,
+                            bottom: 8,
+                          }}
                         >
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e9edf5" />
+                          <CartesianGrid
+                            strokeDasharray="3 3"
+                            vertical={false}
+                            stroke="#e9edf5"
+                          />
                           <XAxis
                             dataKey="timeSlot"
                             tick={{ fontSize: 11, fill: "#65708a" }}
                             interval={0}
                           />
-                          <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "#65708a" }} />
+                          <YAxis
+                            allowDecimals={false}
+                            tick={{ fontSize: 11, fill: "#65708a" }}
+                          />
                           <Tooltip />
                           <Bar
                             dataKey="activeReservations"
@@ -423,7 +494,9 @@ export default function AdminPage() {
                         </BarChart>
                       </ResponsiveContainer>
                     ) : (
-                      <p className="insight-empty">No active reservations to chart yet.</p>
+                      <p className="insight-empty">
+                        No active reservations to chart yet.
+                      </p>
                     )}
                   </div>
                 </article>
@@ -443,12 +516,16 @@ export default function AdminPage() {
                         </div>
                         <strong>
                           {slot.activeReservations} active{" "}
-                          {slot.activeReservations === 1 ? "reservation" : "reservations"}
+                          {slot.activeReservations === 1
+                            ? "reservation"
+                            : "reservations"}
                         </strong>
                       </div>
                     ))
                   ) : (
-                    <p className="insight-empty">No active reservations to analyze yet.</p>
+                    <p className="insight-empty">
+                      No active reservations to analyze yet.
+                    </p>
                   )}
                   {insights.mostPopularSlot && (
                     <div className="busiest-slot">
@@ -469,15 +546,24 @@ export default function AdminPage() {
                       ))}
                     </ul>
                   ) : (
-                    <p className="insight-empty">No recommendations available.</p>
+                    <p className="insight-empty">
+                      No recommendations available.
+                    </p>
                   )}
                 </div>
               </div>
             </>
           ) : (
             <div className="insight-error">
-              <p>Unable to load insights. Check your admin login and backend connection.</p>
-              <button type="button" className="admin-btn primary-btn" onClick={fetchInsights}>
+              <p>
+                Unable to load insights. Check your admin login and backend
+                connection.
+              </p>
+              <button
+                type="button"
+                className="admin-btn primary-btn"
+                onClick={fetchInsights}
+              >
                 <RefreshCw size={16} /> Try again
               </button>
             </div>
@@ -541,7 +627,11 @@ export default function AdminPage() {
           <form className="admin-filter-form" onSubmit={handleSearch}>
             <div className="filter-field">
               <label htmlFor="statusFilter">Reservation status</label>
-              <select id="statusFilter" value={statusFilter} onChange={handleStatusChange}>
+              <select
+                id="statusFilter"
+                value={statusFilter}
+                onChange={handleStatusChange}
+              >
                 {STATUS_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -578,7 +668,11 @@ export default function AdminPage() {
             </div>
 
             <div className="filter-actions">
-              <button type="submit" className="admin-btn primary-btn" disabled={loading}>
+              <button
+                type="submit"
+                className="admin-btn primary-btn"
+                disabled={loading}
+              >
                 <Search size={16} /> Search
               </button>
               <button
@@ -602,7 +696,7 @@ export default function AdminPage() {
               </h2>
               <p>Review guest details, occasions, and special requests.</p>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.65rem" }}>
+            <div className="reservation-list-actions">
               <button
                 type="button"
                 className="admin-btn secondary-btn"
@@ -628,7 +722,11 @@ export default function AdminPage() {
               </div>
               <h3>No reservations found</h3>
               <p>Try another status, email address, or reservation date.</p>
-              <button type="button" className="admin-btn secondary-btn" onClick={handleReset}>
+              <button
+                type="button"
+                className="admin-btn secondary-btn"
+                onClick={handleReset}
+              >
                 <RefreshCw size={16} /> Clear filters
               </button>
             </div>
@@ -651,10 +749,15 @@ export default function AdminPage() {
                         </div>
                         <div className="reservation-user">
                           <h3>{userName}</h3>
-                          <p>{reservation.user?.email || "User information unavailable"}</p>
+                          <p>
+                            {reservation.user?.email ||
+                              "User information unavailable"}
+                          </p>
                         </div>
                       </div>
-                      <span className={`status-badge status-${status.toLowerCase()}`}>
+                      <span
+                        className={`status-badge status-${status.toLowerCase()}`}
+                      >
                         <span className="status-dot" />
                         {getStatusLabel(status)}
                       </span>
@@ -665,7 +768,10 @@ export default function AdminPage() {
                         <span className="detail-label">
                           <Hash size={15} /> Reservation ID
                         </span>
-                        <span className="detail-value id-value" title={reservation._id}>
+                        <span
+                          className="detail-value id-value"
+                          title={reservation._id}
+                        >
                           {reservation._id || "Not available"}
                         </span>
                       </div>
@@ -674,7 +780,9 @@ export default function AdminPage() {
                         <span className="detail-label">
                           <CalendarDays size={15} /> Date
                         </span>
-                        <span className="detail-value">{formatDate(reservation.date)}</span>
+                        <span className="detail-value">
+                          {formatDate(reservation.date)}
+                        </span>
                       </div>
 
                       <div className="reservation-detail">
@@ -710,15 +818,17 @@ export default function AdminPage() {
                     {(reservation.occasion && reservation.occasion !== "None") ||
                     reservation.specialRequests ? (
                       <div className="admin-guest-notes">
-                        {reservation.occasion && reservation.occasion !== "None" && (
-                          <span className="occasion-pill">
-                            <Sparkles size={13} /> {reservation.occasion}
-                          </span>
-                        )}
+                        {reservation.occasion &&
+                          reservation.occasion !== "None" && (
+                            <span className="occasion-pill">
+                              <Sparkles size={13} /> {reservation.occasion}
+                            </span>
+                          )}
                         {reservation.specialRequests && (
                           <span className="special-request-text">
                             <MessageSquareText size={14} />
-                            <strong>Request:</strong> {reservation.specialRequests}
+                            <strong>Request:</strong>{" "}
+                            {reservation.specialRequests}
                           </span>
                         )}
                       </div>
@@ -733,10 +843,13 @@ export default function AdminPage() {
                               type="button"
                               className="action-btn complete-btn"
                               disabled={Boolean(actionLoadingId)}
-                              onClick={() => handleAdminComplete(reservation._id)}
+                              onClick={() =>
+                                handleAdminComplete(reservation._id)
+                              }
                             >
                               <CheckCircle2 size={16} />
-                              {isActionLoading && actionLoadingLabel === "admin-complete"
+                              {isActionLoading &&
+                              actionLoadingLabel === "admin-complete"
                                 ? "Processing…"
                                 : "Complete"}
                             </button>
@@ -747,7 +860,8 @@ export default function AdminPage() {
                               onClick={() => handleAdminCancel(reservation._id)}
                             >
                               <XCircle size={16} />
-                              {isActionLoading && actionLoadingLabel === "admin-cancel"
+                              {isActionLoading &&
+                              actionLoadingLabel === "admin-cancel"
                                 ? "Processing…"
                                 : "Cancel"}
                             </button>
@@ -762,7 +876,8 @@ export default function AdminPage() {
                             onClick={() => handleAdminRestore(reservation._id)}
                           >
                             <RotateCcw size={16} />
-                            {isActionLoading && actionLoadingLabel === "admin-restore"
+                            {isActionLoading &&
+                            actionLoadingLabel === "admin-restore"
                               ? "Processing…"
                               : "Restore reservation"}
                           </button>

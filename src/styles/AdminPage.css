@@ -2,8 +2,16 @@
    ReserveDine — Complete Colorful Admin Dashboard CSS
    ========================================================= */
 
+.admin-container,
+.admin-container *,
+.admin-container *::before,
+.admin-container *::after {
+  box-sizing: border-box;
+}
+
 .admin-container {
   min-height: 100vh;
+  overflow-x: clip;
   background:
     radial-gradient(circle at 8% 6%, rgba(199, 210, 254, 0.58) 0%, transparent 38%),
     radial-gradient(circle at 92% 14%, rgba(254, 215, 170, 0.48) 0%, transparent 36%),
@@ -15,6 +23,7 @@
 
 .admin-page-content {
   max-width: 1240px;
+  min-width: 0;
   margin: 0 auto;
   padding: 2rem 1.5rem 3.5rem;
   display: flex;
@@ -41,6 +50,7 @@
   position: relative;
   z-index: 2;
   max-width: 680px;
+  min-width: 0;
 }
 
 .admin-eyebrow {
@@ -59,7 +69,7 @@
 
 .admin-welcome h1 {
   margin: 0 0 0.5rem;
-  font-size: 2.15rem;
+  font-size: clamp(1.75rem, 3.6vw, 2.15rem);
   font-weight: 800;
   letter-spacing: -0.02em;
   color: #ffffff;
@@ -125,6 +135,7 @@
 
 /* ---------- Frosted Glass Panels ---------- */
 .admin-panel {
+  min-width: 0;
   background: rgba(255, 255, 255, 0.86);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.92);
@@ -181,6 +192,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+}
+
+.reservation-list-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
 }
 
 /* ---------- Buttons ---------- */
@@ -194,6 +213,7 @@
   border-radius: 11px;
   font-size: 0.9rem;
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
   border: 1px solid transparent;
   transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
@@ -249,6 +269,7 @@
 }
 
 .insight-card {
+  min-width: 0;
   border-radius: 16px;
   padding: 1.25rem 1.35rem;
   border: 1px solid #e6ebf4;
@@ -353,6 +374,7 @@
 
 .insight-section-heading {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
@@ -395,12 +417,13 @@
 /* ---------- Recharts Grid ---------- */
 .insight-charts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.25rem;
   margin-bottom: 1.5rem;
 }
 
 .insight-chart-card {
+  min-width: 0;
   border: 1px solid #e0e7ff;
   border-radius: 16px;
   padding: 1.25rem;
@@ -451,12 +474,13 @@
 /* ---------- Popular Slots & Recommendations ---------- */
 .insight-lower-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.25rem;
 }
 
 .popular-slots,
 .insight-recommendations {
+  min-width: 0;
   border: 1px solid #e0e7ff;
   border-radius: 16px;
   padding: 1.25rem;
@@ -477,6 +501,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.75rem;
   padding: 0.65rem 0.85rem;
   background: rgba(255, 255, 255, 0.85);
   border: 1px solid #e2e8f0;
@@ -529,11 +554,12 @@
 /* ---------- Summary Strip ---------- */
 .admin-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1.1rem;
 }
 
 .stat-card {
+  min-width: 0;
   border-radius: 18px;
   padding: 1.25rem 1.4rem;
   display: flex;
@@ -585,6 +611,10 @@
   flex-shrink: 0;
 }
 
+.stat-content {
+  min-width: 0;
+}
+
 .stat-content p {
   margin: 0;
   font-size: 0.85rem;
@@ -619,6 +649,7 @@
 }
 
 .filter-field {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 0.42rem;
@@ -633,6 +664,7 @@
 .filter-field select,
 .filter-field input {
   width: 100%;
+  min-width: 0;
   height: 44px;
   padding: 0 0.9rem;
   border: 1px solid #dbe2ef;
@@ -641,7 +673,6 @@
   color: #1e293b;
   font-size: 0.94rem;
   outline: none;
-  box-sizing: border-box;
 }
 
 .input-with-icon {
@@ -670,6 +701,7 @@
 
 .filter-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.65rem;
   align-items: center;
 }
@@ -693,6 +725,7 @@
 .reservation-item {
   position: relative;
   overflow: hidden;
+  min-width: 0;
   border-radius: 18px;
   padding: 1.35rem 1.5rem;
   border: 1.5px solid #e0e7ff;
@@ -739,29 +772,31 @@
   background: linear-gradient(180deg, #3b82f6, #6366f1);
 }
 
-.reservation-item:hover {
-  transform: translateY(-5px) scale(1.006);
-  box-shadow: 0 18px 36px rgba(67, 56, 202, 0.13);
-  border-color: #818cf8;
-}
+@media (hover: hover) {
+  .reservation-item:hover {
+    transform: translateY(-5px) scale(1.006);
+    box-shadow: 0 18px 36px rgba(67, 56, 202, 0.13);
+    border-color: #818cf8;
+  }
 
-.reservation-item.reservation-status-active:hover {
-  box-shadow: 0 18px 36px rgba(16, 185, 129, 0.17);
-  border-color: #34d399;
-}
+  .reservation-item.reservation-status-active:hover {
+    box-shadow: 0 18px 36px rgba(16, 185, 129, 0.17);
+    border-color: #34d399;
+  }
 
-.reservation-item.reservation-status-cancelled:hover {
-  box-shadow: 0 18px 36px rgba(244, 63, 94, 0.16);
-  border-color: #fb7185;
-}
+  .reservation-item.reservation-status-cancelled:hover {
+    box-shadow: 0 18px 36px rgba(244, 63, 94, 0.16);
+    border-color: #fb7185;
+  }
 
-.reservation-item.reservation-status-completed:hover {
-  box-shadow: 0 18px 36px rgba(59, 130, 246, 0.17);
-  border-color: #60a5fa;
-}
+  .reservation-item.reservation-status-completed:hover {
+    box-shadow: 0 18px 36px rgba(59, 130, 246, 0.17);
+    border-color: #60a5fa;
+  }
 
-.reservation-item:hover::before {
-  width: 7px;
+  .reservation-item:hover::before {
+    width: 7px;
+  }
 }
 
 .reservation-item-header {
@@ -778,6 +813,7 @@
   display: flex;
   align-items: center;
   gap: 0.85rem;
+  min-width: 0;
 }
 
 .reservation-avatar {
@@ -789,19 +825,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+.reservation-user {
+  min-width: 0;
 }
 
 .reservation-user h3 {
   margin: 0 0 0.15rem;
   font-size: 1.05rem;
   color: #0f172a;
+  overflow-wrap: anywhere;
 }
 
 .reservation-user p {
   margin: 0;
   font-size: 0.86rem;
   color: #475569;
+  overflow-wrap: anywhere;
 }
 
 .status-badge {
@@ -838,12 +881,13 @@
 
 .reservation-details {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
   gap: 0.85rem;
   padding: 1rem 0;
 }
 
 .reservation-detail {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -871,6 +915,7 @@
   font-size: 0.94rem;
   font-weight: 700;
   color: #0f172a;
+  overflow-wrap: anywhere;
 }
 
 .id-value {
@@ -912,6 +957,7 @@
   gap: 0.4rem;
   font-size: 0.86rem;
   color: #334155;
+  overflow-wrap: anywhere;
 }
 
 .reservation-actions {
@@ -939,6 +985,7 @@
 .action-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
   height: 36px;
   padding: 0 0.95rem;
@@ -1164,11 +1211,12 @@
 
 .floor-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
   gap: 1.1rem;
 }
 
 .table-tile {
+  min-width: 0;
   border-radius: 16px;
   padding: 1.15rem;
   border: 1.5px solid #e2e8f0;
@@ -1347,4 +1395,79 @@
   gap: 0.4rem;
   font-weight: 700;
   color: #1e293b;
+}
+
+/* ---------- Mobile & Tablet Breakpoints ---------- */
+@media (max-width: 768px) {
+  .admin-page-content {
+    padding: 1.25rem 0.9rem 2.5rem;
+    gap: 1.25rem;
+  }
+
+  .admin-welcome {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.5rem 1.35rem;
+    border-radius: 18px;
+  }
+
+  .admin-welcome-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+  }
+
+  .admin-panel {
+    padding: 1.25rem 1.15rem;
+    border-radius: 16px;
+  }
+
+  .reservation-item {
+    padding: 1.1rem 1.05rem;
+  }
+
+  .filter-actions {
+    width: 100%;
+  }
+
+  .filter-actions .admin-btn {
+    flex: 1;
+  }
+
+  .actions-buttons {
+    width: 100%;
+  }
+
+  .actions-buttons .action-btn {
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .reservation-list-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .admin-pagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pagination-buttons {
+    width: 100%;
+  }
+
+  .pagination-btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-container,
+  .admin-container * {
+    animation: none !important;
+    transition: none !important;
+  }
 }
