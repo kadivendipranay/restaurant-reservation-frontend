@@ -50,3 +50,18 @@
   .navbar .navbar-brand-text { font-size: 19px; }
 }
 @media (prefers-reduced-motion: reduce) { .navbar, .navbar * { transition: none !important; animation: none !important; } }
+
+/* Reset conflicting global brand and header styles */
+header.navbar { margin: 0 !important; border-radius: 0; }
+header.navbar .navbar-brand,
+header.navbar .navbar-brand .navbar-brand-icon,
+header.navbar .navbar-brand .navbar-brand-text {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+}
+header.navbar .navbar-brand .navbar-brand-icon { color: #f5c85c; }
+header.navbar .navbar-brand .navbar-brand-text { color: #fff; }

@@ -20,7 +20,7 @@
   --muted: #64706b;
   --border: #e5dec9;
   width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
   font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--cream);
   color: var(--ink);
@@ -775,3 +775,17 @@
   .home .hero-subtitle { font-size: 15px; }
 }
 @media (hover: none) { .home .review-card:hover, .home .dish-card:hover, .home .feature-card:hover { transform: none; } }
+
+/* Mobile polish and contrast fixes */
+.home .review-card h2#experience-title { color: #ffe098; }
+.home .review-card .experience-list { color: #fffaf0; }
+.home > .navbar { margin-bottom: 0 !important; }
+.home > .hero { margin-top: 0 !important; }
+@media (max-width: 900px) {
+  .home .hero { padding-block: 30px; gap: 20px; }
+  .home .hero-actions { margin-top: 18px; }
+  .home .hero-highlights { margin-top: 16px; gap: 6px; }
+  .home .review-card { padding: 18px; }
+  .home .review-card h2#experience-title { font-size: clamp(22px, 5.5vw, 27px); margin: 10px 0 14px; }
+  .home .experience-list { gap: 10px; }
+}

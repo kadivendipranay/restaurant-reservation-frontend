@@ -1,5 +1,6 @@
-
+//AIChatbot.tsx
 import { useEffect, useRef, useState } from "react";
+import { MessageCircle, X, Utensils, Sparkles, CalendarDays, Clock, CalendarX, Users, Check, ChevronRight, Send } from "lucide-react";
 import axios from "axios";
 import "../styles/AIChatbot.css";
 import {
@@ -18,28 +19,28 @@ const QUICK_ACTIONS = [
   {
     title: "How to book?",
     subtitle: "Step-by-step guide",
-    icon: "📅",
+    icon: CalendarDays,
     style: "booking",
     question: "How do I book a table?",
   },
   {
     title: "Time slots",
     subtitle: "View available slots",
-    icon: "🕒",
+    icon: Clock,
     style: "time",
     question: "What are the available time slots?",
   },
   {
     title: "Cancel booking",
     subtitle: "Manage your booking",
-    icon: "🗓️",
+    icon: CalendarX,
     style: "cancel",
     question: "How do I cancel my reservation?",
   },
   {
     title: "Book a table",
     subtitle: "Reserve your seat",
-    icon: "🍽️",
+    icon: Utensils,
     style: "table",
     question: "",
   },
@@ -60,6 +61,8 @@ export default function AIChatbot() {
     useState<string | number | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const requestRef = useRef(false);
+  const toggleRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -70,11 +73,14 @@ export default function AIChatbot() {
   ]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "end",
-    });
-  }, [messages, loading, pendingReservation]);
+    const area = messagesEndRef.current?.parentElement;
+    if (area) area.scrollTop = area.scrollHeight;
+  }, [messages, loading, pendingReservation, isOpen]);
+
+  function closeChat() {
+    setIsOpen(false);
+    toggleRef.current?.focus();
+  }
 
   function addBotMessage(text: string) {
     setMessages((previous) => [
@@ -104,7 +110,10 @@ export default function AIChatbot() {
   async function sendMessage(text = message) {
     const question = text.trim();
 
-    if (!question || loading) return;
+    if (!question || requestRef.current) return;
+    requestRef.current = true;
+    setPendingReservation(null);
+    setPendingTableNumber(null);
 
     setMessages((previous) => [
       ...previous,
@@ -170,12 +179,14 @@ export default function AIChatbot() {
         )
       );
     } finally {
+      requestRef.current = false;
       setLoading(false);
     }
   }
 
   async function handleConfirmBooking() {
-    if (!pendingReservation || loading) return;
+    if (!pendingReservation || requestRef.current) return;
+    requestRef.current = true;
 
     setLoading(true);
 
@@ -202,6 +213,7 @@ export default function AIChatbot() {
       setPendingReservation(null);
       setPendingTableNumber(null);
     } finally {
+      requestRef.current = false;
       setLoading(false);
     }
   }
@@ -213,9 +225,10 @@ export default function AIChatbot() {
     setPendingReservation(null);
     setPendingTableNumber(null);
 
-    addBotMessage(
-      "Let's find a table for you. Please enter your preferred date, time slot, and number of guests.\n\nExample: Book a table on 2026-11-01 at 18:00-19:00 for 2 guests."
-    );
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const date = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
+    addBotMessage(`Please enter your preferred date, time slot, and number of guests.\n\nExample: Book a table on ${date} at 18:00-19:00 for 2 guests.`);
 
     window.setTimeout(() => inputRef.current?.focus(), 0);
   }
@@ -228,7 +241,7 @@ export default function AIChatbot() {
     setBookingMode(false);
 
     addBotMessage(
-      "Booking cancelled. What else can I help you with?"
+      "Booking request discarded. No existing reservation was cancelled. What else can I help you with?"
     );
   }
 
@@ -248,10 +261,13 @@ export default function AIChatbot() {
       {isOpen && (
         <section
           className={`ai-chat-window${bookingMode ? " booking-mode" : ""}`}
+          id="ai-chat-panel"
+          aria-label="ReserveDine restaurant assistant"
+          onKeyDown={(event) => { if (event.key === "Escape") closeChat(); }}
         >
           <header className="ai-chat-header">
             <div className="ai-brand-avatar" aria-hidden="true">
-              🍽
+              <Utensils size={22} />
             </div>
 
             <div className="ai-header-copy">
@@ -269,10 +285,10 @@ export default function AIChatbot() {
             <button
               type="button"
               className="ai-close-button"
-              onClick={() => setIsOpen(false)}
+              onClick={closeChat}
               aria-label="Close assistant"
             >
-              ×
+              <X size={20} />
             </button>
           </header>
 
@@ -290,7 +306,7 @@ export default function AIChatbot() {
               >
                 {item.sender === "bot" && (
                   <div className="ai-message-avatar" aria-hidden="true">
-                    ✦
+                    <Sparkles size={15} />
                   </div>
                 )}
 
@@ -303,7 +319,7 @@ export default function AIChatbot() {
             {loading && (
               <div className="ai-message-row bot">
                 <div className="ai-message-avatar" aria-hidden="true">
-                  ✦
+                  <Sparkles size={15} />
                 </div>
 
                 <div
@@ -337,7 +353,7 @@ export default function AIChatbot() {
                   onClick={() => handleQuickAction(action.question)}
                 >
                   <span className="ai-action-icon" aria-hidden="true">
-                    {action.icon}
+                    <action.icon size={18} />
                   </span>
 
                   <span className="ai-action-copy">
@@ -346,7 +362,7 @@ export default function AIChatbot() {
                   </span>
 
                   <span className="ai-action-arrow" aria-hidden="true">
-                    ›
+                    <ChevronRight size={16} />
                   </span>
                 </button>
               ))}
@@ -360,7 +376,7 @@ export default function AIChatbot() {
             >
               <div className="ai-booking-card-heading">
                 <div className="ai-booking-card-icon" aria-hidden="true">
-                  ✓
+                  <Check size={20} />
                 </div>
 
                 <div>
@@ -375,7 +391,7 @@ export default function AIChatbot() {
               <div className="ai-booking-details">
                 <div className="ai-booking-detail">
                   <span className="ai-detail-icon" aria-hidden="true">
-                    📅
+                    <CalendarDays size={16} />
                   </span>
                   <div>
                     <small>Date</small>
@@ -385,7 +401,7 @@ export default function AIChatbot() {
 
                 <div className="ai-booking-detail">
                   <span className="ai-detail-icon" aria-hidden="true">
-                    🕒
+                    <Clock size={16} />
                   </span>
                   <div>
                     <small>Time slot</small>
@@ -395,7 +411,7 @@ export default function AIChatbot() {
 
                 <div className="ai-booking-detail">
                   <span className="ai-detail-icon" aria-hidden="true">
-                    👥
+                    <Users size={16} />
                   </span>
                   <div>
                     <small>Guests</small>
@@ -405,7 +421,7 @@ export default function AIChatbot() {
 
                 <div className="ai-booking-detail">
                   <span className="ai-detail-icon" aria-hidden="true">
-                    🍽️
+                    <Utensils size={16} />
                   </span>
                   <div>
                     <small>Table</small>
@@ -444,6 +460,10 @@ export default function AIChatbot() {
             </section>
           )}
 
+          {bookingMode && !pendingReservation && (
+            <button type="button" className="ai-exit-booking" disabled={loading} onClick={cancelBookingMode}>Cancel booking request</button>
+          )}
+
           <form
             className="ai-chat-form"
             onSubmit={(event) => {
@@ -469,9 +489,10 @@ export default function AIChatbot() {
 
             <button
               type="submit"
+              aria-label="Send message"
               disabled={loading || !message.trim()}
             >
-              {loading ? "..." : "Send"}
+              {loading ? "…" : <Send size={18} aria-hidden="true" />}
             </button>
           </form>
         </section>
@@ -480,13 +501,15 @@ export default function AIChatbot() {
       <button
         type="button"
         className="ai-chat-toggle"
+        ref={toggleRef}
+        aria-controls={isOpen ? "ai-chat-panel" : undefined}
         onClick={() => setIsOpen((previous) => !previous)}
         aria-expanded={isOpen}
         aria-label={
           isOpen ? "Close assistant" : "Open restaurant assistant"
         }
       >
-        {isOpen ? "×" : "💬"}
+        {isOpen ? <X size={25} aria-hidden="true" /> : <MessageCircle size={25} aria-hidden="true" />}
       </button>
     </div>
   );
