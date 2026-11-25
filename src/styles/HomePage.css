@@ -1,465 +1,73 @@
-/* =========================================================
-   ReserveDine — HomePage.css
-   ========================================================= */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap');
-.home-container,
-.home-container *,
-.home-container *::before,
-.home-container *::after {
-  box-sizing: border-box;
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap');
+.hp-restaurant { --hp-ink:#172722; --hp-green:#103b2d; --hp-gold:#efbf5b; --hp-cream:#f8f4ec; --hp-muted:#53635a; background:var(--hp-cream); color:var(--hp-ink); min-height:100vh; width:100%; overflow-x:clip; font-family:'DM Sans',sans-serif; }
+.hp-restaurant, .hp-restaurant * { box-sizing:border-box; }
+.hp-restaurant main { margin:0; padding:0; max-width:none; }
+.hp-restaurant main h1,.hp-restaurant main h2,.hp-restaurant main h3 { font-family:'Playfair Display',Georgia,serif; line-height:1.16; margin:0; color:var(--hp-ink); }
+.hp-restaurant main h2 { font-size:clamp(30px,4vw,48px); }
+.hp-restaurant main p { line-height:1.7; margin:0; }
+.hp-restaurant section[id] { scroll-margin-top:90px; }
+.hp-restaurant .hp-hero { min-height:clamp(460px,65vh,690px); display:flex; align-items:center; padding:clamp(40px,7vw,110px) max(5vw,calc((100% - 1240px)/2)); background-color:#101914; background-image:linear-gradient(90deg,rgba(8,22,16,.88),rgba(8,22,16,.55) 55%,rgba(8,22,16,.18)),url('/images/restaurant.jpg'),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=2000&q=85'); background-size:cover; background-position:center; }
+.hp-restaurant .hp-hero-copy { max-width:650px; }
+.hp-restaurant .hp-eyebrow { display:block; font-size:11px; font-weight:700; letter-spacing:.16em; color:#805b1c; margin-bottom:16px; }
+.hp-restaurant .hp-hero .hp-eyebrow,.hp-restaurant .hp-final .hp-eyebrow { color:#ffe098; }
+.hp-restaurant .hp-hero h1 { font-size:clamp(46px,6vw,84px); color:#fff; font-weight:600; margin-bottom:22px; }
+.hp-restaurant .hp-hero h1 em { color:#ffe098; font-weight:500; }
+.hp-restaurant .hp-hero p { color:#f5f1e9; max-width:520px; font-size:clamp(15px,1.4vw,18px); }
+.hp-restaurant .hp-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:28px; }
+.hp-restaurant .hp-button,.hp-restaurant .hp-link { display:inline-flex; align-items:center; justify-content:center; gap:10px; font:600 14px 'DM Sans',sans-serif; cursor:pointer; min-height:48px; text-decoration:none; transition:background-color .25s,color .25s,border-color .25s,transform .25s,box-shadow .25s; }
+.hp-restaurant .hp-button { border:1px solid transparent; border-radius:7px; padding:12px 22px; }
+.hp-restaurant .hp-primary { background:var(--hp-gold); color:#172722; border-color:var(--hp-gold); }
+.hp-restaurant .hp-outline { background:#14251eaa; color:#fff; border-color:#e6cc91; }
+.hp-restaurant .hp-hero .hp-hours { display:flex; align-items:center; gap:8px; margin-top:22px; color:#ffe098; font-size:13px; }
+.hp-restaurant .hp-about { max-width:1240px; margin:0 auto; padding:clamp(36px,6vw,80px) 24px 0; display:grid; grid-template-columns:1fr 1fr; align-items:stretch; }
+.hp-restaurant .hp-about-photo { overflow:hidden; min-height:300px; background:#24382e; }
+.hp-restaurant .hp-about-photo img,.hp-restaurant .hp-card-photo img { display:block; width:100%; height:100%; object-fit:cover; transition:transform .55s ease; }
+.hp-restaurant .hp-about-copy { background:var(--hp-green); padding:clamp(28px,5vw,64px); display:flex; flex-direction:column; align-items:flex-start; justify-content:center; }
+.hp-restaurant .hp-about-copy h2 { color:#fff; margin-bottom:18px; }
+.hp-restaurant .hp-about-copy p { color:#e6eee8; }
+.hp-restaurant .hp-about-copy .hp-eyebrow,.hp-restaurant .hp-about-copy .hp-link { color:#ffe098; }
+.hp-restaurant .hp-link { background:transparent; border:0; padding:0; color:#805b1c; justify-content:flex-start; text-align:left; margin-top:12px; }
+.hp-restaurant .hp-link svg,.hp-restaurant .hp-button svg:last-child { flex-shrink:0; transition:transform .25s ease; }
+.hp-restaurant .hp-section { max-width:1240px; margin:0 auto; padding:clamp(40px,6vw,80px) 24px; }
+.hp-restaurant .hp-heading { text-align:center; max-width:650px; margin:0 auto 32px; }
+.hp-restaurant .hp-heading p { color:var(--hp-muted); margin-top:12px; }
+.hp-restaurant .hp-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:20px; }
+.hp-restaurant .hp-card,.hp-restaurant .hp-admin-card { background:#fffdf8; border:1px solid #e4dccb; border-radius:12px; overflow:hidden; transition:transform .3s ease,box-shadow .3s ease,border-color .3s ease; }
+.hp-restaurant .hp-card { display:flex; flex-direction:column; }
+.hp-restaurant .hp-card-photo { aspect-ratio:4/3; overflow:hidden; background:#d9d1c2; }
+.hp-restaurant .hp-card-copy { padding:22px; display:flex; flex-direction:column; flex:1; align-items:flex-start; }
+.hp-restaurant .hp-card h3,.hp-restaurant .hp-admin-card h3 { font-size:22px; margin-bottom:12px; }
+.hp-restaurant .hp-card p,.hp-restaurant .hp-admin-card p { font-size:14px; color:var(--hp-muted); margin-bottom:14px; }
+.hp-restaurant .hp-card .hp-link { margin-top:auto; }
+.hp-restaurant .hp-management { padding-top:0; }
+.hp-restaurant .hp-admin-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+.hp-restaurant .hp-admin-card { padding:28px; }
+.hp-restaurant .hp-admin-card > svg { color:#805b1c; margin-bottom:14px; }
+.hp-restaurant .hp-admin-card small { color:var(--hp-muted); }
+.hp-restaurant .hp-final { background:var(--hp-green); text-align:center; padding:clamp(42px,6vw,76px) 24px; }
+.hp-restaurant .hp-final h2 { color:#fff; }
+.hp-restaurant .hp-final p { color:#e6eee8; margin:14px 0 24px; }
+.hp-restaurant .hp-footer { background:#101914; color:#cbd6ce; padding:36px max(24px,calc((100% - 1192px)/2)) 28px; }
+.hp-restaurant .hp-footer-main { display:flex; justify-content:space-between; align-items:center; gap:24px; flex-wrap:wrap; }
+.hp-restaurant .hp-brand { display:inline-flex; gap:10px; align-items:center; color:#ffe098; text-decoration:none; font:600 24px 'Playfair Display',Georgia,serif; }
+.hp-restaurant .hp-footer p { font-size:14px; margin:12px 0; color:#cbd6ce; }
+.hp-restaurant .hp-footer nav { display:flex; flex-wrap:wrap; gap:12px 24px; }
+.hp-restaurant .hp-footer nav button { background:transparent; border:0; padding:8px 0; min-height:44px; color:#e4ebe6; cursor:pointer; font:500 14px 'DM Sans',sans-serif; transition:color .25s; }
+.hp-restaurant .hp-footer-bottom { border-top:1px solid #ffffff26; margin-top:24px; padding-top:20px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; font-size:12px; }
+.hp-restaurant .hp-footer-bottom a { color:var(--hp-gold); text-decoration:none; transition:color .25s; }
+.hp-restaurant main button:focus-visible,.hp-restaurant .hp-footer a:focus-visible,.hp-restaurant .hp-footer button:focus-visible { outline:3px solid #b48224; outline-offset:4px; }
+.hp-restaurant .hp-hero button:focus-visible,.hp-restaurant .hp-final button:focus-visible,.hp-restaurant .hp-about button:focus-visible { outline-color:#fff; }
+@media (hover:hover) and (pointer:fine) {
+ .hp-restaurant .hp-card:hover,.hp-restaurant .hp-admin-card:hover { transform:translateY(-6px); border-color:#c7a45d; box-shadow:0 16px 32px #103b2d18; }
+ .hp-restaurant .hp-card:hover img,.hp-restaurant .hp-about:hover img { transform:scale(1.06); }
+ .hp-restaurant .hp-primary:hover { background:#ffe098; transform:translateY(-2px); box-shadow:0 8px 22px #0003; }
+ .hp-restaurant .hp-outline:hover { background:#103b2d; border-color:#ffe098; transform:translateY(-2px); }
+ .hp-restaurant .hp-link:hover { color:#103b2d; }
+ .hp-restaurant .hp-about-copy .hp-link:hover { color:white; }
+ .hp-restaurant .hp-link:hover svg,.hp-restaurant .hp-button:hover svg:last-child { transform:translateX(4px); }
+ .hp-restaurant .hp-footer nav button:hover,.hp-restaurant .hp-footer-bottom a:hover { color:#ffe098; text-decoration:underline; }
 }
-.home-container {
-  --emerald: #0a3c2f;
-  --emerald-deep: #07241c;
-  --obsidian: #0d1613;
-  --gold: #efbf5b;
-  --gold-light: #ffe098;
-  --cream: #f8f4ec;
-  --surface: #ffffff;
-  --ink: #172722;
-  --muted: #64706b;
-  --border: #e5dec9;
-  width: 100%;
-  min-height: 100vh;
-  overflow-x: hidden;
-  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: var(--cream);
-  color: var(--ink);
-}
-.home-container button,
-.home-container a {
-  -webkit-tap-highlight-color: transparent;
-}
-.home-container button {
-  font: inherit;
-}
-/* =========================================================
-   1. HERO CARD
-   ========================================================= */
-.home-container .hero-card {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(240px, 0.75fr);
-  align-items: center;
-  gap: 32px;
-  max-width: 1320px;
-  margin: 24px auto 0;
-  width: calc(100% - 32px);
-  padding: clamp(28px, 4.5vw, 56px);
-  border-radius: 24px;
-  border: 1px solid rgba(239, 191, 91, 0.3);
-  color: #ffffff;
-  background-color: var(--obsidian);
-  background-image:
-    linear-gradient(
-      115deg,
-      rgba(7, 24, 18, 0.82) 0%,
-      rgba(10, 44, 34, 0.58) 55%,
-      rgba(13, 22, 19, 0.30) 100%
-    ),
-    url('/images/restaurant.jpg'),
-    url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=2000&q=85');
-  background-size: cover;
-  background-position: center;
-  box-shadow: 0 20px 48px rgba(10, 36, 28, 0.16);
-}
-.home-container .hero-content {
-  position: relative;
-  z-index: 2;
-  max-width: 620px;
-}
-.home-container .hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  margin-bottom: 16px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 224, 152, 0.38);
-  background: rgba(255, 224, 152, 0.12);
-  color: var(--gold-light);
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-.home-container .hero-title {
-  margin: 0 0 14px;
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: clamp(34px, 4.4vw, 56px);
-  font-weight: 700;
-  line-height: 1.08;
-  color: #ffffff;
-  text-wrap: balance;
-}
-.home-container .hero-title span {
-  color: var(--gold-light);
-}
-.home-container .hero-subtitle {
-  max-width: 540px;
-  margin: 0;
-  color: rgba(255, 252, 245, 0.9);
-  font-size: clamp(14px, 1.15vw, 16px);
-  line-height: 1.68;
-}
-.home-container .hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  margin-top: 24px;
-}
-.home-container .hero-btn,
-.home-container .hero-secondary-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 10px 20px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 700;
-  white-space: normal;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-}
-.home-container .hero-btn {
-  border: 1px solid var(--gold-light);
-  background: linear-gradient(135deg, #ffe299, #eab548);
-  color: #10241c;
-  box-shadow: 0 8px 20px rgba(234, 181, 72, 0.28);
-}
-.home-container .hero-btn:hover {
-  transform: translateY(-2px);
-  background: linear-gradient(135deg, #ffecb8, #f4c662);
-}
-.home-container .hero-secondary-btn {
-  border: 1px solid rgba(255, 224, 152, 0.45);
-  background: rgba(255, 255, 255, 0.08);
-  color: #fffaf0;
-}
-.home-container .hero-secondary-btn:hover {
-  transform: translateY(-2px);
-  border-color: var(--gold-light);
-  color: var(--gold-light);
-}
-.home-container .hero-note {
-  margin-top: 18px;
-  color: #ffe8b0;
-  font-size: 12px;
-  font-weight: 600;
-}
-/* =========================================================
-   2. SECTION HEADINGS & ABOUT SECTION
-   ========================================================= */
-.home-container .about-section,
-.home-container .features-section {
-  max-width: 1320px;
-  margin: 0 auto;
-  padding: 56px clamp(16px, 4vw, 32px) 16px;
-}
-.home-container .section-heading {
-  max-width: 660px;
-  margin: 0 auto 28px;
-  text-align: center;
-}
-.home-container .section-eyebrow {
-  display: inline-block;
-  color: #b48224;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-.home-container .section-heading h2 {
-  margin: 8px 0 10px;
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: clamp(26px, 3.2vw, 38px);
-  color: var(--ink);
-}
-.home-container .section-heading p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--muted);
-}
-.home-container .about-card {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: clamp(22px, 3.5vw, 36px);
-  border-radius: 18px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  box-shadow: 0 12px 30px rgba(13, 22, 19, 0.06);
-}
-.home-container .about-icon {
-  flex: 0 0 64px;
-  display: grid;
-  place-items: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 16px;
-  background: var(--emerald);
-  color: var(--gold-light);
-  font-size: 28px;
-}
-.home-container .about-content h3 {
-  margin: 0 0 8px;
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 21px;
-  color: var(--ink);
-}
-.home-container .about-content p {
-  margin: 0 0 16px;
-  font-size: 13.5px;
-  line-height: 1.65;
-  color: var(--muted);
-}
-.home-container .about-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--emerald);
-  font-size: 13px;
-  font-weight: 800;
-  cursor: pointer;
-}
-.home-container .about-link:hover {
-  color: #b48224;
-}
-/* =========================================================
-   3. FEATURES GRID
-   ========================================================= */
-.home-container .features-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-}
-.home-container .feature-card {
-  position: relative;
-  padding: 24px;
-  border-radius: 16px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-}
-.home-container .feature-card:hover,
-.home-container .feature-card:focus-visible {
-  transform: translateY(-4px);
-  border-color: var(--gold);
-  box-shadow: 0 14px 28px rgba(10, 60, 47, 0.09);
-  outline: none;
-}
-.home-container .feature-icon {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  margin-bottom: 14px;
-  border-radius: 12px;
-  background: var(--emerald);
-  color: var(--gold-light);
-  font-size: 20px;
-}
-.home-container .feature-number {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 15px;
-  font-weight: 700;
-  color: #b8a378;
-}
-.home-container .feature-card h3 {
-  margin: 0 0 8px;
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 17.5px;
-  color: var(--ink);
-}
-.home-container .feature-card p {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.62;
-  color: var(--muted);
-}
-/* =========================================================
-   4. CALL TO ACTION & FOOTER
-   ========================================================= */
-.home-container .cta-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  max-width: 1320px;
-  margin: 56px auto 48px;
-  width: calc(100% - 32px);
-  padding: clamp(24px, 4vw, 40px);
-  border-radius: 20px;
-  border: 1px solid rgba(239, 191, 91, 0.35);
-  background: linear-gradient(120deg, var(--emerald-deep) 0%, var(--emerald) 100%);
-  color: #ffffff;
-  box-shadow: 0 18px 40px rgba(7, 36, 28, 0.16);
-}
-.home-container .cta-eyebrow {
-  display: inline-block;
-  margin-bottom: 6px;
-  color: var(--gold-light);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-}
-.home-container .cta-content h2 {
-  margin: 0 0 6px;
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: clamp(22px, 2.8vw, 32px);
-  color: #fffdf7;
-}
-.home-container .cta-content p {
-  margin: 0;
-  font-size: 13.5px;
-  color: rgba(255, 250, 240, 0.84);
-}
-.home-container .cta-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 46px;
-  padding: 11px 22px;
-  border-radius: 10px;
-  border: 1px solid var(--gold-light);
-  background: linear-gradient(135deg, #ffe299, #eab548);
-  color: #10241c;
-  font-size: 13px;
-  font-weight: 700;
-  white-space: normal;
-  cursor: pointer;
-  transition: transform 0.2s ease, background 0.2s ease;
-}
-.home-container .cta-btn:hover {
-  transform: translateY(-2px);
-  background: linear-gradient(135deg, #ffecb8, #f4c662);
-}
-.home-container .home-footer {
-  padding: 32px 20px 24px;
-  border-top: 1px solid rgba(239, 191, 91, 0.25);
-  background: var(--obsidian);
-  text-align: center;
-  color: rgba(255, 255, 255, 0.72);
-}
-.home-container .footer-brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 20px;
-  color: var(--gold-light);
-}
-.home-container .home-footer > p {
-  margin: 4px 0;
-  font-size: 12px;
-}
-.home-container .footer-copyright {
-  max-width: 640px;
-  margin: 14px auto 0;
-  padding-top: 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.55);
-}
-
-/* =========================================================
-   5. RESPONSIVE DESIGN (TABLET & MOBILE)
-   ========================================================= */
-@media (max-width: 960px) {
-  .home-container .hero-card {
-    grid-template-columns: 1fr;
-    margin: 16px auto 0;
-    gap: 20px;
-  }
-  .home-container .hero-visual {
-    min-height: 150px;
-  }
-  .home-container .features-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .home-container .cta-card {
-    flex-direction: column;
-    align-items: flex-start;
-    margin: 40px auto 36px;
-  }
-}
-@media (max-width: 680px) {
-  .home-container .hero-card {
-    padding: 24px 18px;
-    border-radius: 18px;
-  }
-  .home-container .hero-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .home-container .hero-btn,
-  .home-container .hero-secondary-btn,
-  .home-container .cta-btn {
-    width: 100%;
-  }
-  .home-container .about-card {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
-  }
-  .home-container .features-grid {
-    grid-template-columns: 1fr;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .home-container,
-  .home-container * {
-    animation: none !important;
-    transition: none !important;
-  }
-}
-/* Responsive dining feature panel and accessible controls */
-.home-container .hero-visual {
-  align-self: center;
-  min-width: 0;
-  padding: clamp(18px, 3vw, 30px);
-  border: 1px solid rgba(255,224,152,.45);
-  border-radius: 18px;
-  background: rgba(10,24,19,.88);
-  box-shadow: 0 12px 32px rgba(0,0,0,.22);
-}
-.home-container .visual-eyebrow { display:flex; align-items:center; gap:8px; color:var(--gold-light); font-size:11px; font-weight:800; letter-spacing:.12em; }
-.home-container .hero-visual h2 { font: 700 clamp(21px,2.5vw,30px)/1.2 'Playfair Display',Georgia,serif; margin:12px 0 20px; color:white; }
-.home-container .hero-visual ul { list-style:none; padding:0; margin:0; display:grid; gap:14px; }
-.home-container .hero-visual li { display:flex; align-items:center; gap:10px; font-size:14px; line-height:1.5; }
-.home-container .hero-visual li svg { color:var(--gold-light); flex-shrink:0; }
-.home-container .hero-title span { display:block; overflow-wrap:anywhere; }
-.home-container .hero-note { display:flex; flex-wrap:wrap; gap:8px 18px; }
-.home-container .hero-note span::before { content:'✓ '; }
-.home-container .hero-secondary-btn { background:rgba(10,24,19,.82); }
-.home-container .feature-card { display:flex; flex-direction:column; align-items:flex-start; }
-.home-container .feature-card p { margin-bottom:16px; }
-.home-container .feature-link { margin-top:auto; min-height:44px; }
-.home-container .admin-label { color:#77551a; font-size:10px; font-weight:800; letter-spacing:.1em; margin-bottom:8px; }
-.home-container .admin-note { margin-top:auto; font-size:12px; color:var(--muted); }
-.home-container main button:focus-visible { outline:3px solid #b48224; outline-offset:4px; }
-.home-container .hero-card button:focus-visible, .home-container .cta-card button:focus-visible { outline-color:#fff; }
-@media (max-width:960px) {
-  .home-container .hero-card { background-image:linear-gradient(180deg,rgba(7,24,18,.78),rgba(7,24,18,.58)),url('/images/restaurant.jpg'),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80'); background-position:center; }
-  .home-container .hero-visual { min-height:0; }
-}
-@media (max-width:680px) {
-  .home-container .hero-card { padding:24px 18px; gap:24px; }
-  .home-container .hero-title { font-size:clamp(30px,8.5vw,44px); }
-  .home-container .hero-badge { font-size:10px; letter-spacing:.04em; }
-  .home-container .hero-btn,.home-container .hero-secondary-btn,.home-container .cta-btn { min-height:48px; }
-  .home-container .hero-visual { padding:18px; }
-  .home-container .about-icon { flex:0 0 auto; }
-  .home-container .about-section,.home-container .features-section { padding-top:36px; }
-}
+.hp-restaurant .hp-card:focus-within,.hp-restaurant .hp-admin-card:focus-within { border-color:#b48224; }
+@media(max-width:1000px) { .hp-restaurant .hp-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:680px) { .hp-restaurant .hp-hero { min-height:440px; padding:48px 20px; background-image:linear-gradient(90deg,#081610d9,#08161080),url('/images/restaurant.jpg'),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1000&q=85'); } .hp-restaurant .hp-actions { flex-direction:column; align-items:stretch; } .hp-restaurant .hp-about,.hp-restaurant .hp-admin-grid { grid-template-columns:1fr; } .hp-restaurant .hp-about-photo { min-height:0; aspect-ratio:4/3; } .hp-restaurant .hp-section,.hp-restaurant .hp-about { padding-left:16px; padding-right:16px; } .hp-restaurant .hp-grid { grid-template-columns:1fr; } .hp-restaurant .hp-footer { padding-bottom:80px; } }
+@media(prefers-reduced-motion:reduce) { .hp-restaurant main *, .hp-restaurant .hp-footer * { transition:none!important; animation:none!important; transform:none!important; } }

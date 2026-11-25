@@ -1,6 +1,17 @@
-//AIChatbot.tsx
 import { useEffect, useRef, useState } from "react";
-import { MessageCircle, X, Utensils, Sparkles, CalendarDays, Clock, CalendarX, Users, Check, ChevronRight, Send } from "lucide-react";
+import {
+  MessageCircle,
+  X,
+  Utensils,
+  Sparkles,
+  CalendarDays,
+  Clock,
+  CalendarX,
+  Users,
+  Check,
+  ChevronRight,
+  Send,
+} from "lucide-react";
 import axios from "axios";
 import "../styles/AIChatbot.css";
 import {
@@ -51,14 +62,11 @@ export default function AIChatbot() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [bookingMode, setBookingMode] = useState(false);
-
   const [pendingReservation, setPendingReservation] =
     useState<ReservationDetails | null>(null);
-
-  // The table number comes from the availability response,
-  // not from ReservationDetails.
-  const [pendingTableNumber, setPendingTableNumber] =
-    useState<string | number | null>(null);
+  const [pendingTableNumber, setPendingTableNumber] = useState<
+    string | number | null
+  >(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const requestRef = useRef(false);
@@ -77,16 +85,20 @@ export default function AIChatbot() {
     if (area) area.scrollTop = area.scrollHeight;
   }, [messages, loading, pendingReservation, isOpen]);
 
+  useEffect(() => {
+    if (isOpen) {
+      const timer = window.setTimeout(() => inputRef.current?.focus(), 0);
+      return () => window.clearTimeout(timer);
+    }
+  }, [isOpen]);
+
   function closeChat() {
     setIsOpen(false);
     toggleRef.current?.focus();
   }
 
   function addBotMessage(text: string) {
-    setMessages((previous) => [
-      ...previous,
-      { sender: "bot", text },
-    ]);
+    setMessages((previous) => [...previous, { sender: "bot", text }]);
   }
 
   function getErrorMessage(
@@ -97,11 +109,16 @@ export default function AIChatbot() {
     if (axios.isAxiosError(error)) {
       const serverMessage = error.response?.data?.message;
       const serverReply = error.response?.data?.reply;
-
-      if (typeof serverMessage === "string") return serverMessage;
-      if (includeReply && typeof serverReply === "string") {
+      if (typeof serverMessage === "string" && serverMessage.trim()) {
+        return serverMessage;
+      }
+      if (includeReply && typeof serverReply === "string" && serverReply.trim()) {
         return serverReply;
       }
+    }
+
+    if (error instanceof Error && error.message.trim()) {
+      return error.message;
     }
 
     return fallback;
@@ -109,17 +126,13 @@ export default function AIChatbot() {
 
   async function sendMessage(text = message) {
     const question = text.trim();
-
     if (!question || requestRef.current) return;
+
     requestRef.current = true;
     setPendingReservation(null);
     setPendingTableNumber(null);
 
-    setMessages((previous) => [
-      ...previous,
-      { sender: "user", text: question },
-    ]);
-
+    setMessages((previous) => [...previous, { sender: "user", text: question }]);
     setMessage("");
     setLoading(true);
 
@@ -137,7 +150,6 @@ export default function AIChatbot() {
         if (!data.availability?.available) {
           setPendingReservation(null);
           setPendingTableNumber(null);
-
           addBotMessage(
             data.message ||
               data.availability?.reason ||
@@ -153,9 +165,7 @@ export default function AIChatbot() {
         };
 
         setPendingReservation(details);
-        setPendingTableNumber(
-          data.availability.table?.tableNumber ?? null
-        );
+        setPendingTableNumber(data.availability.table?.tableNumber ?? null);
 
         addBotMessage(
           data.message ||
@@ -163,14 +173,10 @@ export default function AIChatbot() {
         );
       } else {
         const data = await sendAIMessage(question);
-
-        addBotMessage(
-          data.reply || "Sorry, I couldn't answer that."
-        );
+        addBotMessage(data.reply || "Sorry, I couldn't answer that.");
       }
     } catch (error: unknown) {
       console.error("Chatbot request failed:", error);
-
       addBotMessage(
         getErrorMessage(
           error,
@@ -186,15 +192,18 @@ export default function AIChatbot() {
 
   async function handleConfirmBooking() {
     if (!pendingReservation || requestRef.current) return;
-    requestRef.current = true;
 
+    requestRef.current = true;
     setLoading(true);
 
     try {
       const result = await confirmAIReservation(pendingReservation);
-
       addBotMessage(
-        `${result.message}\n\nReservation confirmed!\nDate: ${result.reservation.date}\nTime: ${result.reservation.timeSlot}\nGuests: ${result.reservation.guests}\nTable: ${result.reservation.table?.tableNumber ?? "Assigned"}`
+        `${result.message}\n\nReservation confirmed!\nDate: ${
+          result.reservation.date
+        }\nTime: ${result.reservation.timeSlot}\nGuests: ${
+          result.reservation.guests
+        }\nTable: ${result.reservation.table?.tableNumber ?? "Assigned"}`
       );
 
       setPendingReservation(null);
@@ -202,14 +211,12 @@ export default function AIChatbot() {
       setBookingMode(false);
     } catch (error: unknown) {
       console.error("Reservation confirmation failed:", error);
-
       addBotMessage(
         getErrorMessage(
           error,
           "We couldn't confirm your reservation. Please check your details and try again."
         )
       );
-
       setPendingReservation(null);
       setPendingTableNumber(null);
     } finally {
@@ -227,8 +234,13 @@ export default function AIChatbot() {
 
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    const date = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
-    addBotMessage(`Please enter your preferred date, time slot, and number of guests.\n\nExample: Book a table on ${date} at 18:00-19:00 for 2 guests.`);
+    const date = `${tomorrow.getFullYear()}-${String(
+      tomorrow.getMonth() + 1
+    ).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
+
+    addBotMessage(
+      `Please enter your preferred date, time slot, and number of guests.\n\nExample: Book a table on ${date} at 18:00-19:00 for 2 guests.`
+    );
 
     window.setTimeout(() => inputRef.current?.focus(), 0);
   }
@@ -247,12 +259,10 @@ export default function AIChatbot() {
 
   function handleQuickAction(question: string) {
     if (loading || bookingMode) return;
-
     if (!question) {
       startBooking();
       return;
     }
-
     void sendMessage(question);
   }
 
@@ -263,7 +273,9 @@ export default function AIChatbot() {
           className={`ai-chat-window${bookingMode ? " booking-mode" : ""}`}
           id="ai-chat-panel"
           aria-label="ReserveDine restaurant assistant"
-          onKeyDown={(event) => { if (event.key === "Escape") closeChat(); }}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") closeChat();
+          }}
         >
           <header className="ai-chat-header">
             <div className="ai-brand-avatar" aria-hidden="true">
@@ -310,9 +322,7 @@ export default function AIChatbot() {
                   </div>
                 )}
 
-                <div className={`ai-message ${item.sender}`}>
-                  {item.text}
-                </div>
+                <div className={`ai-message ${item.sender}`}>{item.text}</div>
               </div>
             ))}
 
@@ -461,7 +471,14 @@ export default function AIChatbot() {
           )}
 
           {bookingMode && !pendingReservation && (
-            <button type="button" className="ai-exit-booking" disabled={loading} onClick={cancelBookingMode}>Cancel booking request</button>
+            <button
+              type="button"
+              className="ai-exit-booking"
+              disabled={loading}
+              onClick={cancelBookingMode}
+            >
+              Cancel booking request
+            </button>
           )}
 
           <form
@@ -505,11 +522,13 @@ export default function AIChatbot() {
         aria-controls={isOpen ? "ai-chat-panel" : undefined}
         onClick={() => setIsOpen((previous) => !previous)}
         aria-expanded={isOpen}
-        aria-label={
-          isOpen ? "Close assistant" : "Open restaurant assistant"
-        }
+        aria-label={isOpen ? "Close assistant" : "Open restaurant assistant"}
       >
-        {isOpen ? <X size={25} aria-hidden="true" /> : <MessageCircle size={25} aria-hidden="true" />}
+        {isOpen ? (
+          <X size={25} aria-hidden="true" />
+        ) : (
+          <MessageCircle size={25} aria-hidden="true" />
+        )}
       </button>
     </div>
   );

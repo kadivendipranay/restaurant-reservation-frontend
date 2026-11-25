@@ -1,13 +1,14 @@
-
 import API from "../api/api";
+
+export interface FoodSuggestionItem {
+  name: string;
+  category: string;
+  price: number;
+}
 
 export interface AIChatResponse {
   reply: string;
-  foodItems?: {
-    name: string;
-    category: string;
-    price: number;
-  }[];
+  foodItems?: FoodSuggestionItem[];
 }
 
 export interface ReservationDetails {
@@ -50,41 +51,75 @@ export interface ConfirmReservationResponse {
   };
 }
 
-// Existing general chatbot
+const normalizeAIError = (error: unknown, fallback: string): Error => {
+  const err = error as {
+    response?: { data?: { message?: string; error?: string } };
+    message?: string;
+  };
+  const message =
+    err?.response?.data?.message ||
+    err?.response?.data?.error ||
+    err?.message ||
+    fallback;
+  return new Error(message);
+};
+
+// General chatbot & food recommendations
 export const sendAIMessage = async (
   message: string
 ): Promise<AIChatResponse> => {
-  const response = await API.post<AIChatResponse>(
-    "/ai/chat",
-    { message }
-  );
+  const cleanMessage = message.trim();
+  if (!cleanMessage) {
+    throw new Error("Please enter a message before sending.");
+  }
 
-  return response.data;
+  try {
+    const response = await API.post<AIChatResponse>("/ai/chat", {
+      message: cleanMessage,
+    });
+    return response.data;
+  } catch (error) {
+    throw normalizeAIError(error, "Unable to reach the AI assistant right now.");
+  }
 };
 
-// Prepare reservation and check availability
+// Prepare reservation and check slot/table availability
 export const prepareAIReservation = async (
   message: string
 ): Promise<PrepareReservationResponse> => {
-  const response = await API.post<PrepareReservationResponse>(
-    "/ai/reservation/prepare",
-    { message }
-  );
+  const cleanMessage = message.trim();
+  if (!cleanMessage) {
+    throw new Error("Please describe your preferred date, time slot, and guests.");
+  }
 
-  return response.data;
+  try {
+    const response = await API.post<PrepareReservationResponse>(
+      "/ai/reservation/prepare",
+      { message: cleanMessage }
+    );
+    return response.data;
+  } catch (error) {
+    throw normalizeAIError(
+      error,
+      "Unable to prepare your reservation request right now."
+    );
+  }
 };
 
 // Create reservation only after explicit confirmation
 export const confirmAIReservation = async (
   details: ReservationDetails
 ): Promise<ConfirmReservationResponse> => {
-  const response = await API.post<ConfirmReservationResponse>(
-    "/ai/reservation/confirm",
-    {
-      ...details,
-      confirmed: true,
-    }
-  );
-
-  return response.data;
+  try {
+    const response = await API.post<ConfirmReservationResponse>(
+      "/ai/reservation/confirm",
+      {
+        ...details,
+        confirmed: true,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw normalizeAIError(error, "Unable to confirm your reservation.");
+  }
 };

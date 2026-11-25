@@ -1,5 +1,5 @@
-
-import { Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -11,17 +11,25 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AIChatbot from "./components/AIChatbot";
 import FoodRecommendations from "./pages/FoodRecommendations";
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [pathname]);
+
+  return null;
+}
+
 function App() {
   return (
     <>
-      <Routes>
-        {/* Home Page */}
-        <Route path="/" element={<Home />} />
+      <ScrollToTop />
 
-        {/* Login Page */}
+      <Routes>
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
 
-        {/* Admin Dashboard */}
         <Route
           path="/admin"
           element={
@@ -31,7 +39,6 @@ function App() {
           }
         />
 
-        {/* User Dashboard */}
         <Route
           path="/user"
           element={
@@ -41,23 +48,16 @@ function App() {
           }
         />
 
-        {/* Food Recommendations */}
         <Route
           path="/food-recommendations"
           element={<FoodRecommendations />}
         />
 
-        {/* Redirect unknown routes */}
-        <Route
-          path="*"
-          element={<Navigate to="/" replace />}
-        />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
-      {/* Floating AI Chatbot */}
       <AIChatbot />
 
-      {/* Toast Notifications */}
       <ToastContainer
         position="top-right"
         autoClose={3000}
