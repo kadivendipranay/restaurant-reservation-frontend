@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { CalendarDays, Utensils, RefreshCw, Sparkles, Armchair, ArrowRight, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
@@ -45,25 +46,25 @@ const POPULAR_DISHES = [
 
 const HIGHLIGHTS = [
   {
-    icon: "📅",
+    icon: CalendarDays,
     title: "Real-Time Table Booking",
     description:
       "Select your party size, date, and evening time slot with live availability.",
   },
   {
-    icon: "🔄",
+    icon: RefreshCw,
     title: "Instant Rescheduling",
     description:
       "Modify your reservation time, guest count, or cancel directly from your dashboard.",
   },
   {
-    icon: "🤖",
+    icon: Sparkles,
     title: "AI Food Recommendations",
     description:
       "Filter dishes by dietary preference, spice level, and budget in ₹.",
   },
   {
-    icon: "🪑",
+    icon: Armchair,
     title: "Preferred Seating Zones",
     description:
       "Choose between Main Hall, Window, Patio, or VIP tables when booking.",
@@ -100,10 +101,10 @@ export default function Home() {
     setLikedDishes((prev) => ({ ...prev, [dishName]: !prev[dishName] }));
   };
 
-  const handleCardKeyDown = (event) => {
+  const handleCardKeyDown = (event, action) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      goDashboard();
+      action();
     }
   };
 
@@ -131,13 +132,13 @@ export default function Home() {
 
           <div className="hero-actions">
             <button type="button" className="hero-btn" onClick={goDashboard}>
-              📅{" "}
+              <CalendarDays size={18} aria-hidden="true" />
               {isLoggedIn
                 ? isAdmin
                   ? "Admin Dashboard"
                   : "My Dashboard"
-                : "Book a Table"}{" "}
-              →
+                : "Book a Table"}
+              <ArrowRight size={17} aria-hidden="true" />
             </button>
 
             <button
@@ -145,7 +146,7 @@ export default function Home() {
               className="hero-login-btn"
               onClick={goToFoodRecommendations}
             >
-              🍴 Explore Food
+              <Utensils size={18} aria-hidden="true" /> Explore Food
             </button>
 
             {!isLoggedIn && (
@@ -166,22 +167,15 @@ export default function Home() {
           </div>
         </div>
 
-        <aside className="review-card" aria-label="Guest highlight">
-          <p className="review-quote">
-            “Quick table booking and personalized dish suggestions in one place.”
-          </p>
-          <div className="review-stars" aria-label="5 out of 5 stars">
-            ★★★★★
-          </div>
-          <div className="review-bottom">
-            <span className="review-avatar">A</span>
-            <span className="review-avatar">R</span>
-            <span className="review-avatar">K</span>
-            <span className="review-guests">
-              <strong>Verified Reservations</strong>
-              <small>Instant Booking &amp; Zone Selection</small>
-            </span>
-          </div>
+        <aside className="review-card" aria-labelledby="experience-title">
+          <span className="experience-eyebrow"><Sparkles size={17} aria-hidden="true" /> DINING MADE SIMPLE</span>
+          <h2 id="experience-title">A Smarter Dining Experience</h2>
+          <ul className="experience-list">
+            <li><CalendarDays aria-hidden="true" /> Real-time table availability</li>
+            <li><Armchair aria-hidden="true" /> Preferred seating zones</li>
+            <li><Sparkles aria-hidden="true" /> AI food recommendations</li>
+            <li><RefreshCw aria-hidden="true" /> Easy reservation management</li>
+          </ul>
         </aside>
       </section>
 
@@ -189,9 +183,9 @@ export default function Home() {
       <section className="menu-section" id="menu">
         <div className="menu-heading">
           <span className="menu-eyebrow">— POPULAR DISHES —</span>
-          <h2>Customer Favorites</h2>
+          <h2>Featured Dishes</h2>
           <p>
-            Explore popular dishes from our menu or open the AI Food
+            Explore sample dishes from our menu or open the AI Food
             Recommender to filter by budget and dietary preference.
           </p>
         </div>
@@ -208,16 +202,18 @@ export default function Home() {
                     alt={dish.name}
                     loading="lazy"
                     onError={(event) => {
-                      event.currentTarget.style.visibility = "hidden";
+                      event.currentTarget.hidden = true;
+                      event.currentTarget.parentElement?.classList.add("image-unavailable");
                     }}
                   />
                   <button
                     type="button"
                     className={`dish-like-btn ${isLiked ? "liked" : ""}`}
-                    aria-label={`Save ${dish.name}`}
+                    aria-label={`${isLiked ? "Unsave" : "Save"} ${dish.name}`}
+                    aria-pressed={isLiked}
                     onClick={() => toggleLike(dish.name)}
                   >
-                    {isLiked ? "♥" : "♡"}
+                    <Heart size={18} fill={isLiked ? "currentColor" : "none"} aria-hidden="true" />
                   </button>
                 </div>
 
@@ -226,9 +222,9 @@ export default function Home() {
                   <span className="dish-category-label">{dish.category}</span>
                   <div className="dish-meta">
                     <strong className="dish-price">{dish.price}</strong>
-                    <span className="dish-rating">
+                    <span className="dish-rating" title="Illustrative rating">
                       <span aria-hidden="true">★</span> {dish.rating}
-                      <small> ({dish.reviews})</small>
+                      <small> (sample)</small>
                     </span>
                   </div>
                 </div>
@@ -270,11 +266,11 @@ export default function Home() {
               key={item.title}
               role="button"
               tabIndex={0}
-              onClick={goDashboard}
-              onKeyDown={handleCardKeyDown}
+              onClick={item.icon === Sparkles ? goToFoodRecommendations : goDashboard}
+              onKeyDown={(event) => handleCardKeyDown(event, item.icon === Sparkles ? goToFoodRecommendations : goDashboard)}
             >
               <div className="feature-icon" aria-hidden="true">
-                {item.icon}
+                <item.icon size={23} aria-hidden="true" />
               </div>
               <span className="feature-number">
                 {String(index + 1).padStart(2, "0")}
@@ -304,7 +300,7 @@ export default function Home() {
               className="hero-btn banner-button"
               onClick={goDashboard}
             >
-              📅 {isLoggedIn ? "Go to Dashboard" : "Book a Table"} →
+              <CalendarDays size={18} aria-hidden="true" /> {isLoggedIn ? "Go to Dashboard" : "Book a Table"} →
             </button>
           </div>
         </div>
@@ -313,7 +309,7 @@ export default function Home() {
       {/* 5. FOOTER */}
       <footer className="footer">
         <div className="footer-brand">
-          <span aria-hidden="true">🍽️</span>
+          <Utensils size={22} aria-hidden="true" />
           <strong>ReserveDine</strong>
         </div>
         <p>Table Reservation &amp; AI Food Recommendation System</p>
@@ -325,3 +321,5 @@ export default function Home() {
     </main>
   );
 }
+
+
