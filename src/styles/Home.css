@@ -134,3 +134,38 @@
   outline: 2px solid #efbf5b;
   outline-offset: 4px;
 }
+/* Mobile touch effects */
+@media (hover: none) and (pointer: coarse) {
+
+  .rd-dish,
+  .rd-benefit-card,
+  .rd-button {
+    transition: transform 0.25s ease,
+                box-shadow 0.25s ease,
+                border-color 0.25s ease;
+  }
+
+  .rd-dish:active,
+  .rd-benefit-card:active {
+    transform: translateY(-4px);
+    border-color: #efbf5b;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .rd-dish:active img,
+  .rd-benefit-card:active img {
+    transform: scale(1.06);
+  }
+
+  .rd-button:active {
+    transform: scale(0.97);
+  }
+
+  .rd-favorite:active {
+    transform: scale(1.12);
+  }
+
+  .rd-text-link:active {
+    color: #b48224;
+  }
+}

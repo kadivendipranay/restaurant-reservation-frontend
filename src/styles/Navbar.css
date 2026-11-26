@@ -164,3 +164,14 @@ header.rdn-navbar .rdn-brand-name {
     transform: none !important;
   }
 }
+
+
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
