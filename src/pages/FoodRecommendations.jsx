@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext";
 import Navbar from "../components/Navbar";
 import {
   menuData,
@@ -12,7 +14,7 @@ const DEFAULTS = {
   type: "All",
   category: "All",
   spice: "Any",
-  budget: "500",
+  budget: "all",
   search: "",
   sort: "recommended",
 };
@@ -63,6 +65,49 @@ export default function FoodRecommendations() {
   const [search, setSearch] = useState(DEFAULTS.search);
   const [sort, setSort] = useState(DEFAULTS.sort);
 
+  const { cart, cartItems, cartCount: count, subtotal: total, addToCart, decreaseQuantity, clearCart } = useCart();
+  const [cartOpen, setCartOpen] = useState(false);
+  const [orderType, setOrderType] = useState("Takeaway");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [scrollRequest, setScrollRequest] = useState(0);
+
+  useEffect(() => {
+    if (new URLSearchParams(location.search).get("cart") === "1") {
+      setCartOpen(true);
+      setScrollRequest(value => value + 1);
+    }
+  }, [location.search, location.key]);
+
+  useEffect(() => {
+    if (!cartOpen || !scrollRequest) return;
+    const frame = requestAnimationFrame(() => {
+      document.getElementById("fr-cart")?.scrollIntoView({
+        block: "start",
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [cartOpen, scrollRequest]);
+  function changeQuantity(id, delta) {
+    if (delta > 0) addToCart(id);
+    else decreaseQuantity(id);
+  }
+  function quantityControl(food) {
+    const quantity = cart[food.id] || 0;
+    return quantity ? (
+      <div className="fr-quantity">
+        <button type="button" aria-label={`Remove one ${food.name}`} onClick={() => changeQuantity(food.id, -1)}>−</button>
+        <span aria-live="polite">{quantity}</span>
+        <button type="button" disabled={quantity >= 99} aria-label={`Add one ${food.name}`} onClick={() => changeQuantity(food.id, 1)}>+</button>
+      </div>
+    ) : <button type="button" className="fr-add" onClick={() => changeQuantity(food.id, 1)} aria-label={`Add ${food.name} to cart`}>ADD +</button>;
+  }
+  function viewCart() {
+    setCartOpen(true);
+    setScrollRequest(value => value + 1);
+  }
+
   const foods = useMemo(() => {
     const term = search.trim().toLowerCase();
     const maximumPrice = Number(budget);
@@ -74,9 +119,8 @@ export default function FoodRecommendations() {
       const matchesSpice = spice === "Any" || food.spice === spice;
       const itemPrice = Number(food.price);
       const matchesBudget =
-        Number.isFinite(maximumPrice) &&
-        Number.isFinite(itemPrice) &&
-        itemPrice <= maximumPrice;
+        Number.isFinite(itemPrice) && itemPrice >= 0 &&
+        (budget === "all" || itemPrice <= maximumPrice);
 
       const searchableText = [
         food.name,
@@ -128,7 +172,7 @@ export default function FoodRecommendations() {
   };
 
   return (
-    <div className="fr-shell">
+    <div className={`fr-shell${count > 0 && !cartOpen ? " fr-has-cart" : ""}`}>
       <Navbar />
 
       <main className="fr-page">
@@ -138,9 +182,9 @@ export default function FoodRecommendations() {
             <span className="fr-eyebrow">✦ THE ART OF GOOD FOOD</span>
 
             <h1>
-              Find your next
+              A taste of
               <br />
-              <span>favourite dish.</span>
+              <span>something special.</span>
             </h1>
 
             <p>
@@ -149,13 +193,13 @@ export default function FoodRecommendations() {
             </p>
 
             <div className="fr-hero-points">
-              <span>✓ Your taste</span>
-              <span>✓ Your budget</span>
-              <span>✓ Your choice</span>
+              <span>Indian favourites</span>
+              <span>Vegetarian choices</span>
+              <span>Dine-in & takeaway</span>
             </div>
 
-            <a className="fr-hero-cta" href="#fr-menu">
-              Explore our menu
+            <a className="fr-hero-cta" href="#fr-menu" onClick={event => { event.preventDefault(); document.getElementById("fr-menu")?.scrollIntoView({ block: "start" }); }}>
+              Explore & order
               <span aria-hidden="true">↗</span>
             </a>
           </div>
@@ -177,7 +221,7 @@ export default function FoodRecommendations() {
 
             <div className="fr-hero-stamp" aria-hidden="true">
               ✦
-              <span>MADE FRESH</span>
+              <span>OUR MENU</span>
             </div>
           </div>
         </section>
@@ -186,7 +230,7 @@ export default function FoodRecommendations() {
         <section className="fr-discovery">
           <div className="fr-section-heading">
             <div>
-              <span className="fr-kicker">YOUR PERSONAL MENU</span>
+              <span className="fr-kicker">THE RESERVEDINE MENU</span>
               <h2>What are you craving?</h2>
               <p>Make your selection and discover your perfect dish.</p>
             </div>
@@ -224,6 +268,9 @@ export default function FoodRecommendations() {
             )}
           </div>
 
+          <nav className="fr-category-tabs" aria-label="Menu categories">
+            {MENU_CATEGORIES.map(item => <button type="button" key={item} aria-pressed={category === item} onClick={() => setCategory(item)}>{item === "All" ? "Full menu" : item}</button>)}
+          </nav>
           {/* FILTERS */}
           <div className="fr-filters">
             <label>
@@ -271,6 +318,7 @@ export default function FoodRecommendations() {
                 value={budget}
                 onChange={(event) => setBudget(event.target.value)}
               >
+                <option value="all">Any price</option>
                 <option value="50">Up to ₹50</option>
                 <option value="100">Up to ₹100</option>
                 <option value="150">Up to ₹150</option>
@@ -364,10 +412,8 @@ export default function FoodRecommendations() {
                     </div>
 
                     <div className="fr-card-bottom">
-                      <span>Discover your taste</span>
-                      <span className="fr-arrow" aria-hidden="true">
-                        ↗
-                      </span>
+                      <span>{cart[food.id] ? "In your cart" : "Add to your bag"}</span>
+                      {quantityControl(food)}
                     </div>
                   </div>
                 </article>
@@ -388,13 +434,66 @@ export default function FoodRecommendations() {
           )}
         </section>
 
+        {cartOpen && (
+          <section className="fr-cart" id="fr-cart" aria-labelledby="fr-cart-title">
+            <div className="fr-menu-heading">
+              <div><span className="fr-kicker">YOUR SELECTION</span><h2 id="fr-cart-title">Your order</h2></div>
+              <button type="button" className="fr-reset" onClick={() => setCartOpen(false)}>Close</button>
+            </div>
+            {cartItems.length ? <>
+              {cartItems.map(food => (
+                <div className="fr-cart-row" key={food.id}>
+                  <div className="fr-cart-dish"><FoodImage src={food.image} alt={food.name} /><div><strong>{food.name}</strong><p>{formatMenuPrice(food.price)} each</p></div></div>
+                  {quantityControl(food)}
+                  <strong>{formatMenuPrice(Number(food.price) * cart[food.id])}</strong>
+                </div>
+              ))}
+              <fieldset className="fr-order-type">
+                <legend>How would you like your meal?</legend>
+                <div className="fr-order-options">
+                  {[
+                    { name: "Takeaway", icon: "🥡", description: "Pick up your favourites" },
+                    { name: "Dine-in", icon: "🍽️", description: "Enjoy at our restaurant" },
+                    { name: "Delivery", icon: "🛵", description: "Delivery preview" },
+                  ].map((option) => (
+                    <button
+                      type="button"
+                      key={option.name}
+                      className={`fr-order-option${orderType === option.name ? " selected" : ""}`}
+                      aria-pressed={orderType === option.name}
+                      onClick={() => setOrderType(option.name)}
+                    >
+                      <span className="fr-order-icon" aria-hidden="true">{option.icon}</span>
+                      <strong>{option.name}</strong>
+                      <small>{option.description}</small>
+                      {orderType === option.name && <span className="fr-order-check" aria-hidden="true">✓</span>}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
+              <div className="fr-cart-total"><strong>Item subtotal</strong><strong>{formatMenuPrice(total)}</strong></div>
+              <button
+                type="button"
+                className="fr-checkout-btn"
+                disabled={count === 0}
+                onClick={() => navigate("/checkout", { state: { orderType } })}
+              >
+                Proceed to Checkout · {formatMenuPrice(total)} →
+              </button>
+              <p className="fr-cart-note">Checkout preview only. Orders, taxes, delivery charges and payments are not connected yet.</p>
+              <button type="button" className="fr-reset" onClick={clearCart}>Clear cart</button>
+            </> : <div className="fr-empty"><h3>Your bag is empty</h3><p>Discover something delicious from our menu.</p><button type="button" onClick={() => { setCartOpen(false); document.getElementById("fr-menu")?.scrollIntoView({block:"start"}); }}>Explore menu</button></div>}
+          </section>
+        )}
+       {count > 0 && !cartOpen &&  <aside className="fr-cart-bar" aria-label="Cart summary"><div><span>{count} {count === 1 ? "item" : "items"} in your bag</span><strong>{formatMenuPrice(total)}</strong></div><button type="button" onClick={viewCart}>View bag →</button></aside>}
         {/* FOOTER */}
         <footer className="fr-footer">
           <span aria-hidden="true">✦</span>
           <p>Made with a love for good food.</p>
-          <span>Created by Pranay Kumar · ReserveDine</span>
+          <span>Designed &amp; Developed by Kadivendi Pranay Kumar · ReserveDine</span>
         </footer>
       </main>
     </div>
   );
 }
+

@@ -7,17 +7,14 @@
 .login-page *::after {
   box-sizing: border-box;
 }
-
 .login-page button,
 .login-page input {
   font: inherit;
 }
-
 .login-page button,
 .login-page a {
   -webkit-tap-highlight-color: transparent;
 }
-
 /* ==================================================
    2. LOGIN PAGE BACKGROUND
    ================================================== */
@@ -29,25 +26,24 @@
   min-height: 100dvh;
   overflow-x: clip;
   font-family: "DM Sans", "Segoe UI", Arial, sans-serif;
-  color: #172033;
-  background-color: #271b29;
+  color: #172820;
+  background-color: #101c16;
   background-image:
     linear-gradient(
       135deg,
-      rgba(20, 26, 42, 0.78),
-      rgba(70, 22, 48, 0.65),
-      rgba(15, 23, 42, 0.78)
+      rgba(10, 28, 20, 0.82),
+      rgba(25, 53, 38, 0.65),
+      rgba(10, 28, 20, 0.82)
     ),
     url("https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=2000&q=85");
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
 }
-
 /* ==================================================
    3. MAIN LOGIN LAYOUT
    ================================================== */
-.login-main {
+.login-page .login-main {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -57,11 +53,10 @@
   min-height: calc(100dvh - 72px);
   padding: 36px 20px 48px;
 }
-
 /* ==================================================
    4. LOGIN CARD
    ================================================== */
-.login-card {
+.login-page .login-card {
   position: relative;
   width: 100%;
   max-width: 470px;
@@ -69,30 +64,28 @@
   margin: 0 auto;
   padding: 38px 38px 30px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  border: 1px solid #dfc69b;
   border-radius: 28px;
-  background: rgba(255, 255, 255, 0.97);
+  background: #fffaf0;
   box-shadow:
     0 25px 70px rgba(0, 0, 0, 0.24),
-    0 4px 15px rgba(255, 106, 0, 0.08);
+    0 4px 15px rgba(180, 139, 69, 0.12);
   backdrop-filter: blur(15px);
   animation: loginFadeIn 0.65s ease-out both;
 }
-
-.login-card::before {
+.login-page .login-card::before {
   position: absolute;
   top: 0;
   right: 0;
   left: 0;
   height: 6px;
-  background: linear-gradient(90deg, #ff6a00, #ff3158, #ed087c);
+  background: linear-gradient(90deg, #103b2d, #246348, #b48b45);
   content: "";
 }
-
 /* ==================================================
    5. BRANDING
    ================================================== */
-.login-brand-icon {
+.login-page .login-brand-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -100,30 +93,27 @@
   height: 76px;
   margin: 0 auto 18px;
   border-radius: 25px;
-  background: linear-gradient(135deg, #fff0e4, #ffe3ed);
+  background: linear-gradient(135deg, #f8edd4, #ead4a5);
   font-size: 38px;
-  box-shadow: 0 8px 22px rgba(255, 68, 94, 0.12);
+  box-shadow: 0 8px 22px rgba(180, 139, 69, 0.18);
 }
-
-.login-eyebrow {
+.login-page .login-eyebrow {
   margin: 0 0 8px;
-  color: #e83e61;
+  color: #176b55;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 2px;
   text-align: center;
 }
-
-.login-title {
+.login-page .login-title {
   margin: 0 0 10px;
-  color: #172b52;
+  color: #103b2d;
   font-size: clamp(27px, 4vw, 34px);
   font-weight: 800;
   line-height: 1.3;
   text-align: center;
 }
-
-.login-subtitle {
+.login-page .login-subtitle {
   max-width: 350px;
   margin: 0 auto 27px;
   color: #6b7280;
@@ -131,29 +121,27 @@
   line-height: 1.8;
   text-align: center;
 }
-
 /* ==================================================
    6. LOGIN AND REGISTER TABS
    ================================================== */
-.login-tabs {
+.login-page .login-tabs {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 6px;
   margin-bottom: 25px;
   padding: 6px;
-  border: 1px solid #f1e9ed;
+  border: 1px solid #e5d6b8;
   border-radius: 15px;
-  background: #f7f5f7;
+  background: #f3ecde;
 }
-
-.tab-btn {
+.login-page .tab-btn {
   min-width: 0;
   min-height: 45px;
   padding: 10px 14px;
   border: none;
   border-radius: 11px;
   background: transparent;
-  color: #737b8c;
+  color: #625f53;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
@@ -162,68 +150,59 @@
     color 0.25s ease,
     box-shadow 0.25s ease;
 }
-
-.tab-btn:hover:not(:disabled) {
-  color: #e83e61;
+.login-page .tab-btn:hover:not(:disabled) {
+  color: #176b55;
 }
-
-.tab-btn.active {
-  background: linear-gradient(135deg, #ff6a00, #ff005c);
-  color: #ffffff;
-  box-shadow: 0 5px 14px rgba(255, 48, 87, 0.22);
+.login-page .tab-btn.active {
+  background: linear-gradient(135deg, #103b2d, #246348);
+  color: #fffdf7;
+  box-shadow: 0 5px 14px rgba(16, 59, 45, 0.22);
 }
-
-.tab-btn:disabled {
+.login-page .tab-btn:disabled {
   cursor: not-allowed;
   opacity: 0.65;
 }
-
 /* ==================================================
    7. FORM GROUPS & INPUTS
    ================================================== */
-.form-group {
+.login-page .form-group {
   width: 100%;
   min-width: 0;
   margin-bottom: 19px;
 }
-
-.form-group label {
+.login-page .form-group label {
   display: block;
   margin-bottom: 8px;
-  color: #263651;
+  color: #234536;
   font-size: 13px;
   font-weight: 700;
 }
-
-.input-wrapper {
+.login-page .input-wrapper {
   display: flex;
   align-items: center;
   width: 100%;
   min-width: 0;
   min-height: 53px;
   padding: 0 13px;
-  border: 1.5px solid #e3e6ed;
+  border: 1.5px solid #d8cbb1;
   border-radius: 13px;
-  background: #ffffff;
+  background: #fffdf7;
   transition:
     border-color 0.25s ease,
     box-shadow 0.25s ease,
     background 0.25s ease;
 }
-
-.input-wrapper:focus-within {
-  border-color: #ff4b70;
-  background: #fffdfd;
-  box-shadow: 0 0 0 4px rgba(255, 75, 112, 0.1);
+.login-page .input-wrapper:focus-within {
+  border-color: #a47b32;
+  background: #fffdf7;
+  box-shadow: 0 0 0 4px rgba(180, 139, 69, 0.18);
 }
-
-.input-icon {
+.login-page .input-icon {
   flex-shrink: 0;
   margin-right: 11px;
   font-size: 17px;
 }
-
-.login-input {
+.login-page .login-input {
   display: block;
   width: 100%;
   min-width: 0;
@@ -232,55 +211,47 @@
   border: none;
   outline: none;
   background: transparent;
-  color: #172033;
+  color: #172820;
   font-size: 14px;
 }
-
-.login-input::placeholder {
-  color: #a0a7b5;
+.login-page .login-input::placeholder {
+  color: #777467;
 }
-
-.login-input:disabled {
+.login-page .login-input:disabled {
   cursor: not-allowed;
   opacity: 0.7;
 }
-
-.password-input {
+.login-page .password-input {
   padding-right: 7px;
 }
-
-.password-toggle {
+.login-page .password-toggle {
   flex-shrink: 0;
   padding: 7px 3px 7px 8px;
   border: none;
   background: transparent;
-  color: #e83e61;
+  color: #176b55;
   font-size: 12px;
   font-weight: 800;
   cursor: pointer;
   transition: color 0.2s ease;
 }
-
-.password-toggle:hover:not(:disabled) {
-  color: #c2184b;
+.login-page .password-toggle:hover:not(:disabled) {
+  color: #103b2d;
   text-decoration: underline;
 }
-
-.password-toggle:disabled {
+.login-page .password-toggle:disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }
-
-.input-hint {
+.login-page .input-hint {
   margin: 7px 0 0;
-  color: #7b8495;
+  color: #68665b;
   font-size: 12px;
 }
-
 /* ==================================================
    8. MESSAGES, FORGOT PASSWORD & SUBMIT BUTTON
    ================================================== */
-.form-message {
+.login-page .form-message {
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -292,26 +263,22 @@
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
-
-.error-message {
+.login-page .error-message {
   border-color: #fecaca;
   background: #fff1f2;
   color: #be123c;
 }
-
-.success-message {
+.login-page .success-message {
   border-color: #a7f3d0;
   background: #ecfdf5;
   color: #047857;
 }
-
-.forgot-password-row {
+.login-page .forgot-password-row {
   display: flex;
   justify-content: flex-end;
   margin: -5px 0 14px;
 }
-
-.forgot-password-link {
+.login-page .forgot-password-link {
   padding: 4px 0;
   border: none;
   background: transparent;
@@ -321,27 +288,23 @@
   cursor: pointer;
   transition: color 0.2s ease;
 }
-
-.forgot-password-link:hover:not(:disabled) {
+.login-page .forgot-password-link:hover:not(:disabled) {
   color: #a47b32;
   text-decoration: underline;
 }
-
-.forgot-password-link:disabled {
+.login-page .forgot-password-link:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
-
-.login-extra {
+.login-page .login-extra {
   display: flex;
   justify-content: flex-end;
   margin-top: -4px;
   margin-bottom: 18px;
-  color: #788295;
+  color: #68665b;
   font-size: 12px;
 }
-
-.login-btn {
+.login-page .login-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -352,92 +315,81 @@
   padding: 14px 20px;
   border: none;
   border-radius: 14px;
-  background: linear-gradient(135deg, #ff6a00, #ff3158, #ed087c);
-  color: #ffffff;
+  background: linear-gradient(135deg, #103b2d, #246348, #b48b45);
+  color: #fffdf7;
   font-size: 15px;
   font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 9px 22px rgba(238, 40, 91, 0.22);
+  box-shadow: 0 9px 22px rgba(16, 59, 45, 0.22);
   transition:
     transform 0.25s ease,
     box-shadow 0.25s ease,
     opacity 0.25s ease;
 }
-
-.login-btn:hover:not(:disabled) {
+.login-page .login-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 13px 28px rgba(238, 40, 91, 0.3);
+  box-shadow: 0 13px 28px rgba(16, 59, 45, 0.3);
 }
-
-.login-btn:active:not(:disabled) {
+.login-page .login-btn:active:not(:disabled) {
   transform: translateY(0);
 }
-
-.login-btn:disabled {
+.login-page .login-btn:disabled {
   cursor: not-allowed;
   opacity: 0.7;
   box-shadow: none;
 }
-
-.loading-spinner {
+.login-page .loading-spinner {
   width: 18px;
   height: 18px;
   border: 2px solid rgba(255, 255, 255, 0.45);
-  border-top-color: #ffffff;
+  border-top-color: #fffdf7;
   border-radius: 50%;
   animation: loginSpin 0.7s linear infinite;
 }
-
 /* ==================================================
    9. DIVIDER, BOTTOM LINKS & ANIMATIONS
    ================================================== */
-.login-divider {
+.login-page .login-divider {
   display: flex;
   align-items: center;
   gap: 12px;
   margin: 25px 0 20px;
-  color: #b0b6c2;
+  color: #82745d;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 2px;
 }
-
-.login-divider span:first-child,
-.login-divider span:last-child {
+.login-page .login-divider span:first-child,
+.login-page .login-divider span:last-child {
   flex: 1;
   height: 1px;
-  background: #eceef2;
+  background: #e5d6b8;
 }
-
-.login-footer-text {
+.login-page .login-footer-text {
   margin: 0;
-  color: #737b8c;
+  color: #625f53;
   font-size: 13px;
   text-align: center;
 }
-
-.switch-link {
+.login-page .switch-link {
   padding: 0;
   border: none;
   background: transparent;
-  color: #e83e61;
+  color: #176b55;
   font-size: inherit;
   font-weight: 800;
   cursor: pointer;
   transition: color 0.2s ease;
 }
-
-.switch-link:hover:not(:disabled) {
-  color: #bd174b;
+.login-page .switch-link:hover:not(:disabled) {
+  color: #103b2d;
   text-decoration: underline;
 }
-
-.switch-link:disabled {
+.login-page .switch-link:disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }
-
-.back-to-login {
+.login-page .back-to-login {
   display: block;
   margin: 18px auto 0;
   padding: 8px 12px;
@@ -447,21 +399,18 @@
   font-weight: 700;
   transition: color 0.2s ease, background 0.2s ease;
 }
-
-.back-to-login:hover:not(:disabled) {
+.login-page .back-to-login:hover:not(:disabled) {
   background: #f3f5ed;
   color: #a47b32;
   text-decoration: none;
 }
-
-.login-security-note {
+.login-page .login-security-note {
   margin: 18px 0 0;
-  color: #969dac;
+  color: #68665b;
   font-size: 11px;
   line-height: 1.7;
   text-align: center;
 }
-
 @keyframes loginFadeIn {
   from {
     opacity: 0;
@@ -472,13 +421,11 @@
     transform: translateY(0);
   }
 }
-
 @keyframes loginSpin {
   to {
     transform: rotate(360deg);
   }
 }
-
 /* ==================================================
    10. TABLET, MOBILE & ACCESSIBILITY
    ================================================== */
@@ -488,80 +435,81 @@
     min-height: calc(100dvh - 68px);
     padding: 32px 18px 42px;
   }
-
   .login-card {
     max-width: 450px;
     padding: 34px 30px 27px;
   }
 }
-
 @media (max-width: 480px) {
   .login-page {
     background-attachment: scroll;
   }
-
   .login-main {
     min-height: calc(100vh - 64px);
     min-height: calc(100dvh - 64px);
     padding: 24px 14px 34px;
   }
-
   .login-card {
     padding: 30px 21px 24px;
     border-radius: 23px;
   }
-
   .login-brand-icon {
     width: 66px;
     height: 66px;
     border-radius: 21px;
     font-size: 33px;
   }
-
   .login-title {
     font-size: 28px;
   }
-
   .login-subtitle {
     font-size: 13px;
   }
-
   .login-input {
     font-size: 13px;
   }
-
   .form-group {
     margin-bottom: 17px;
   }
-
   .login-security-note {
     font-size: 10px;
   }
 }
-
-.login-btn:focus-visible,
-.tab-btn:focus-visible,
-.password-toggle:focus-visible,
-.switch-link:focus-visible,
-.forgot-password-link:focus-visible,
-.back-to-login:focus-visible {
-  outline: 3px solid #ff8a65;
+.login-page .login-btn:focus-visible,
+.login-page .tab-btn:focus-visible,
+.login-page .password-toggle:focus-visible,
+.login-page .switch-link:focus-visible,
+.login-page .forgot-password-link:focus-visible,
+.login-page .back-to-login:focus-visible {
+  outline: 3px solid #a47b32;
   outline-offset: 3px;
 }
-
 @media (prefers-reduced-motion: reduce) {
   .login-card,
-  .loading-spinner {
+  .login-page .loading-spinner {
     animation: none;
   }
-
   .login-btn,
-  .tab-btn,
-  .input-wrapper,
-  .password-toggle,
-  .switch-link,
-  .forgot-password-link,
-  .back-to-login {
+  .login-page .tab-btn,
+  .login-page .input-wrapper,
+  .login-page .password-toggle,
+  .login-page .switch-link,
+  .login-page .forgot-password-link,
+  .login-page .back-to-login {
     transition: none;
   }
+}
+/* Premium typography and touch accessibility */
+.login-page .login-title { font-family: "Playfair Display", Georgia, serif; }
+.login-page .login-btn { background: linear-gradient(135deg, #103b2d, #246348); color: #fff8e9; border: 1px solid #b48b45; }
+.login-page .tab-btn.active { color: #ffe098; }
+.login-page .password-toggle { min-height: 44px; }
+@media (max-width: 480px) {
+  .login-page .login-input { font-size: 16px; }
+}
+@media (hover: none) {
+  .login-page .login-btn:active:not(:disabled) { transform: scale(.98); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .login-page .login-btn { transform: none !important; }
 }

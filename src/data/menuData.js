@@ -13,16 +13,25 @@ export const MENU_CATEGORIES = [
 
 export const menuData = [
   // MAIN COURSE
-  {
-    id: 1,
-    name: "Chicken Biryani",
-    type: "Non-Veg",
-    category: "Main Course",
-    price: 250,
-    spice: "Hot",
-    image: "/images/chicken-biryani.jpg",
-    description: "Aromatic biryani with traditional spices.",
-  },
+ {
+  id: 1,
+  name: "Hyderabadi Chicken Dum Biryani",
+  type: "Non-Veg",
+  category: "Main Course",
+  price: 250,
+  spice: "Hot",
+  image: "/images/chicken-biryani.jpg",
+  description:
+    "Slow-cooked aromatic basmati rice layered with tender chicken and traditional Hyderabadi spices.",
+
+  rating: 4.6,
+  reviewCount: 128,
+  preparationTime: 30,
+  bestseller: true,
+  chefSpecial: true,
+  available: true,
+  serves: 1,
+},
   {
     id: 2,
     name: "Paneer Butter Masala",

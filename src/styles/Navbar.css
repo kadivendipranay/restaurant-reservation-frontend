@@ -1,3 +1,4 @@
+/*Nabvar.css - Styles for the navigation bar component of the restaurant reservation frontend application.*/
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
 
 header.rdn-navbar, .rdn-navbar *, .rdn-navbar *::before, .rdn-navbar *::after { box-sizing: border-box; }
@@ -174,4 +175,261 @@ header.rdn-navbar .rdn-brand-name {
     animation: none !important;
     transition: none !important;
   }
+}
+
+
+
+/* ========================================
+   RESERVEDINE PREMIUM SHOPPING CART
+======================================== */
+
+.rdn-navbar .rdn-quick-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 12px;
+}
+
+header.rdn-navbar .rdn-cart-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid #b48b4577;
+  border-radius: 9px;
+  background: transparent;
+  color: #fff8e9;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+header.rdn-navbar .rdn-cart-link.has-items {
+  background: #efbf5b12;
+  border-color: #efbf5b;
+  color: #efbf5b;
+}
+
+.rdn-navbar .rdn-cart-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rdn-navbar .rdn-cart-count {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 4px;
+  border: 2px solid #101c16;
+  border-radius: 30px;
+  background: #efbf5b;
+  color: #101c16;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  animation: rdn-cart-pop 0.3s ease;
+}
+
+.rdn-navbar .rdn-cart-text {
+  white-space: nowrap;
+  margin-left: 2px;
+}
+
+@keyframes rdn-cart-pop {
+  0% {
+    transform: scale(0.65);
+  }
+
+  65% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* DESKTOP HOVER */
+
+@media (hover: hover) and (pointer: fine) {
+  header.rdn-navbar .rdn-cart-link:hover {
+    background: #efbf5b;
+    color: #101c16;
+    border-color: #efbf5b;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px #efbf5b30;
+  }
+}
+
+/* RESPONSIVE NAVIGATION */
+
+@media (max-width: 1400px) {
+  header.rdn-navbar {
+    min-height: 70px;
+    padding: 10px 18px;
+  }
+
+  .rdn-navbar .rdn-toggle {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    padding: 0;
+  }
+
+  .rdn-navbar .rdn-panel {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    padding: 18px;
+    background: #101c16;
+    border-bottom: 1px solid #b48b4577;
+    box-shadow: 0 16px 28px #0004;
+    max-height: calc(100vh - 70px);
+    max-height: calc(100dvh - 70px);
+    overflow-y: auto;
+  }
+
+  .rdn-navbar .rdn-panel.is-open {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    animation: rdn-enter 0.25s ease both;
+  }
+
+  .rdn-navbar .rdn-links {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  .rdn-navbar .rdn-link {
+    padding: 10px 8px;
+  }
+
+  .rdn-navbar .rdn-actions {
+    flex-wrap: wrap;
+    border-top: 1px solid #ffffff20;
+    padding-top: 14px;
+  }
+
+  .rdn-navbar .rdn-primary {
+    flex: 1 1 100%;
+  }
+
+  .rdn-navbar .rdn-account {
+    width: 100%;
+  }
+
+  .rdn-navbar .rdn-account-toggle {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .rdn-navbar .rdn-dropdown {
+    position: static;
+    margin-top: 8px;
+    min-width: 0;
+    box-shadow: none;
+  }
+}
+
+/* MOBILE CART */
+
+@media (max-width: 600px) {
+  header.rdn-navbar {
+    gap: 8px;
+    padding-inline: 12px;
+  }
+
+  .rdn-navbar .rdn-quick-actions {
+    gap: 8px;
+  }
+
+  header.rdn-navbar .rdn-cart-link {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+  }
+
+  .rdn-navbar .rdn-cart-text {
+    display: none;
+  }
+
+  .rdn-navbar .rdn-cart-count {
+    top: -7px;
+    right: -8px;
+  }
+}
+
+@media (max-width: 360px) {
+  header.rdn-navbar {
+    padding-inline: 8px;
+  }
+
+  header.rdn-navbar .rdn-brand-name {
+    font-size: 20px;
+  }
+
+  header.rdn-navbar .rdn-tagline {
+    font-size: 6px;
+    letter-spacing: 1px;
+  }
+
+  header.rdn-navbar .rdn-brand-icon {
+    width: 28px;
+  }
+
+  .rdn-navbar .rdn-quick-actions {
+    gap: 5px;
+  }
+}
+
+/* MOBILE TOUCH EFFECT */
+
+@media (hover: none) {
+  header.rdn-navbar .rdn-cart-link:active,
+  header.rdn-navbar .rdn-toggle:active {
+    transform: scale(0.93);
+    background: #efbf5b20;
+  }
+}
+
+/* ACCESSIBILITY */
+
+@media (prefers-reduced-motion: reduce) {
+  .rdn-navbar .rdn-cart-link,
+  .rdn-navbar .rdn-cart-count {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+header.rdn-navbar .rdn-cart-icon,
+header.rdn-navbar .rdn-cart-text,
+header.rdn-navbar .rdn-cart-icon svg {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
 }

@@ -1,28 +1,37 @@
-import { useState } from "react";
+//Login.jsx
+import { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import API from "../api/api";
 import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
 import "../styles/Login.css";
-
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 export default function Login() {
-  const [activeTab, setActiveTab] = useState("LOGIN");
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(() =>
+    new URLSearchParams(location.search).get("tab") === "register"
+      ? "REGISTER" : "LOGIN"
+  );
   const [forgotPassword, setForgotPassword] = useState(false);
-
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
   const navigate = useNavigate();
   const { login } = useAuth();
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    setActiveTab(params.get("tab") === "register" ? "REGISTER" : "LOGIN");
+    setForgotPassword(false);
+    setError("");
+    setSuccess("");
+    setPassword("");
+    setShowPassword(false);
+  }, [location.search, location.key]);
 
   const clearMessages = () => {
     setError("");
@@ -31,26 +40,21 @@ export default function Login() {
 
   const switchTab = (tab) => {
     if (loading) return;
-
     setActiveTab(tab);
     setForgotPassword(false);
     clearMessages();
     setShowPassword(false);
     setPassword("");
   };
-
   const openForgotPassword = () => {
     if (loading) return;
-
     setForgotPassword(true);
     clearMessages();
     setPassword("");
     setShowPassword(false);
   };
-
   const backToLogin = () => {
     if (loading) return;
-
     setForgotPassword(false);
     setActiveTab("LOGIN");
     clearMessages();
@@ -61,26 +65,21 @@ export default function Login() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     clearMessages();
-
     const trimmedEmail = email.trim().toLowerCase();
-
     if (!trimmedEmail) {
       setError("Please enter your email address.");
       return;
     }
-
     if (!EMAIL_REGEX.test(trimmedEmail)) {
       setError("Please enter a valid email address.");
       return;
     }
-
     if (forgotPassword) {
       setLoading(true);
       try {
         await API.post("/auth/forgot-password", {
           email: trimmedEmail,
         });
-
         setSuccess(
           "If an account exists for this email, password reset instructions will be sent to you."
         );
@@ -95,64 +94,58 @@ export default function Login() {
       }
       return;
     }
-
     if (activeTab === "REGISTER" && !name.trim()) {
       setError("Please enter your full name.");
       return;
     }
-
     if (!password) {
       setError("Please enter your password.");
       return;
     }
-
     if (activeTab === "REGISTER" && password.length < 8) {
       setError("Password must contain at least 8 characters.");
       return;
     }
-
     setLoading(true);
-
     try {
       if (activeTab === "LOGIN") {
         const response = await API.post("/auth/login", {
           email: trimmedEmail,
           password,
         });
-
         const token = response.data?.token;
         if (!token) {
           throw new Error(
             "The server did not return an authentication token."
           );
         }
-
         const decoded = jwtDecode(token);
-
         if (decoded.exp && decoded.exp * 1000 <= Date.now()) {
           throw new Error(
             "The server returned an expired token. Please try again."
           );
         }
-
         const role = String(decoded.role || "").toUpperCase();
         if (role !== "ADMIN" && role !== "USER") {
           throw new Error(
             "Your account role is invalid. Please contact support."
           );
         }
-
         login(token);
-        navigate(role === "ADMIN" ? "/admin" : "/user", {
-          replace: true,
-        });
+        const from = location.state?.from;
+        const allowedReturnPaths = ["/user", "/checkout", "/food-recommendations"];
+        const destination = role === "ADMIN"
+          ? "/admin"
+          : allowedReturnPaths.includes(from?.pathname)
+            ? from.pathname + (from.search || "")
+            : "/user";
+        navigate(destination, { replace: true });
       } else {
         await API.post("/auth/register", {
           name: name.trim(),
           email: trimmedEmail,
           password,
         });
-
         setActiveTab("LOGIN");
         setForgotPassword(false);
         setName("");
@@ -177,15 +170,12 @@ export default function Login() {
   return (
     <div className="login-page">
       <Navbar />
-
       <main className="login-main">
         <section className="login-card" aria-labelledby="login-title">
           <div className="login-brand-icon" aria-hidden="true">
             {forgotPassword ? "🔑" : "🍽️"}
           </div>
-
           <p className="login-eyebrow">WELCOME TO RESERVEDINE</p>
-
           <h1 className="login-title" id="login-title">
             {forgotPassword
               ? "Reset Your Password"
@@ -193,7 +183,6 @@ export default function Login() {
                 ? "Welcome Back!"
                 : "Create Your Account"}
           </h1>
-
           <p className="login-subtitle">
             {forgotPassword
               ? "Enter your registered email address to receive password reset instructions."
@@ -201,7 +190,6 @@ export default function Login() {
                 ? "Sign in to manage your restaurant reservations."
                 : "Join us and make your next dining experience special."}
           </p>
-
           {!forgotPassword && (
             <div
               className="login-tabs"
@@ -220,7 +208,6 @@ export default function Login() {
               >
                 Sign In
               </button>
-
               <button
                 type="button"
                 role="tab"
@@ -235,31 +222,26 @@ export default function Login() {
               </button>
             </div>
           )}
-
           {error && (
             <div className="form-message error-message" role="alert">
               <span aria-hidden="true">⚠️</span>
               <span>{error}</span>
             </div>
           )}
-
           {success && (
             <div className="form-message success-message" role="status">
               <span aria-hidden="true">✅</span>
               <span>{success}</span>
             </div>
           )}
-
           <form id="login-form" onSubmit={handleSubmit} noValidate>
             {activeTab === "REGISTER" && !forgotPassword && (
               <div className="form-group">
                 <label htmlFor="register-name">Full Name</label>
-
                 <div className="input-wrapper">
                   <span className="input-icon" aria-hidden="true">
                     👤
                   </span>
-
                   <input
                     id="register-name"
                     className="login-input"
@@ -278,15 +260,12 @@ export default function Login() {
                 </div>
               </div>
             )}
-
             <div className="form-group">
               <label htmlFor="login-email">Email Address</label>
-
               <div className="input-wrapper">
                 <span className="input-icon" aria-hidden="true">
                   ✉️
                 </span>
-
                 <input
                   id="login-email"
                   className="login-input"
@@ -305,16 +284,13 @@ export default function Login() {
                 />
               </div>
             </div>
-
             {!forgotPassword && (
               <div className="form-group">
                 <label htmlFor="login-password">Password</label>
-
                 <div className="input-wrapper">
                   <span className="input-icon" aria-hidden="true">
                     🔒
                   </span>
-
                   <input
                     id="login-password"
                     className="login-input password-input"
@@ -338,7 +314,6 @@ export default function Login() {
                     required
                     maxLength={128}
                   />
-
                   <button
                     type="button"
                     className="password-toggle"
@@ -352,7 +327,6 @@ export default function Login() {
                     {showPassword ? "Hide" : "Show"}
                   </button>
                 </div>
-
                 {activeTab === "REGISTER" && (
                   <p className="input-hint">
                     Use at least 8 characters for your password.
@@ -360,7 +334,6 @@ export default function Login() {
                 )}
               </div>
             )}
-
             {activeTab === "LOGIN" && !forgotPassword && (
               <div className="forgot-password-row">
                 <button
@@ -373,13 +346,11 @@ export default function Login() {
                 </button>
               </div>
             )}
-
             {!forgotPassword && activeTab === "LOGIN" && (
               <div className="login-extra">
                 <span>🔐 Secure authentication</span>
               </div>
             )}
-
             <button type="submit" className="login-btn" disabled={loading}>
               {loading ? (
                 <>
@@ -401,7 +372,6 @@ export default function Login() {
               )}
             </button>
           </form>
-
           {forgotPassword ? (
             <button
               type="button"
@@ -418,12 +388,10 @@ export default function Login() {
                 <span>RESERVEDINE</span>
                 <span />
               </div>
-
               <p className="login-footer-text">
                 {activeTab === "LOGIN"
                   ? "New to ReserveDine? "
                   : "Already have an account? "}
-
                 <button
                   type="button"
                   className="switch-link"
@@ -437,7 +405,6 @@ export default function Login() {
               </p>
             </>
           )}
-
           <p className="login-security-note">
             Your account access is protected by server-side authentication.
           </p>
